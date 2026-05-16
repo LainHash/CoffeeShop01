@@ -1,0 +1,115 @@
+@page
+@{
+    ViewData["Title"] = "Contact - KOPPEE Coffee Shop";
+    ViewData["ActivePage"] = "Contact";
+}
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Contact Us</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Home</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Contact</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Contact Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Contact Us</h4>
+            <h1 class="display-4">Get In Touch</h1>
+        </div>
+        <div class="row">
+            <!-- Contact Info -->
+            <div class="col-lg-4 mb-5 mb-lg-0">
+                <div class="d-flex flex-column mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Address</h6>
+                            <p class="m-0">123 Coffee Street, District 1, Ho Chi Minh City, Vietnam</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-phone-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Phone</h6>
+                            <p class="m-0">+84 028 123 4567</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Email</h6>
+                            <p class="m-0">hello@koppee.vn</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-clock"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Opening Hours</h6>
+                            <p class="m-0">Mon-Fri: 7:00 AM – 10:00 PM</p>
+                            <p class="m-0">Sat-Sun: 8:00 AM – 11:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow" style="border-radius: 16px;">
+                    <div class="card-body p-5">
+                        <h4 class="font-weight-bold mb-4">Send us a message</h4>
+                        <form>
+                            <div class="form-row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Your Name</label>
+                                        <input type="text" class="form-control p-3" placeholder="John Doe" required />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Your Email</label>
+                                        <input type="email" class="form-control p-3" placeholder="john@example.com" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="font-weight-bold">Subject</label>
+                                <input type="text" class="form-control p-3" placeholder="How can we help?" />
+                            </div>
+                            <div class="form-group">
+                                <label class="font-weight-bold">Message</label>
+                                <textarea class="form-control p-3" rows="5" placeholder="Write your message here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary font-weight-bold py-3 px-5">
+                                <i class="fa fa-paper-plane mr-2"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Contact End -->

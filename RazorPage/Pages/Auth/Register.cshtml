@@ -1,0 +1,195 @@
+@page
+@model RazorPage.Pages.Auth.RegisterModel
+@{
+    ViewData["Title"] = "Register - KOPPEE Coffee Shop";
+    ViewData["ActivePage"] = "Register";
+    Layout = "_Layout";
+}
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 300px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Register</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Home</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Register</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header text-center py-4" style="background: #33211d;">
+                    <h1 class="text-white m-0 display-4 text-uppercase">KOPPEE</h1>
+                    <p class="text-primary m-0 font-weight-bold">Create Your Account</p>
+                </div>
+                <div class="card-body p-5">
+                    @if (Model.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-circle mr-2"></i>@Model.ErrorMessage
+                        </div>
+                    }
+
+                    <form method="post" id="register-form">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label asp-for="Input.FullName" class="font-weight-bold">Full Name</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-user text-primary"></i>
+                                    </span>
+                                </div>
+                                <input asp-for="Input.FullName"
+                                       type="text"
+                                       class="form-control p-3"
+                                       placeholder="Your full name"
+                                       style="border-color: #d4a054;"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Input.Username" class="font-weight-bold">Username</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-at text-primary"></i>
+                                    </span>
+                                </div>
+                                <input asp-for="Input.Username"
+                                       type="text"
+                                       class="form-control p-3"
+                                       placeholder="Choose a username"
+                                       style="border-color: #d4a054;"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Input.Username" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Input.Email" class="font-weight-bold">Email</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-envelope text-primary"></i>
+                                    </span>
+                                </div>
+                                <input asp-for="Input.Email"
+                                       type="email"
+                                       class="form-control p-3"
+                                       placeholder="your@email.com"
+                                       style="border-color: #d4a054;"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Input.Phone" class="font-weight-bold">Phone Number</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-phone text-primary"></i>
+                                    </span>
+                                </div>
+                                <input asp-for="Input.Phone"
+                                       type="tel"
+                                       class="form-control p-3"
+                                       placeholder="+84 0XX XXX XXXX"
+                                       style="border-color: #d4a054;"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Input.Phone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Input.Password" class="font-weight-bold">Password</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-lock text-primary"></i>
+                                    </span>
+                                </div>
+                                <input asp-for="Input.Password"
+                                       type="password"
+                                       class="form-control p-3"
+                                       placeholder="Create a password (min. 6 chars)"
+                                       style="border-color: #d4a054;"
+                                       required
+                                       id="password-field" />
+                            </div>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Input.ConfirmPassword" class="font-weight-bold">Confirm Password</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-lock text-primary"></i>
+                                    </span>
+                                </div>
+                                <input asp-for="Input.ConfirmPassword"
+                                       type="password"
+                                       class="form-control p-3"
+                                       placeholder="Repeat your password"
+                                       style="border-color: #d4a054;"
+                                       required
+                                       id="confirm-field" />
+                            </div>
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                            <div id="pwd-match-msg" class="small mt-1"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block font-weight-bold py-3 mt-3" id="register-btn"
+                                style="border-radius: 8px; font-size: 1.1rem;">
+                            <i class="fa fa-user-plus mr-2"></i>Create Account
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <p class="mb-1">Already have an account?</p>
+                        <a asp-page="/Auth/Login" class="btn btn-outline-primary font-weight-bold py-2 px-4"
+                           style="border-radius: 8px;">
+                            <i class="fa fa-sign-in-alt mr-2"></i>Login Here
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Real-time password match check
+        document.getElementById('confirm-field').addEventListener('input', function () {
+            var pwd = document.getElementById('password-field').value;
+            var confirm = this.value;
+            var msg = document.getElementById('pwd-match-msg');
+            if (confirm.length === 0) {
+                msg.innerHTML = '';
+            } else if (pwd === confirm) {
+                msg.innerHTML = '<span class="text-success"><i class="fa fa-check mr-1"></i>Passwords match</span>';
+            } else {
+                msg.innerHTML = '<span class="text-danger"><i class="fa fa-times mr-1"></i>Passwords do not match</span>';
+            }
+        });
+
+        // Loading state on submit
+        document.getElementById('register-form').addEventListener('submit', function () {
+            document.getElementById('register-btn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Creating Account...';
+            document.getElementById('register-btn').disabled = true;
+        });
+    </script>
+}

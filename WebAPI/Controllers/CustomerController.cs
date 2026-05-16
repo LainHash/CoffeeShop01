@@ -1,4 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Accounts.Customers;
 using WebAPI.Services.Interfaces;
@@ -31,18 +30,8 @@ namespace WebAPI.Controllers
             return Ok(new
             {
                 success = true,
-                message = result.Message
-            });
-        }
-
-        [HttpPost("Logout")]
-        public async Task<IActionResult> Logout()
-        {
-            var result = await _customerService.LogoutAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message
+                message = result.Message,
+                customer = result.Customer   // trả data về để RazorPage lưu session
             });
         }
 

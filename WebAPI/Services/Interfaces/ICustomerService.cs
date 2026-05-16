@@ -1,4 +1,4 @@
-﻿using WebAPI.DTOs.Accounts.Customers;
+using WebAPI.DTOs.Accounts.Customers;
 using WebAPI.DTOs.Results;
 
 namespace WebAPI.Services.Interfaces
@@ -6,7 +6,6 @@ namespace WebAPI.Services.Interfaces
     public interface ICustomerService
     {
         Task<CustomerResult> LoginAsync(LoginDTO dto);
-        Task<CustomerResult> LogoutAsync();
         Task<CustomerResult> RegisterAsync(RegisterDTO dto);
     }
 }
