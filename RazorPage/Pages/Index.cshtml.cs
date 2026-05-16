@@ -53,13 +53,13 @@ namespace RazorPage.Pages
                 }
                 else
                 {
-                    ApiError = "Could not load products from API at this time.";
+                    ApiError = "Không thể tải danh sách sản phẩm từ API vào lúc này.";
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Failed to fetch products from WebAPI");
-                ApiError = "API service is currently unavailable. Showing static content.";
+                ApiError = "Dịch vụ API hiện không khả dụng. Đang hiển thị nội dung tĩnh.";
             }
         }
     }

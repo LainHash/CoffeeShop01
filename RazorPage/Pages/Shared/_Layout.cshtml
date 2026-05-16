@@ -36,18 +36,18 @@
             </button>
             <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                 <div class="navbar-nav ml-auto p-4">
-                    <a asp-page="/Index" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Index" ? "active" : "")">Home</a>
-                    <a asp-page="/About" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "About" ? "active" : "")">About</a>
-                    <a asp-page="/Service" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Service" ? "active" : "")">Service</a>
-                    <a asp-page="/Menu" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Menu" ? "active" : "")">Menu</a>
+                    <a asp-page="/Index" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Index" ? "active" : "")">Trang Chủ</a>
+                    <a asp-page="/About" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "About" ? "active" : "")">Giới Thiệu</a>
+                    <a asp-page="/Service" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Service" ? "active" : "")">Dịch Vụ</a>
+                    <a asp-page="/Menu" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Menu" ? "active" : "")">Thực Đơn</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle @(ViewData["ActivePage"]?.ToString() is "Reservation" or "Testimonial" ? "active" : "")" data-toggle="dropdown">Pages</a>
+                        <a href="#" class="nav-link dropdown-toggle @(ViewData["ActivePage"]?.ToString() is "Reservation" or "Testimonial" ? "active" : "")" data-toggle="dropdown">Trang</a>
                         <div class="dropdown-menu text-capitalize">
-                            <a asp-page="/Reservation" class="dropdown-item @(ViewData["ActivePage"]?.ToString() == "Reservation" ? "active" : "")">Reservation</a>
-                            <a asp-page="/Testimonial" class="dropdown-item @(ViewData["ActivePage"]?.ToString() == "Testimonial" ? "active" : "")">Testimonial</a>
+                            <a asp-page="/Reservation" class="dropdown-item @(ViewData["ActivePage"]?.ToString() == "Reservation" ? "active" : "")">Đặt Bàn</a>
+                            <a asp-page="/Testimonial" class="dropdown-item @(ViewData["ActivePage"]?.ToString() == "Testimonial" ? "active" : "")">Đánh Giá</a>
                         </div>
                     </div>
-                    <a asp-page="/Contact" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Contact" ? "active" : "")">Contact</a>
+                    <a asp-page="/Contact" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Contact" ? "active" : "")">Liên Hệ</a>
                     @if (Context.Session.GetString("CustomerEmail") != null)
                     {
                         <div class="nav-item dropdown ml-3">
@@ -56,7 +56,7 @@
                             </a>
                             <div class="dropdown-menu">
                                 <a asp-page="/Auth/Logout" class="dropdown-item text-danger">
-                                    <i class="fa fa-sign-out-alt mr-2"></i>Logout
+                                    <i class="fa fa-sign-out-alt mr-2"></i>Đăng xuất
                                 </a>
                             </div>
                         </div>
@@ -64,7 +64,7 @@
                     else
                     {
                         <a asp-page="/Auth/Login" class="btn btn-primary font-weight-bold ml-3">
-                            <i class="fa fa-sign-in-alt mr-1"></i>Login
+                            <i class="fa fa-sign-in-alt mr-1"></i>Đăng Nhập
                         </a>
                     }
                 </div>
@@ -79,14 +79,14 @@
     <div class="container-fluid footer text-white mt-5 pt-5 px-0 position-relative overlay-top">
         <div class="row mx-0 pt-5 px-sm-3 px-lg-5 mt-4">
             <div class="col-lg-3 col-md-6 mb-5">
-                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Get In Touch</h4>
-                <p><i class="fa fa-map-marker-alt mr-2"></i>123 Coffee Street, HCMC, Vietnam</p>
+                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Liên Hệ</h4>
+                <p><i class="fa fa-map-marker-alt mr-2"></i>123 Đường Cà Phê, Quận 1, TP. HCM</p>
                 <p><i class="fa fa-phone-alt mr-2"></i>+84 028 123 4567</p>
                 <p class="m-0"><i class="fa fa-envelope mr-2"></i>hello@koppee.vn</p>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Follow Us</h4>
-                <p>Stay connected for daily coffee inspiration and special offers.</p>
+                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Theo Dõi</h4>
+                <p>Luôn kết nối để nhận những cảm hứng cà phê và ưu đãi đặc biệt mỗi ngày.</p>
                 <div class="d-flex justify-content-start">
                     <a class="btn btn-lg btn-outline-light btn-lg-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
                     <a class="btn btn-lg btn-outline-light btn-lg-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
@@ -95,29 +95,29 @@
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Open Hours</h4>
+                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Giờ Mở Cửa</h4>
                 <div>
-                    <h6 class="text-white text-uppercase">Monday - Friday</h6>
+                    <h6 class="text-white text-uppercase">Thứ Hai - Thứ Sáu</h6>
                     <p>7:00 AM - 10:00 PM</p>
-                    <h6 class="text-white text-uppercase">Saturday - Sunday</h6>
+                    <h6 class="text-white text-uppercase">Thứ Bảy - Chủ Nhật</h6>
                     <p>8:00 AM - 11:00 PM</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Newsletter</h4>
-                <p>Subscribe to get the latest news and special offers.</p>
+                <h4 class="text-white text-uppercase mb-4" style="letter-spacing: 3px;">Bản Tin</h4>
+                <p>Đăng ký để nhận tin tức mới nhất và các ưu đãi đặc biệt.</p>
                 <div class="w-100">
                     <div class="input-group">
-                        <input type="text" class="form-control border-light" style="padding: 25px;" placeholder="Your Email">
+                        <input type="text" class="form-control border-light" style="padding: 25px;" placeholder="Email của bạn">
                         <div class="input-group-append">
-                            <button class="btn btn-primary font-weight-bold px-3">Sign Up</button>
+                            <button class="btn btn-primary font-weight-bold px-3">Đăng Ký</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="container-fluid text-center text-white border-top mt-4 py-4 px-sm-3 px-md-5" style="border-color: rgba(256, 256, 256, .1) !important;">
-            <p class="mb-0 text-white">&copy; 2026 <strong>KOPPEE Coffee Shop</strong>. All Rights Reserved.</p>
+            <p class="mb-0 text-white">&copy; 2026 <strong>Cửa hàng Cà phê KOPPEE</strong>. Bảo lưu mọi quyền.</p>
         </div>
     </div>
     <!-- Footer End -->

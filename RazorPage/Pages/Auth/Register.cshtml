@@ -9,11 +9,11 @@
 <!-- Page Header Start -->
 <div class="container-fluid page-header mb-5 position-relative overlay-bottom">
     <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 300px">
-        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Register</h1>
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Đăng Ký</h1>
         <div class="d-inline-flex mb-lg-5">
-            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Home</a></p>
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Trang Chủ</a></p>
             <p class="m-0 text-white px-2">/</p>
-            <p class="m-0 text-white">Register</p>
+            <p class="m-0 text-white">Đăng Ký</p>
         </div>
     </div>
 </div>
@@ -25,7 +25,7 @@
             <div class="card border-0 shadow" style="border-radius: 16px; overflow: hidden;">
                 <div class="card-header text-center py-4" style="background: #33211d;">
                     <h1 class="text-white m-0 display-4 text-uppercase">KOPPEE</h1>
-                    <p class="text-primary m-0 font-weight-bold">Create Your Account</p>
+                    <p class="text-primary m-0 font-weight-bold">Tạo Tài Khoản Của Bạn</p>
                 </div>
                 <div class="card-body p-5">
                     @if (Model.ErrorMessage != null)
@@ -49,7 +49,7 @@
                                 <input asp-for="Input.FullName"
                                        type="text"
                                        class="form-control p-3"
-                                       placeholder="Your full name"
+                                       placeholder="Họ và tên của bạn"
                                        style="border-color: #d4a054;"
                                        required />
                             </div>
@@ -67,7 +67,7 @@
                                 <input asp-for="Input.Username"
                                        type="text"
                                        class="form-control p-3"
-                                       placeholder="Choose a username"
+                                       placeholder="Chọn tên đăng nhập"
                                        style="border-color: #d4a054;"
                                        required />
                             </div>
@@ -121,7 +121,7 @@
                                 <input asp-for="Input.Password"
                                        type="password"
                                        class="form-control p-3"
-                                       placeholder="Create a password (min. 6 chars)"
+                                       placeholder="Tạo mật khẩu (tối thiểu 6 ký tự)"
                                        style="border-color: #d4a054;"
                                        required
                                        id="password-field" />
@@ -140,7 +140,7 @@
                                 <input asp-for="Input.ConfirmPassword"
                                        type="password"
                                        class="form-control p-3"
-                                       placeholder="Repeat your password"
+                                       placeholder="Nhập lại mật khẩu"
                                        style="border-color: #d4a054;"
                                        required
                                        id="confirm-field" />
@@ -150,18 +150,18 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block font-weight-bold py-3 mt-3" id="register-btn"
-                                style="border-radius: 8px; font-size: 1.1rem;">
-                            <i class="fa fa-user-plus mr-2"></i>Create Account
+                                 style="border-radius: 8px; font-size: 1.1rem;">
+                            <i class="fa fa-user-plus mr-2"></i>Tạo Tài Khoản
                         </button>
                     </form>
 
                     <hr class="my-4">
 
                     <div class="text-center">
-                        <p class="mb-1">Already have an account?</p>
+                        <p class="mb-1">Đã có tài khoản?</p>
                         <a asp-page="/Auth/Login" class="btn btn-outline-primary font-weight-bold py-2 px-4"
                            style="border-radius: 8px;">
-                            <i class="fa fa-sign-in-alt mr-2"></i>Login Here
+                            <i class="fa fa-sign-in-alt mr-2"></i>Đăng Nhập Tại Đây
                         </a>
                     </div>
                 </div>
@@ -180,15 +180,15 @@
             if (confirm.length === 0) {
                 msg.innerHTML = '';
             } else if (pwd === confirm) {
-                msg.innerHTML = '<span class="text-success"><i class="fa fa-check mr-1"></i>Passwords match</span>';
+                msg.innerHTML = '<span class="text-success"><i class="fa fa-check mr-1"></i>Mật khẩu khớp</span>';
             } else {
-                msg.innerHTML = '<span class="text-danger"><i class="fa fa-times mr-1"></i>Passwords do not match</span>';
+                msg.innerHTML = '<span class="text-danger"><i class="fa fa-times mr-1"></i>Mật khẩu không khớp</span>';
             }
         });
 
         // Loading state on submit
         document.getElementById('register-form').addEventListener('submit', function () {
-            document.getElementById('register-btn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Creating Account...';
+            document.getElementById('register-btn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Đang tạo tài khoản...';
             document.getElementById('register-btn').disabled = true;
         });
     </script>

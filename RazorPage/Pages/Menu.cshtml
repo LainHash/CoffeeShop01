@@ -8,11 +8,11 @@
 <!-- Page Header Start -->
 <div class="container-fluid page-header mb-5 position-relative overlay-bottom">
     <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
-        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Our Menu</h1>
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Thực Đơn</h1>
         <div class="d-inline-flex mb-lg-5">
-            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Home</a></p>
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Trang Chủ</a></p>
             <p class="m-0 text-white px-2">/</p>
-            <p class="m-0 text-white">Menu</p>
+            <p class="m-0 text-white">Thực Đơn</p>
         </div>
     </div>
 </div>
@@ -22,8 +22,8 @@
 <div class="container-fluid pt-5 pb-5">
     <div class="container">
         <div class="section-title">
-            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Menu &amp; Pricing</h4>
-            <h1 class="display-4">Competitive Pricing</h1>
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Thực Đơn & Giá Cả</h4>
+            <h1 class="display-4">Giá Cả Cạnh Tranh</h1>
         </div>
 
         @if (Model.ApiError != null)
@@ -38,7 +38,7 @@
         {
             <div class="d-flex flex-wrap justify-content-center mb-5" id="category-filter">
                 <button class="btn btn-primary font-weight-bold mx-2 mb-2 px-4 filter-btn active" data-cat="all">
-                    All
+                    Tất Cả
                 </button>
                 @foreach (var cat in Model.Categories)
                 {
@@ -67,7 +67,7 @@
                                 {
                                     <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
                                          style="top:0; left:0; background: rgba(0,0,0,0.5);">
-                                        <span class="badge badge-danger py-2 px-3" style="font-size:1rem;">Sold Out</span>
+                                        <span class="badge badge-danger py-2 px-3" style="font-size:1rem;">Hết Hàng</span>
                                     </div>
                                 }
                                 <div class="position-absolute" style="top: 15px; right: 15px;">
@@ -80,18 +80,18 @@
                                 <h5 class="card-title font-weight-bold mb-2">@product.ProductName</h5>
                                 <p class="card-text text-muted small mb-3">
                                     @(string.IsNullOrEmpty(product.Description)
-                                        ? "A delicious blend crafted with the finest coffee beans."
+                                        ? "Một sự kết hợp ngon miệng được chế biến từ những hạt cà phê tốt nhất."
                                         : product.Description)
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         <i class="fa fa-box mr-1"></i>
-                                        @(product.UnitsInstock > 0 ? $"{product.UnitsInstock} in stock" : "Out of stock")
+                                        @(product.UnitsInstock > 0 ? $"{product.UnitsInstock} trong kho" : "Hết hàng")
                                     </small>
                                     @if (product.IsAvailable)
                                     {
                                         <a asp-page="/Reservation" class="btn btn-primary btn-sm font-weight-bold px-3">
-                                            Order Now
+                                            Đặt Ngay
                                         </a>
                                     }
                                 </div>
@@ -104,8 +104,8 @@
             {
                 <div class="col-12 text-center py-5">
                     <i class="fa fa-coffee fa-4x text-primary mb-4"></i>
-                    <h4>No products available at the moment.</h4>
-                    <p class="text-muted">Please check back soon.</p>
+                    <h4>Hiện tại không có sản phẩm nào.</h4>
+                    <p class="text-muted">Vui lòng quay lại sau.</p>
                 </div>
             }
         </div>
@@ -115,8 +115,8 @@
         {
             <div class="text-center mt-3 mb-3">
                 <small class="text-muted">
-                    Showing <strong>@Model.Products.Count</strong> products
-                    &mdash; <strong>@Model.Products.Count(p => p.IsAvailable)</strong> available
+                    Hiển thị <strong>@Model.Products.Count</strong> sản phẩm
+                    &mdash; <strong>@Model.Products.Count(p => p.IsAvailable)</strong> còn hàng
                 </small>
             </div>
         }

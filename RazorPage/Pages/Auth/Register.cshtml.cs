@@ -8,25 +8,25 @@ namespace RazorPage.Pages.Auth
 {
     public class RegisterInputModel
     {
-        [Required(ErrorMessage = "Full name is required")]
+        [Required(ErrorMessage = "Vui lòng nhập họ tên")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Username is required")]
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
         public string Username { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [Required(ErrorMessage = "Vui lòng nhập email")]
+        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Phone number is required")]
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         public string Phone { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required")]
-        [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
+        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Please confirm your password")]
-        [Compare("Password", ErrorMessage = "Passwords do not match")]
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
+        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 
@@ -62,7 +62,7 @@ namespace RazorPage.Pages.Auth
         {
             if (!ModelState.IsValid)
             {
-                ErrorMessage = "Please fix the errors below.";
+                ErrorMessage = "Vui lòng sửa các lỗi bên dưới.";
                 return Page();
             }
 
@@ -92,19 +92,19 @@ namespace RazorPage.Pages.Auth
 
                 if (result?.Success == true)
                 {
-                    TempData["SuccessMessage"] = "Account created successfully! Please log in.";
+                    TempData["SuccessMessage"] = "Tài khoản đã được tạo thành công! Vui lòng đăng nhập.";
                     return RedirectToPage("/Auth/Login");
                 }
                 else
                 {
-                    ErrorMessage = result?.Message ?? "Registration failed. Please try again.";
+                    ErrorMessage = result?.Message ?? "Đăng ký thất bại. Vui lòng thử lại.";
                     return Page();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Registration failed");
-                ErrorMessage = "Service unavailable. Please try again later.";
+                ErrorMessage = "Dịch vụ không khả dụng. Vui lòng thử lại sau.";
                 return Page();
             }
         }

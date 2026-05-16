@@ -7,6 +7,7 @@ namespace WebAPI.Mappings
     public class CustomerMP : Profile
     { 
         public CustomerMP() {
+            CreateMap<Customer, CustomerDTO>();
             CreateMap<RegisterDTO, Customer>();
         }
     }

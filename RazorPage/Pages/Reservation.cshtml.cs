@@ -6,14 +6,14 @@ namespace RazorPage.Pages
 {
     public class ReservationInputModel
     {
-        [Required(ErrorMessage = "Full name is required")]
+        [Required(ErrorMessage = "Vui lòng nhập họ tên")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [Required(ErrorMessage = "Vui lòng nhập email")]
+        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Phone number is required")]
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         public string Phone { get; set; } = string.Empty;
 
         public string? Date { get; set; }
@@ -47,13 +47,13 @@ namespace RazorPage.Pages
         {
             if (!ModelState.IsValid)
             {
-                ErrorMessage = "Please fill in all required fields correctly.";
+                ErrorMessage = "Vui lòng điền đầy đủ các thông tin bắt buộc.";
                 return Page();
             }
 
             // In a real scenario, you'd call the API here to save the reservation.
             // For now, we simulate a successful booking.
-            SuccessMessage = $"Thank you, {Input.FullName}! Your table for {Input.NumberOfGuests} person(s) has been reserved. We will confirm by email at {Input.Email}.";
+            SuccessMessage = $"Cảm ơn bạn, {Input.FullName}! Bàn cho {Input.NumberOfGuests} người đã được đặt thành công. Chúng tôi sẽ gửi email xác nhận đến {Input.Email}.";
 
             // Clear form after success
             Input = new ReservationInputModel();

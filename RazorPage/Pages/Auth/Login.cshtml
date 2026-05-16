@@ -9,11 +9,11 @@
 <!-- Page Header Start -->
 <div class="container-fluid page-header mb-5 position-relative overlay-bottom">
     <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 300px">
-        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Login</h1>
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Đăng Nhập</h1>
         <div class="d-inline-flex mb-lg-5">
-            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Home</a></p>
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Trang Chủ</a></p>
             <p class="m-0 text-white px-2">/</p>
-            <p class="m-0 text-white">Login</p>
+            <p class="m-0 text-white">Đăng Nhập</p>
         </div>
     </div>
 </div>
@@ -25,7 +25,7 @@
             <div class="card border-0 shadow" style="border-radius: 16px; overflow: hidden;">
                 <div class="card-header text-center py-4" style="background: #33211d;">
                     <h1 class="text-white m-0 display-4 text-uppercase">KOPPEE</h1>
-                    <p class="text-primary m-0 font-weight-bold">Welcome Back</p>
+                    <p class="text-primary m-0 font-weight-bold">Chào mừng quay trở lại</p>
                 </div>
                 <div class="card-body p-5">
                     @if (Model.ErrorMessage != null)
@@ -54,14 +54,14 @@
                                 <input asp-for="Input.Email"
                                        type="email"
                                        class="form-control p-3"
-                                       placeholder="Enter your email"
+                                       placeholder="Nhập email của bạn"
                                        style="border-color: #d4a054;"
                                        required />
                             </div>
                             <span asp-validation-for="Input.Email" class="text-danger small"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="Input.Password" class="font-weight-bold">Password</label>
+                            <label asp-for="Input.Password" class="font-weight-bold">Mật khẩu</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
@@ -71,7 +71,7 @@
                                 <input asp-for="Input.Password"
                                        type="password"
                                        class="form-control p-3"
-                                       placeholder="Enter your password"
+                                       placeholder="Nhập mật khẩu"
                                        style="border-color: #d4a054;"
                                        required
                                        id="password-field" />
@@ -85,18 +85,18 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block font-weight-bold py-3 mt-4" id="login-btn"
-                                style="border-radius: 8px; font-size: 1.1rem;">
-                            <i class="fa fa-sign-in-alt mr-2"></i>Login
+                                 style="border-radius: 8px; font-size: 1.1rem;">
+                            <i class="fa fa-sign-in-alt mr-2"></i>Đăng Nhập
                         </button>
                     </form>
 
                     <hr class="my-4">
 
                     <div class="text-center">
-                        <p class="mb-1">Don't have an account?</p>
+                        <p class="mb-1">Chưa có tài khoản?</p>
                         <a asp-page="/Auth/Register" class="btn btn-outline-primary font-weight-bold py-2 px-4"
                            style="border-radius: 8px;">
-                            <i class="fa fa-user-plus mr-2"></i>Register Now
+                            <i class="fa fa-user-plus mr-2"></i>Đăng Ký Ngay
                         </a>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
 
         // Loading state on submit
         document.getElementById('login-form').addEventListener('submit', function () {
-            document.getElementById('login-btn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Logging in...';
+            document.getElementById('login-btn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Đang đăng nhập...';
             document.getElementById('login-btn').disabled = true;
         });
     </script>

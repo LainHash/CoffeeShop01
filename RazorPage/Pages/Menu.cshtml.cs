@@ -46,13 +46,13 @@ namespace RazorPage.Pages
                 }
                 else
                 {
-                    ApiError = "Could not load products. Please try again later.";
+                    ApiError = "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Failed to fetch products");
-                ApiError = "API service unavailable. Showing placeholder content.";
+                ApiError = "Dịch vụ API hiện không khả dụng. Vui lòng quay lại sau.";
             }
 
             // Fetch categories

@@ -8,11 +8,11 @@
 <!-- Page Header Start -->
 <div class="container-fluid page-header mb-5 position-relative overlay-bottom">
     <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
-        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Reservation</h1>
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Đặt Bàn</h1>
         <div class="d-inline-flex mb-lg-5">
-            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Home</a></p>
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Trang Chủ</a></p>
             <p class="m-0 text-white px-2">/</p>
-            <p class="m-0 text-white">Reservation</p>
+            <p class="m-0 text-white">Đặt Bàn</p>
         </div>
     </div>
 </div>
@@ -26,20 +26,19 @@
                 <div class="col-lg-6 my-5 my-lg-0">
                     <div class="p-5">
                         <div class="mb-4">
-                            <h1 class="display-3 text-primary">30% OFF</h1>
-                            <h1 class="text-white">For Online Reservation</h1>
+                            <h1 class="display-3 text-primary">GIẢM 30%</h1>
+                            <h1 class="text-white">Khi Đặt Bàn Trực Tuyến</h1>
                         </div>
-                        <p class="text-white">Book your table online and enjoy exclusive discounts. Our team will confirm your reservation within 15 minutes.</p>
+                        <p class="text-white">Đặt bàn trực tuyến ngay để nhận ưu đãi hấp dẫn. Đội ngũ của chúng tôi sẽ xác nhận yêu cầu của bạn trong vòng 15 phút.</p>
                         <ul class="list-inline text-white m-0">
-                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Instant booking confirmation</li>
-                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>No cancellation fee</li>
-                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Exclusive member discounts</li>
+                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Xác nhận đặt bàn ngay lập tức</li>
+                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Không phí hủy bàn</li>
+                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Ưu đãi độc quyền cho thành viên</li>
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-6">
                     <div class="text-center p-5" style="background: rgba(51, 33, 29, .8);">
-                        <h1 class="text-white mb-4 mt-5">Book Your Table</h1>
+                        <h1 class="text-white mb-4 mt-5">Đặt Chỗ Của Bạn</h1>
 
                         @if (Model.SuccessMessage != null)
                         {
@@ -60,7 +59,7 @@
                                 <input asp-for="Input.FullName"
                                        type="text"
                                        class="form-control bg-transparent border-primary p-4 text-white"
-                                       placeholder="Your Full Name"
+                                       placeholder="Họ và Tên của bạn"
                                        required />
                                 <span asp-validation-for="Input.FullName" class="text-warning small"></span>
                             </div>
@@ -68,7 +67,7 @@
                                 <input asp-for="Input.Email"
                                        type="email"
                                        class="form-control bg-transparent border-primary p-4 text-white"
-                                       placeholder="Your Email"
+                                       placeholder="Email của bạn"
                                        required />
                                 <span asp-validation-for="Input.Email" class="text-warning small"></span>
                             </div>
@@ -76,7 +75,7 @@
                                 <input asp-for="Input.Phone"
                                        type="tel"
                                        class="form-control bg-transparent border-primary p-4 text-white"
-                                       placeholder="Your Phone Number"
+                                       placeholder="Số Điện Thoại"
                                        required />
                             </div>
                             <div class="form-group">
@@ -103,25 +102,25 @@
                                 <select asp-for="Input.NumberOfGuests"
                                         class="custom-select bg-transparent border-primary px-4 text-white"
                                         style="height: 49px;">
-                                    <option value="" disabled selected>Number of Guests</option>
-                                    <option value="1">1 Person</option>
-                                    <option value="2">2 Persons</option>
-                                    <option value="3">3 Persons</option>
-                                    <option value="4">4 Persons</option>
-                                    <option value="5">5 Persons</option>
-                                    <option value="6">6 Persons</option>
-                                    <option value="7">7+ Persons</option>
+                                    <option value="" disabled selected>Số Lượng Khách</option>
+                                    <option value="1">1 Người</option>
+                                    <option value="2">2 Người</option>
+                                    <option value="3">3 Người</option>
+                                    <option value="4">4 Người</option>
+                                    <option value="5">5 Người</option>
+                                    <option value="6">6 Người</option>
+                                    <option value="7">7+ Người</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <textarea asp-for="Input.Note"
                                           class="form-control bg-transparent border-primary p-4 text-white"
-                                          placeholder="Special requests (optional)"
+                                          placeholder="Yêu cầu đặc biệt (tùy chọn)"
                                           rows="3"></textarea>
                             </div>
                             <div>
                                 <button class="btn btn-primary btn-block font-weight-bold py-3" type="submit" id="submit-btn">
-                                    <i class="fa fa-calendar-check mr-2"></i>Book Now
+                                    <i class="fa fa-calendar-check mr-2"></i>Đặt Ngay
                                 </button>
                             </div>
                         </form>
@@ -148,7 +147,7 @@
 
             // Form submit loading state
             $('#reservation-form').on('submit', function () {
-                $('#submit-btn').html('<i class="fa fa-spinner fa-spin mr-2"></i>Processing...').prop('disabled', true);
+                $('#submit-btn').html('<i class="fa fa-spinner fa-spin mr-2"></i>Đang xử lý...').prop('disabled', true);
             });
         });
     </script>
