@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="RazorPage/RazorPage.csproj" Id="c05870b7-a8de-46fe-b641-c4aab3bf9895" />
   <Project Path="WebAPI/WebAPI.csproj" />
 </Solution>

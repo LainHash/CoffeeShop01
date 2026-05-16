@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.DTOs.Products;
+using WebAPI.DTOs.Products.Create;
+using WebAPI.DTOs.Products.Update;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -17,9 +20,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAll()
         {
-            var products = await _productsService.GetAllProductsAsync();
+            var products = await _productsService.GetAllAsync();
             return Ok(new
             {
                 success = true,
@@ -29,9 +32,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetOneProduct(Guid id)
+        public async Task<IActionResult> GetOne(Guid id)
         {
-            var result = await _productsService.GetOneProductAsync(id);
+            var result = await _productsService.GetOneAsync(id);
             if (!result.Success)
             {
                 return BadRequest(new
@@ -49,9 +52,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(CreateProductDTO dto)
+        public async Task<IActionResult> Create(CreateProductDTO dto, [FromServices] IValidator<CreateProductDTO> validator)
         {
-            var result = await _productsService.CreateProductAsync(dto);
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null)
+            {
+                return error;
+            }
+
+            var result = await _productsService.CreateAsync(dto);
             if (!result.Success)
             {
                 return BadRequest(new
@@ -69,9 +78,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductDTO dto)
+        public async Task<IActionResult> Update(Guid id, UpdateProductDTO dto, [FromServices] IValidator<UpdateProductDTO> validator)
         {
-            var result = await _productsService.UpdateProductAsync(id, dto);
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null)
+            {
+                return error;
+            }
+
+            var result = await _productsService.UpdateAsync(id, dto);
             if (!result.Success)
             {
                 return BadRequest(new
@@ -89,9 +104,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _productsService.DeleteProductAsync(id);
+            var result = await _productsService.DeleteAsync(id);
             if (!result.Success)
             {
                 return BadRequest(new

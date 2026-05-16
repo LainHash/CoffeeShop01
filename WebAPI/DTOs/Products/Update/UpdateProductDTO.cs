@@ -1,4 +1,4 @@
-﻿namespace WebAPI.DTOs.Products
+﻿namespace WebAPI.DTOs.Products.Update
 {
     public class UpdateProductDTO
     {

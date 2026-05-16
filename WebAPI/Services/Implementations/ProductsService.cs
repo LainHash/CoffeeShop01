@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs.Products;
+using WebAPI.DTOs.Products.Create;
+using WebAPI.DTOs.Products.Update;
+using WebAPI.DTOs.Results;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
@@ -18,7 +21,7 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<ProductDTO>> GetAllProductsAsync()
+        public async Task<List<ProductDTO>> GetAllAsync()
         {
             var products = await _context.Products
                 .Where(p => p.IsAvailable == true)
@@ -27,7 +30,7 @@ namespace WebAPI.Services.Implementations
             return dtos;
         }
 
-        public async Task<ProductResult> GetOneProductAsync(Guid id)
+        public async Task<ProductResult> GetOneAsync(Guid id)
         {
             var product = await _context.Products
                 .FirstOrDefaultAsync(p => p.PublicId == id);
@@ -42,7 +45,7 @@ namespace WebAPI.Services.Implementations
             return new ProductResult(true, "Lấy sản phẩm thành công", _mapper.Map<ProductDTO>(product));
         }
 
-        public async Task<ProductResult> CreateProductAsync(CreateProductDTO dto)
+        public async Task<ProductResult> CreateAsync(CreateProductDTO dto)
         {
             var product = _mapper.Map<Product>(dto);
             _context.Products.Add(product);
@@ -50,7 +53,7 @@ namespace WebAPI.Services.Implementations
             return new ProductResult(true, "Tạo sản phẩm thành công.", _mapper.Map<ProductDTO>(product));
         }
 
-        public async Task<ProductResult> UpdateProductAsync(Guid id, UpdateProductDTO dto)
+        public async Task<ProductResult> UpdateAsync(Guid id, UpdateProductDTO dto)
         {
             var product = await _context.Products
                 .FirstOrDefaultAsync(p => p.PublicId == id);
@@ -67,7 +70,7 @@ namespace WebAPI.Services.Implementations
             return new ProductResult(true, "Cập nhật sản phẩm thành công.", _mapper.Map<ProductDTO>(product));
         }
 
-        public async Task<ProductResult> DeleteProductAsync(Guid id)
+        public async Task<ProductResult> DeleteAsync(Guid id)
         {
             var product = await _context.Products
                 .FirstOrDefaultAsync(p => p.PublicId == id);

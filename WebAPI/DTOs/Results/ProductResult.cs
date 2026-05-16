@@ -1,4 +1,6 @@
-﻿namespace WebAPI.DTOs.Products
+﻿using WebAPI.DTOs.Products;
+
+namespace WebAPI.DTOs.Results
 {
     public class ProductResult
     {

@@ -1,4 +1,4 @@
-﻿namespace WebAPI.DTOs.Products
+﻿namespace WebAPI.DTOs.Products.Create
 {
     public class CreateProductDTO
     {

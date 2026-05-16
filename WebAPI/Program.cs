@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Services.Implementations;
@@ -10,6 +11,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Validator
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 //Auto Mapper
 builder.Services.AddAutoMapper(cfg =>
