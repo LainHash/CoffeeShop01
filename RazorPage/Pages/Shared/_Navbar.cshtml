@@ -1,0 +1,76 @@
+﻿@page
+@model RazorPage.Pages.Shared._NavbarModel
+@using RazorPage.Helpers.Constants.Sessions
+@using RazorPage.Helpers.Globals
+@{
+    var username = HttpContext.Session.GetString(AccountConstants.Username);
+}
+
+<!-- Navbar Start -->
+<div class="container-fluid p-0 nav-bar">
+    <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
+        <a asp-page="/Index" class="navbar-brand px-lg-4 m-0">
+            <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
+        </a>
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+            <div class="navbar-nav ml-auto p-4">
+                <a class="nav-item nav-link"
+                   asp-page="/Index">
+                    @RouteDisplayNames.HomePage
+                </a>
+                <a class="nav-item nav-link"
+                   asp-page="/About">
+                    @RouteDisplayNames.AboutPage
+                </a>
+                <a class="nav-item nav-link"
+                   asp-page="/Service">
+                    @RouteDisplayNames.Service
+                </a>
+                <a class="nav-item nav-link"
+                   asp-page="/Menu">
+                    @RouteDisplayNames.MenuPage
+                </a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle"
+                       data-toggle="dropdown">
+                        Trang
+                    </a>
+                    <div class="dropdown-menu text-capitalize">
+                        <a class="dropdown-item"
+                           asp-page="/Reservation">
+                            @RouteDisplayNames.ReservationPage
+                        </a>
+                        <a class="dropdown-item"
+                           asp-page="/Testimonial">
+                            @RouteDisplayNames.TestimonialPage
+                        </a>
+                    </div>
+                </div>
+                <a asp-page="/Contact" class="nav-item nav-link">Liên Hệ</a>
+                @if (username != null)
+                {
+                    <div class="nav-item dropdown ml-3">
+                        <a href="#" class="nav-link dropdown-toggle text-primary font-weight-bold" data-toggle="dropdown">
+                            <i class="fa fa-user mr-1"></i>@username
+                        </a>
+                        <div class="dropdown-menu">
+                            <a asp-page="/Auth/Logout" class="dropdown-item text-danger">
+                                <i class="fa fa-sign-out-alt mr-2"></i>@RouteDisplayNames.LogoutPage
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a asp-page="/Auth/Login" class="btn btn-primary font-weight-bold ml-3">
+                        <i class="fa fa-sign-in-alt mr-1"></i>@RouteDisplayNames.LoginPage
+                    </a>
+                }
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- Navbar End -->

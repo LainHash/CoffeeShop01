@@ -31,7 +31,27 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                customer = result.Customer   // trả data về để RazorPage lưu session
+                customer = result.Customer  
+            });
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetInfo(Guid id)
+        {
+            var result = await _customerService.GetInfoAsync(id);
+            if (!result.Success)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = result.Message
+                });
+            }
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                customer = result.Customer
             });
         }
 

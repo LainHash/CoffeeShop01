@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using RazorPage.Helpers.Constants.Sessions;
 using System.ComponentModel.DataAnnotations;
 
 namespace RazorPage.Pages
@@ -33,10 +34,9 @@ namespace RazorPage.Pages
 
         public void OnGet()
         {
-            // Pre-fill nếu đã đăng nhập
-            var email = HttpContext.Session.GetString("CustomerEmail");
-            var fullName = HttpContext.Session.GetString("CustomerFullName");
-            var phone = HttpContext.Session.GetString("CustomerPhone");
+            var email = HttpContext.Session.GetString(AccountConstants.Email);
+            var fullName = HttpContext.Session.GetString(AccountConstants.FullName);
+            var phone = HttpContext.Session.GetString(AccountConstants.Phone);
 
             if (email != null) Input.Email = email;
             if (fullName != null) Input.FullName = fullName;

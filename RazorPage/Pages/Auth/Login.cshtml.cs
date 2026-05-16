@@ -1,37 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
+using RazorPage.DTOs.Accounts.Customers;
+using RazorPage.Helpers.Constants.Sessions;
 using System.Text;
 using System.Text.Json;
 
 namespace RazorPage.Pages.Auth
 {
-    public class LoginInputModel
-    {
-        [Required(ErrorMessage = "Vui lòng nhập email")]
-        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
-        public string Email { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-        public string Password { get; set; } = string.Empty;
-    }
-
-    // Ánh xạ response trả về từ WebAPI
-    internal class LoginApiResponse
-    {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-        public CustomerInfo? Customer { get; set; }
-    }
-
-    internal class CustomerInfo
-    {
-        public Guid PublicId { get; set; }
-        public string FullName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-    }
 
     public class LoginModel : PageModel
     {
@@ -39,7 +14,7 @@ namespace RazorPage.Pages.Auth
         private readonly ILogger<LoginModel> _logger;
 
         [BindProperty]
-        public LoginInputModel Input { get; set; } = new();
+        public LoginDTO Input { get; set; } = new();
         public string? ErrorMessage { get; set; }
 
         public LoginModel(IHttpClientFactory httpClientFactory, ILogger<LoginModel> logger)
@@ -51,7 +26,7 @@ namespace RazorPage.Pages.Auth
         public IActionResult OnGet()
         {
             // Redirect nếu đã đăng nhập
-            if (HttpContext.Session.GetString("CustomerEmail") != null)
+            if (HttpContext.Session.GetString(AccountConstants.Email) != null)
                 return RedirectToPage("/Index");
             return Page();
         }
@@ -82,12 +57,17 @@ namespace RazorPage.Pages.Auth
 
                 if (result?.Success == true && result.Customer != null)
                 {
-                    // Lưu thông tin user vào Session của RazorPage
-                    HttpContext.Session.SetString("CustomerId", result.Customer.PublicId.ToString());
-                    HttpContext.Session.SetString("CustomerEmail", result.Customer.Email);
-                    HttpContext.Session.SetString("CustomerUsername", result.Customer.Username);
-                    HttpContext.Session.SetString("CustomerFullName", result.Customer.FullName);
-                    HttpContext.Session.SetString("CustomerPhone", result.Customer.Phone);
+                    var customer = result.Customer;
+                    HttpContext.Session
+                        .SetString(AccountConstants.CustomerId, customer.PublicId.ToString());
+                    HttpContext.Session
+                        .SetString(AccountConstants.Email, customer.Email);
+                    HttpContext.Session
+                        .SetString(AccountConstants.Username, customer.Username);
+                    HttpContext.Session
+                        .SetString(AccountConstants.FullName, customer.FullName);
+                    HttpContext.Session
+                        .SetString(AccountConstants.Phone, customer.Phone);
 
                     return RedirectToPage("/Index");
                 }

@@ -25,53 +25,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <!-- Navbar Start -->
-    <div class="container-fluid p-0 nav-bar">
-        <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
-            <a asp-page="/Index" class="navbar-brand px-lg-4 m-0">
-                <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
-            </a>
-            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                <div class="navbar-nav ml-auto p-4">
-                    <a asp-page="/Index" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Index" ? "active" : "")">Trang Chủ</a>
-                    <a asp-page="/About" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "About" ? "active" : "")">Giới Thiệu</a>
-                    <a asp-page="/Service" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Service" ? "active" : "")">Dịch Vụ</a>
-                    <a asp-page="/Menu" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Menu" ? "active" : "")">Thực Đơn</a>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle @(ViewData["ActivePage"]?.ToString() is "Reservation" or "Testimonial" ? "active" : "")" data-toggle="dropdown">Trang</a>
-                        <div class="dropdown-menu text-capitalize">
-                            <a asp-page="/Reservation" class="dropdown-item @(ViewData["ActivePage"]?.ToString() == "Reservation" ? "active" : "")">Đặt Bàn</a>
-                            <a asp-page="/Testimonial" class="dropdown-item @(ViewData["ActivePage"]?.ToString() == "Testimonial" ? "active" : "")">Đánh Giá</a>
-                        </div>
-                    </div>
-                    <a asp-page="/Contact" class="nav-item nav-link @(ViewData["ActivePage"]?.ToString() == "Contact" ? "active" : "")">Liên Hệ</a>
-                    @if (Context.Session.GetString("CustomerEmail") != null)
-                    {
-                        <div class="nav-item dropdown ml-3">
-                            <a href="#" class="nav-link dropdown-toggle text-primary font-weight-bold" data-toggle="dropdown">
-                                <i class="fa fa-user mr-1"></i>@Context.Session.GetString("CustomerFullName")
-                            </a>
-                            <div class="dropdown-menu">
-                                <a asp-page="/Auth/Logout" class="dropdown-item text-danger">
-                                    <i class="fa fa-sign-out-alt mr-2"></i>Đăng xuất
-                                </a>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <a asp-page="/Auth/Login" class="btn btn-primary font-weight-bold ml-3">
-                            <i class="fa fa-sign-in-alt mr-1"></i>Đăng Nhập
-                        </a>
-                    }
-                </div>
-            </div>
-        </nav>
-    </div>
-    <!-- Navbar End -->
+    <partial name="_Header" />
 
     @RenderBody()
 

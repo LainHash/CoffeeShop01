@@ -7,5 +7,6 @@ namespace WebAPI.Services.Interfaces
     {
         Task<CustomerResult> LoginAsync(LoginDTO dto);
         Task<CustomerResult> RegisterAsync(RegisterDTO dto);
+        Task<CustomerResult> GetInfoAsync(Guid id);
     }
 }

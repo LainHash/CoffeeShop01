@@ -34,9 +34,20 @@ namespace WebAPI.Services.Implementations
                 return new CustomerResult(false, "Email hoặc mật khẩu không đúng.");
             }
 
-            // Map thông tin customer để trả về cho client
-            var customerDto = _mapper.Map<CustomerDTO>(customer);
-            return new CustomerResult(true, "Đăng nhập thành công.", customerDto);
+            return new CustomerResult(true, "Đăng nhập thành công.", _mapper.Map<CustomerDTO>(customer));
+        }
+
+        public async Task<CustomerResult> GetInfoAsync(Guid id)
+        {
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.PublicId == id);
+
+            if (customer == null)
+            {
+                return new CustomerResult(false, "Tài khoản không tồn tại!");
+            }
+
+            return new CustomerResult(true, "Lấy thông tin tài khoản thành công.", _mapper.Map<CustomerDTO>(customer));
         }
 
         public async Task<CustomerResult> RegisterAsync(RegisterDTO dto)

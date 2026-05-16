@@ -1,48 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using RazorPage.DTOs.Accounts.Customers;
+using RazorPage.Helpers.Constants.Sessions;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json;
 
 namespace RazorPage.Pages.Auth
 {
-    public class RegisterInputModel
-    {
-        [Required(ErrorMessage = "Vui lòng nhập họ tên")]
-        public string FullName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
-        public string Username { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Vui lòng nhập email")]
-        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
-        public string Email { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
-        public string Phone { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
-        public string Password { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
-        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
-        public string ConfirmPassword { get; set; } = string.Empty;
-    }
-
-    internal class RegisterApiResponse
-    {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-    }
-
     public class RegisterModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<RegisterModel> _logger;
 
         [BindProperty]
-        public RegisterInputModel Input { get; set; } = new();
+        public RegisterDTO Input { get; set; } = new();
         public string? ErrorMessage { get; set; }
 
         public RegisterModel(IHttpClientFactory httpClientFactory, ILogger<RegisterModel> logger)
@@ -53,7 +25,7 @@ namespace RazorPage.Pages.Auth
 
         public IActionResult OnGet()
         {
-            if (HttpContext.Session.GetString("CustomerEmail") != null)
+            if (HttpContext.Session.GetString(AccountConstants.Email) != null)
                 return RedirectToPage("/Index");
             return Page();
         }

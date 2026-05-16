@@ -1,21 +1,18 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using RazorPage.DTOs.Categories;
+using RazorPage.DTOs.Products;
 using System.Text.Json;
 
 namespace RazorPage.Pages
 {
-    public class CategoryDto
-    {
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; } = string.Empty;
-    }
 
     public class MenuModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<MenuModel> _logger;
 
-        public List<ProductDto> Products { get; set; } = new();
-        public List<CategoryDto> Categories { get; set; } = new();
+        public List<ProductDTO> Products { get; set; } = new();
+        public List<CategoryDTO> Categories { get; set; } = new();
         public string? ApiError { get; set; }
 
         public MenuModel(IHttpClientFactory httpClientFactory, ILogger<MenuModel> logger)
@@ -28,7 +25,6 @@ namespace RazorPage.Pages
         {
             var client = _httpClientFactory.CreateClient("WebAPI");
 
-            // Fetch products
             try
             {
                 var productResponse = await client.GetAsync("/api/Product");
@@ -62,7 +58,7 @@ namespace RazorPage.Pages
                 if (catResponse.IsSuccessStatusCode)
                 {
                     var json = await catResponse.Content.ReadAsStringAsync();
-                    var categories = JsonSerializer.Deserialize<List<CategoryDto>>(json, new JsonSerializerOptions
+                    var categories = JsonSerializer.Deserialize<List<CategoryDTO>>(json, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
