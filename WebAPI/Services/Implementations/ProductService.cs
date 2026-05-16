@@ -10,12 +10,12 @@ using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services.Implementations
 {
-    public class ProductsService : IProductsService
+    public class ProductService : IProductService
     {
         private readonly CoffeeShopDbContext _context;
         private readonly IMapper _mapper;
 
-        public ProductsService(CoffeeShopDbContext context, IMapper mapper)
+        public ProductService(CoffeeShopDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

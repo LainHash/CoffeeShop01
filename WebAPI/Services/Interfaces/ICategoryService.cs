@@ -3,7 +3,7 @@ using WebAPI.DTOs.Results;
 
 namespace WebAPI.Services.Interfaces
 {
-    public interface ICategoriesService
+    public interface ICategoryService
     {
         Task<List<CategoryDTO>> GetAllAsync();
     }

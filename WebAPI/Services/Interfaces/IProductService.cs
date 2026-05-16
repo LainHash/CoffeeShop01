@@ -6,7 +6,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Services.Interfaces
 {
-    public interface IProductsService
+    public interface IProductService
     {
         Task<List<ProductDTO>> GetAllAsync();
         Task<ProductResult> GetOneAsync(Guid id);

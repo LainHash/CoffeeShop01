@@ -10,11 +10,11 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly IProductsService _productsService;
+        private readonly IProductService _productsService;
 
-        public ProductsController(IProductsService productsService)
+        public ProductController(IProductService productsService)
         {
             _productsService = productsService;
         }

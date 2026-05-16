@@ -31,11 +31,15 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddHttpContextAccessor();
+
 
 var myConnectionString = builder.Configuration.GetConnectionString("MyConnectString");
 builder.Services.AddDbContext<CoffeeShopDbContext>(option => option.UseSqlServer(myConnectionString));
 
-builder.Services.AddScoped<IProductsService, ProductsService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 

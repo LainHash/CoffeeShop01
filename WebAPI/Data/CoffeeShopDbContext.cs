@@ -44,7 +44,7 @@ public partial class CoffeeShopDbContext : DbContext
     {
         modelBuilder.Entity<Area>(entity =>
         {
-            entity.HasKey(e => e.AreaId).HasName("PK__Areas__70B82048A23593EA");
+            entity.HasKey(e => e.AreaId).HasName("PK__Areas__70B8204819B7CB47");
 
             entity.Property(e => e.AreaName).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(255);
@@ -52,7 +52,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0BF12EB7C5");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0BCCD8340B");
 
             entity.Property(e => e.CategoryName).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(255);
@@ -66,7 +66,6 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.HasIndex(e => e.Username, "UQ__Customer__536C85E40C349FFD").IsUnique();
 
-            entity.Property(e => e.ConfirmationToken).HasMaxLength(500);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -81,7 +80,6 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.TokenExpiry).HasColumnType("datetime");
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -117,7 +115,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCFC05C1C50");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF2EB59461");
 
             entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Note).HasMaxLength(255);
@@ -152,7 +150,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36C20A4E275");
+            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36CD1203DB3");
 
             entity.Property(e => e.LineTotal).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Quantity).HasDefaultValue(1);
@@ -171,7 +169,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A3810191A38");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A3810009DE9");
 
             entity.Property(e => e.Note).HasMaxLength(255);
             entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 2)");
@@ -192,14 +190,15 @@ public partial class CoffeeShopDbContext : DbContext
         {
             entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6CD22FC355F");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
             entity.Property(e => e.IsAvailable).HasDefaultValue(true);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ProductName).HasMaxLength(150);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.UnitsInstock).HasDefaultValue(0);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -209,7 +208,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => e.ReservationId).HasName("PK__Reservat__B7EE5F24A164447F");
+            entity.HasKey(e => e.ReservationId).HasName("PK__Reservat__B7EE5F24583A8EB4");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -234,9 +233,9 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<TableEntity>(entity =>
         {
-            entity.HasKey(e => e.TableId).HasName("PK__TableEnt__7D5F01EEAF885A52");
+            entity.HasKey(e => e.TableId).HasName("PK__TableEnt__7D5F01EE20E26DB1");
 
-            entity.HasIndex(e => e.TableCode, "UQ__TableEnt__896A4323F21978C0").IsUnique();
+            entity.HasIndex(e => e.TableCode, "UQ__TableEnt__896A432310E76BBC").IsUnique();
 
             entity.Property(e => e.Capacity).HasDefaultValue(2);
             entity.Property(e => e.IsActive).HasDefaultValue(true);

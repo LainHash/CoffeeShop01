@@ -7,7 +7,7 @@ using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services.Implementations
 {
-    public class CategoryService : ICategoriesService
+    public class CategoryService : ICategoryService
     {
         private readonly CoffeeShopDbContext _context;
         private readonly IMapper _mapper;
