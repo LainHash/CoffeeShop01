@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using RazorPage.Helpers.Constants.Sessions;
 using System.ComponentModel.DataAnnotations;
 
-namespace RazorPage.Pages
+namespace RazorPage.Pages.Order
 {
     public class ReservationInputModel
     {

@@ -22,12 +22,12 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productsService.GetAllAsync();
+            var result = await _productsService.GetAllAsync();
             return Ok(new
             {
                 success = true,
-                message = "Lấy danh sách sản phẩm thành công!",
-                list = products
+                message = result.Message,
+                list = result.Products
             });
         }
 

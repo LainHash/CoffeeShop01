@@ -5,6 +5,6 @@ namespace WebAPI.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<CategoryDTO>> GetAllAsync();
+        Task<CategoryResult> GetAllAsync();
     }
 }

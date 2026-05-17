@@ -18,8 +18,13 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var categories = await _categoryService.GetAllAsync();
-            return Ok(categories);
+            var result = await _categoryService.GetAllAsync();
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                categories = result.Categories
+            });
         }
     }
 }

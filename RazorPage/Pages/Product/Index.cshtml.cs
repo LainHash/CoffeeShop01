@@ -1,21 +1,21 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RazorPage.DTOs.Categories;
 using RazorPage.DTOs.Products;
 using System.Text.Json;
 
-namespace RazorPage.Pages
+namespace RazorPage.Pages.Product
 {
-
-    public class MenuModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ILogger<MenuModel> _logger;
+        private readonly ILogger<IndexModel> _logger;
 
         public List<ProductDTO> Products { get; set; } = new();
         public List<CategoryDTO> Categories { get; set; } = new();
         public string? ApiError { get; set; }
 
-        public MenuModel(IHttpClientFactory httpClientFactory, ILogger<MenuModel> logger)
+        public IndexModel(IHttpClientFactory httpClientFactory, ILogger<IndexModel> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;

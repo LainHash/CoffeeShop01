@@ -18,12 +18,11 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<CategoryDTO>> GetAllAsync()
+        public async Task<CategoryResult> GetAllAsync()
         {
             var categories = await _context.Categories
                 .ToListAsync();
-            var dtos = _mapper.Map<List<CategoryDTO>>(categories);
-            return dtos;
+            return new CategoryResult(true, "Lấy danh sách danh mục thành công.", _mapper.Map<List<CategoryDTO>>(categories));
         }
     }
 }

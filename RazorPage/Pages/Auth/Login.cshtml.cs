@@ -25,9 +25,10 @@ namespace RazorPage.Pages.Auth
 
         public IActionResult OnGet()
         {
-            // Redirect nếu đã đăng nhập
             if (HttpContext.Session.GetString(AccountConstants.Email) != null)
+            {
                 return RedirectToPage("/Index");
+            }
             return Page();
         }
 

@@ -1,5 +1,5 @@
-@page
-@model RazorPage.Pages.MenuModel
+﻿@page
+@model RazorPage.Pages.Product.IndexModel
 @{
     ViewData["Title"] = "Menu - KOPPEE Coffee Shop";
     ViewData["ActivePage"] = "Menu";
@@ -17,7 +17,6 @@
     </div>
 </div>
 <!-- Page Header End -->
-
 <!-- Menu Start -->
 <div class="container-fluid pt-5 pb-5">
     <div class="container">
@@ -59,7 +58,7 @@
                         <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
                             <div class="position-relative">
                                 <img class="card-img-top"
-                                     src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/img/menu-1.jpg" : product.ImageUrl)"
+                                     src="@(string.IsNullOrEmpty(product.ImageUrl) ? "~/img/menu-1.jpg" : product.ImageUrl)"
                                      alt="@product.ProductName"
                                      onerror="this.src='/img/menu-1.jpg'"
                                      style="height: 220px; object-fit: cover;">
@@ -123,7 +122,6 @@
     </div>
 </div>
 <!-- Menu End -->
-
 @section Scripts {
     <script>
         // Category filter

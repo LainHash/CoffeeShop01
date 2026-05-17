@@ -98,11 +98,13 @@ public partial class CoffeeShopDbContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF2EB59461");
 
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Note).HasMaxLength(255);
             entity.Property(e => e.OrderTime)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false)
