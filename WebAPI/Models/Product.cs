@@ -23,6 +23,8 @@ public partial class Product
 
     public DateTime? CreatedAt { get; set; }
 
+    public int? UnitsInStock { get; set; }
+
     public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();

@@ -34,6 +34,8 @@ public partial class CoffeeShopDbContext : DbContext
 
     public virtual DbSet<Reservation> Reservations { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<TableEntity> TableEntities { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -184,6 +186,7 @@ public partial class CoffeeShopDbContext : DbContext
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ProductName).HasMaxLength(150);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.UnitsInStock).HasDefaultValue(0);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -216,6 +219,12 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasConstraintName("FK_Reservations_Tables");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.RoleName).HasMaxLength(20);
+        });
+
         modelBuilder.Entity<TableEntity>(entity =>
         {
             entity.HasKey(e => e.TableId).HasName("PK__TableEnt__7D5F01EE20E26DB1");
@@ -241,15 +250,17 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.Property(e => e.UserId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(false);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .HasDefaultValue("Customer");
+            entity.Property(e => e.RoleId).HasDefaultValue(1);
             entity.Property(e => e.Username).HasMaxLength(100);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Users_Roles");
         });
 
         OnModelCreatingPartial(modelBuilder);
