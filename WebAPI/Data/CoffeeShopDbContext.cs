@@ -36,6 +36,8 @@ public partial class CoffeeShopDbContext : DbContext
 
     public virtual DbSet<TableEntity> TableEntities { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=localhost; Initial Catalog=CoffeeShopDb; Persist Security Info=True; User ID=sa; Password=123456; Trust Server Certificate=True;");
@@ -56,6 +58,7 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.Property(e => e.CategoryName).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
         });
 
         modelBuilder.Entity<Customer>(entity =>
@@ -64,53 +67,39 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.HasIndex(e => e.Phone, "IX_Customers").IsUnique();
 
-            entity.HasIndex(e => e.Username, "UQ__Customer__536C85E40C349FFD").IsUnique();
+            entity.HasIndex(e => e.UserId, "IX_Customers_1").IsUnique();
 
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsFixedLength();
             entity.Property(e => e.FullName).HasMaxLength(100);
-            entity.Property(e => e.PasswordHash)
-                .HasMaxLength(255)
-                .IsUnicode(false);
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+
+            entity.HasOne(d => d.User).WithOne(p => p.Customer)
+                .HasForeignKey<Customer>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Customers_Users");
         });
 
         modelBuilder.Entity<Employee>(entity =>
         {
             entity.HasKey(e => e.EmployeeId).HasName("PK__Employee__7AD04F11C2D61717");
 
-            entity.HasIndex(e => e.Email, "IX_Employees").IsUnique();
+            entity.HasIndex(e => e.UserId, "IX_Employees").IsUnique();
 
             entity.HasIndex(e => e.Phone, "IX_Employees_1").IsUnique();
 
-            entity.HasIndex(e => e.Username, "UQ__Employee__536C85E4481AFB86").IsUnique();
-
-            entity.Property(e => e.Email)
-                .HasMaxLength(50)
-                .IsUnicode(false);
             entity.Property(e => e.FullName).HasMaxLength(100);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.PasswordHash)
-                .HasMaxLength(255)
-                .IsUnicode(false);
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.Position).HasMaxLength(50);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+
+            entity.HasOne(d => d.User).WithOne(p => p.Employee)
+                .HasForeignKey<Employee>(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Employees_Users");
         });
 
         modelBuilder.Entity<Order>(entity =>
@@ -128,10 +117,6 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasDefaultValue("Open");
             entity.Property(e => e.SubTotal).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
-
-            entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK_Orders_Customers");
 
             entity.HasOne(d => d.Employee).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.EmployeeId)
@@ -252,6 +237,19 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasForeignKey(d => d.AreaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Tables_Areas");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Property(e => e.UserId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.IsActive).HasDefaultValue(false);
+            entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.Role)
+                .HasMaxLength(20)
+                .HasDefaultValue("Customer");
+            entity.Property(e => e.Username).HasMaxLength(100);
         });
 
         OnModelCreatingPartial(modelBuilder);

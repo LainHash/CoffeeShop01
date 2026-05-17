@@ -1,4 +1,4 @@
-﻿namespace WebAPI.DTOs.Accounts.Customers
+﻿namespace WebAPI.DTOs.Accounts
 {
     public class RegisterDTO
     {

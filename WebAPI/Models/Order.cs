@@ -9,8 +9,6 @@ public partial class Order
 
     public int TableId { get; set; }
 
-    public int? CustomerId { get; set; }
-
     public int EmployeeId { get; set; }
 
     public int? ReservationId { get; set; }
@@ -26,8 +24,6 @@ public partial class Order
     public decimal TotalAmount { get; set; }
 
     public string? Note { get; set; }
-
-    public virtual Customer? Customer { get; set; }
 
     public virtual Employee Employee { get; set; } = null!;
 

@@ -1,0 +1,150 @@
+@page
+@model RazorPage.Pages.MenuModel
+@{
+    ViewData["Title"] = "Menu - KOPPEE Coffee Shop";
+    ViewData["ActivePage"] = "Menu";
+}
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Thực Đơn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" asp-page="/Index">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Thực Đơn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Menu Start -->
+<div class="container-fluid pt-5 pb-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Thực Đơn & Giá Cả</h4>
+            <h1 class="display-4">Giá Cả Cạnh Tranh</h1>
+        </div>
+
+        @if (Model.ApiError != null)
+        {
+            <div class="alert alert-warning text-center">
+                <i class="fa fa-wifi mr-2"></i>@Model.ApiError
+            </div>
+        }
+
+        <!-- Category Filter -->
+        @if (Model.Categories.Any())
+        {
+            <div class="d-flex flex-wrap justify-content-center mb-5" id="category-filter">
+                <button class="btn btn-primary font-weight-bold mx-2 mb-2 px-4 filter-btn active" data-cat="all">
+                    Tất Cả
+                </button>
+                @foreach (var cat in Model.Categories)
+                {
+                    <button class="btn btn-outline-primary font-weight-bold mx-2 mb-2 px-4 filter-btn" data-cat="@cat.CategoryId">
+                        @cat.CategoryName
+                    </button>
+                }
+            </div>
+        }
+
+        <!-- Product Grid -->
+        <div class="row" id="products-container">
+            @if (Model.Products.Any())
+            {
+                @foreach (var product in Model.Products)
+                {
+                    <div class="col-lg-4 col-md-6 mb-5 product-card" data-cat="@product.CategoryId">
+                        <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                            <div class="position-relative">
+                                <img class="card-img-top"
+                                     src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/img/menu-1.jpg" : product.ImageUrl)"
+                                     alt="@product.ProductName"
+                                     onerror="this.src='/img/menu-1.jpg'"
+                                     style="height: 220px; object-fit: cover;">
+                                @if (!product.IsAvailable)
+                                {
+                                    <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
+                                         style="top:0; left:0; background: rgba(0,0,0,0.5);">
+                                        <span class="badge badge-danger py-2 px-3" style="font-size:1rem;">Hết Hàng</span>
+                                    </div>
+                                }
+                                <div class="position-absolute" style="top: 15px; right: 15px;">
+                                    <span class="badge badge-primary py-2 px-3" style="font-size: 0.95rem; border-radius: 20px;">
+                                        @product.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title font-weight-bold mb-2">@product.ProductName</h5>
+                                <p class="card-text text-muted small mb-3">
+                                    @(string.IsNullOrEmpty(product.Description)
+                                        ? "Không có mô tả."
+                                        : product.Description)
+                                </p>
+                                @* <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fa fa-box mr-1"></i>
+                                        @(product.UnitsInstock > 0 ? $"{product.UnitsInstock} trong kho" : "Hết hàng")
+                                    </small>
+                                    @if (product.IsAvailable)
+                                    {
+                                        <a asp-page="/Reservation" class="btn btn-primary btn-sm font-weight-bold px-3">
+                                            Đặt Ngay
+                                        </a>
+                                    }
+                                </div> *@
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else if (Model.ApiError == null)
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="fa fa-coffee fa-4x text-primary mb-4"></i>
+                    <h4>Hiện tại không có sản phẩm nào.</h4>
+                    <p class="text-muted">Vui lòng quay lại sau.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Stats -->
+        @if (Model.Products.Any())
+        {
+            <div class="text-center mt-3 mb-3">
+                <small class="text-muted">
+                    Hiển thị <strong>@Model.Products.Count</strong> sản phẩm
+                    &mdash; <strong>@Model.Products.Count(p => p.IsAvailable)</strong> còn hàng
+                </small>
+            </div>
+        }
+    </div>
+</div>
+<!-- Menu End -->
+
+@section Scripts {
+    <script>
+        // Category filter
+        document.querySelectorAll('.filter-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active', 'btn-primary');
+                    b.classList.add('btn-outline-primary');
+                });
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('active', 'btn-primary');
+
+                var cat = this.getAttribute('data-cat');
+                document.querySelectorAll('.product-card').forEach(function (card) {
+                    if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+}

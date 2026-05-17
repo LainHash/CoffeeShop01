@@ -1,27 +1,30 @@
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Accounts;
+using WebAPI.DTOs.Accounts.Managers;
+using WebAPI.Services.Implementations;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : ControllerBase
+    public class ManagerController : ControllerBase
     {
-        private readonly ICustomerService _customerService;
+        private readonly IManagerService _managerService;
 
-        public CustomerController(ICustomerService customerService)
+        public ManagerController(IManagerService managerService)
         {
-            _customerService = customerService;
+            _managerService = managerService;
         }
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDTO dto)
         {
-            var result = await _customerService.LoginAsync(dto);
+            var result = await _managerService.LoginAsync(dto);
             if (!result.Success)
             {
-                return Ok(new
+                return BadRequest(new
                 {
                     success = false,
                     message = result.Message
@@ -31,17 +34,17 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                customer = result.Customer  
+                manager = result.Manager
             });
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetInfo(Guid id)
         {
-            var result = await _customerService.GetInfoAsync(id);
+            var result = await _managerService.GetInfoAsync(id);
             if (!result.Success)
             {
-                return Ok(new
+                return BadRequest(new
                 {
                     success = false,
                     message = result.Message
@@ -51,28 +54,28 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                customer = result.Customer
+                manager = result.Manager
             });
         }
 
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterDTO dto)
+        [HttpPost("Create/Employee")]
+        public async Task<IActionResult> CreateEmployee(CreateEmployeeDTO dto)
         {
-            var result = await _customerService.RegisterAsync(dto);
-            if (!result.Success)
+            var result = await _managerService.CreateEmployeeAsync(dto); if (!result.Success)
             {
-                return Ok(new
+                return BadRequest(new
                 {
                     success = false,
-                    message = result.Message
+                    message = result.Message,
                 });
             }
             return Ok(new
             {
                 success = true,
                 message = result.Message,
-                customer = result.Customer
+                manager = result.Manager
             });
+
         }
     }
 }
