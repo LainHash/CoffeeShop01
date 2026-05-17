@@ -9,6 +9,8 @@ namespace WebAPI.Mappings
         public CustomerMP() {
             CreateMap<Customer, CustomerDTO>();
             CreateMap<RegisterDTO, Customer>();
+            CreateMap<RegisterDTO, User>();
+            CreateMap<User, AccountDTO>();
         }
     }
 }

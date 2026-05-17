@@ -7,7 +7,6 @@ namespace RazorPage.Pages.Auth
     {
         public IActionResult OnGet()
         {
-            // Chỉ xóa session phía RazorPage — API không cần biết
             HttpContext.Session.Clear();
 
             TempData["SuccessMessage"] = "Bạn đã đăng xuất thành công.";

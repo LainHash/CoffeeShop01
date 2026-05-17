@@ -1,9 +1,8 @@
-﻿@page
-@model RazorPage.Pages.Shared._NavbarModel
+@using Microsoft.AspNetCore.Http
 @using RazorPage.Helpers.Constants.Sessions
 @using RazorPage.Helpers.Globals
 @{
-    var username = HttpContext.Session.GetString(AccountConstants.Username);
+    var username = Context.Session.GetString(AccountConstants.Username);
 }
 
 <!-- Navbar Start -->
