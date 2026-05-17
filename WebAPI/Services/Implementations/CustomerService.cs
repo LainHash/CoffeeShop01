@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
+using WebAPI.DTOs.Accounts;
 using WebAPI.DTOs.Accounts.Customers;
 using WebAPI.DTOs.Results;
 using WebAPI.Models;
@@ -54,13 +55,15 @@ namespace WebAPI.Services.Implementations
 
         public async Task<CustomerResult> RegisterAsync(RegisterDTO dto)
         {
-            var existedEmail = await _context.Customers.AnyAsync(c => c.User.Email == dto.Email);
+            var query = _context.Customers
+                .Include(c => c.User);
+            var existedEmail = await query.AnyAsync(c => c.User.Email == dto.Email);
             if (existedEmail)
             {
                 return new CustomerResult(false, "Email này đã được sử dụng.");
             }
 
-            var existedUsername = await _context.Customers.AnyAsync(c => c.User.Username == dto.Username);
+            var existedUsername = await query.AnyAsync(c => c.User.Username == dto.Username);
             if (existedUsername)
             {
                 return new CustomerResult(false, "Username này đã được sử dụng.");
@@ -72,7 +75,7 @@ namespace WebAPI.Services.Implementations
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
-            return new CustomerResult(true, "Đăng ký thành công.");
+            return new CustomerResult(true, "Đăng ký thành công.", _mapper.Map<CustomerDTO>(customer));
         }
     }
 }

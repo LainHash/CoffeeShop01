@@ -15,7 +15,7 @@ public partial class Employee
 
     public string Phone { get; set; } = null!;
 
-    public string Position { get; set; } = null!;
+    public string? Position { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

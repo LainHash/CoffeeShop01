@@ -1,4 +1,4 @@
-using WebAPI.DTOs.Accounts.Customers;
+using WebAPI.DTOs.Accounts;
 using WebAPI.DTOs.Results;
 
 namespace WebAPI.Services.Interfaces

@@ -28,6 +28,7 @@ builder.Services.AddDbContext<CoffeeShopDbContext>(option => option.UseSqlServer
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
 
 var app = builder.Build();
 
