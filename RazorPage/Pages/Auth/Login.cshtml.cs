@@ -61,9 +61,9 @@ namespace RazorPage.Pages.Auth
                     HttpContext.Session
                         .SetString(AccountConstants.CustomerId, customer.PublicId.ToString());
                     HttpContext.Session
-                        .SetString(AccountConstants.Email, customer.Email);
+                        .SetString(AccountConstants.Email, customer.User.Email);
                     HttpContext.Session
-                        .SetString(AccountConstants.Username, customer.Username);
+                        .SetString(AccountConstants.Username, customer.User.Username);
                     HttpContext.Session
                         .SetString(AccountConstants.FullName, customer.FullName);
                     HttpContext.Session
