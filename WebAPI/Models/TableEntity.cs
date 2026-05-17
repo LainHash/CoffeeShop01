@@ -7,19 +7,19 @@ public partial class TableEntity
 {
     public int TableId { get; set; }
 
-    public string TableCode { get; set; } = null!;
+    public string Shape { get; set; } = null!;
 
-    public string TableName { get; set; } = null!;
+    public int TableNumber { get; set; }
 
-    public int AreaId { get; set; }
+    public int FloorNumber { get; set; }
 
-    public int Capacity { get; set; }
+    public int RecommendedCapacity { get; set; }
 
     public string Status { get; set; } = null!;
 
-    public bool IsActive { get; set; }
+    public bool? IsActive { get; set; }
 
-    public virtual Area Area { get; set; } = null!;
+    public int MaxCapacity { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

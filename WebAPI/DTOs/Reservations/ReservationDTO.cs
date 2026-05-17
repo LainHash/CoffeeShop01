@@ -6,7 +6,8 @@ namespace WebAPI.DTOs.Reservations
         public string CustomerFullName { get; set; } = string.Empty;
         public string CustomerPhone { get; set; } = string.Empty;
         public string? TableName { get; set; }
-        public string? AreaName { get; set; }
+        public int TableNumber { get; set; }
+        public int FloorNumber { get; set; }
         public DateTime ReservationTime { get; set; }
         public int NumberOfGuests { get; set; }
         public string Status { get; set; } = string.Empty;

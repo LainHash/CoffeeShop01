@@ -45,8 +45,8 @@ namespace WebAPI.Services.Implementations
             };
 
             var availableTable = await _context.TableEntities
-                .Where(t => t.IsActive && t.Status == "Available" && t.Capacity >= dto.NumberOfGuests)
-                .OrderBy(t => t.Capacity)
+                .Where(t => t.IsActive == true && t.Status == "Available" && t.RecommendedCapacity >= dto.NumberOfGuests)
+                .OrderBy(t => t.RecommendedCapacity)
                 .FirstOrDefaultAsync();
 
             if (availableTable == null)
@@ -60,7 +60,6 @@ namespace WebAPI.Services.Implementations
             await _context.Entry(reservation).Reference(r => r.Customer).LoadAsync();
             await _context.Entry(reservation.Customer).Reference(c => c.User).LoadAsync();
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
-            await _context.Entry(reservation.Table).Reference(t => t.Area).LoadAsync();
 
             return new ReservationResult(true, "Đặt bàn thành công! Chúng tôi sẽ xác nhận sớm.", _mapper.Map<ReservationDTO>(reservation));
         }
@@ -75,7 +74,7 @@ namespace WebAPI.Services.Implementations
 
             var reservations = await _context.Reservations
                 .Include(r => r.Customer).ThenInclude(c => c.User)
-                .Include(r => r.Table).ThenInclude(t => t.Area)
+                .Include(r => r.Table)
                 .Where(r => r.CustomerId == customer.CustomerId)
                 .OrderByDescending(r => r.ReservationTime)
                 .ToListAsync();
@@ -88,7 +87,7 @@ namespace WebAPI.Services.Implementations
         {
             var reservations = await _context.Reservations
                 .Include(r => r.Customer).ThenInclude(c => c.User)
-                .Include(r => r.Table).ThenInclude(t => t.Area)
+                .Include(r => r.Table)
                 .OrderByDescending(r => r.ReservationTime)
                 .ToListAsync();
 
@@ -100,7 +99,7 @@ namespace WebAPI.Services.Implementations
         {
             var reservation = await _context.Reservations
                 .Include(r => r.Customer).ThenInclude(c => c.User)
-                .Include(r => r.Table).ThenInclude(t => t.Area)
+                .Include(r => r.Table)
                 .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
 
             if (reservation == null)
@@ -117,7 +116,7 @@ namespace WebAPI.Services.Implementations
 
             var reservation = await _context.Reservations
                 .Include(r => r.Customer).ThenInclude(c => c.User)
-                .Include(r => r.Table).ThenInclude(t => t.Area)
+                .Include(r => r.Table)
                 .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
 
             if (reservation == null)
@@ -126,7 +125,7 @@ namespace WebAPI.Services.Implementations
             if (dto.TableId.HasValue)
             {
                 var table = await _context.TableEntities
-                    .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value && t.IsActive);
+                    .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value && t.IsActive == true);
 
                 if (table == null)
                     return new ReservationResult(false, "Bàn không tồn tại hoặc không hoạt động.");
@@ -141,7 +140,6 @@ namespace WebAPI.Services.Implementations
             await _context.SaveChangesAsync();
 
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
-            await _context.Entry(reservation.Table).Reference(t => t.Area).LoadAsync();
 
             return new ReservationResult(true, "Cập nhật đặt bàn thành công.", _mapper.Map<ReservationDTO>(reservation));
         }
