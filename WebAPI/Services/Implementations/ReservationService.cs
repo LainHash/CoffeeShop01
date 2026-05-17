@@ -19,12 +19,8 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // CREATE – Khách đặt bàn (chưa cần chọn bàn cụ thể)
-        // ──────────────────────────────────────────────────────────────
         public async Task<ReservationResult> CreateAsync(CreateReservationDTO dto)
         {
-            // Tìm customer theo PublicId
             var customer = await _context.Customers
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(c => c.PublicId == dto.CustomerPublicId);
@@ -32,26 +28,22 @@ namespace WebAPI.Services.Implementations
             if (customer == null)
                 return new ReservationResult(false, "Khách hàng không tồn tại.");
 
-            // Validate thời gian đặt bàn (phải ít nhất 30 phút trong tương lai)
             if (dto.ReservationTime <= DateTime.Now.AddMinutes(30))
                 return new ReservationResult(false, "Thời gian đặt bàn phải ít nhất 30 phút trong tương lai.");
 
-            // Validate số khách
             if (dto.NumberOfGuests <= 0)
                 return new ReservationResult(false, "Số lượng khách phải lớn hơn 0.");
 
             var reservation = new Reservation
             {
                 CustomerId = customer.CustomerId,
-                TableId    = 0,           // chưa gán bàn; admin sẽ gán khi xác nhận
+                TableId    = 0,          
                 ReservationTime = dto.ReservationTime,
                 NumberOfGuests  = dto.NumberOfGuests,
                 Note   = dto.Note,
                 Status = "Pending",
             };
 
-            // TableId không được là 0 (FK); dùng bàn placeholder hoặc bỏ ràng buộc FK
-            // Ở đây ta tìm bàn khả dụng đầu tiên có đủ chỗ để gán tạm, admin có thể đổi sau
             var availableTable = await _context.TableEntities
                 .Where(t => t.IsActive && t.Status == "Available" && t.Capacity >= dto.NumberOfGuests)
                 .OrderBy(t => t.Capacity)
@@ -65,7 +57,6 @@ namespace WebAPI.Services.Implementations
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();
 
-            // Reload đầy đủ thông tin để map sang DTO
             await _context.Entry(reservation).Reference(r => r.Customer).LoadAsync();
             await _context.Entry(reservation.Customer).Reference(c => c.User).LoadAsync();
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
@@ -74,9 +65,6 @@ namespace WebAPI.Services.Implementations
             return new ReservationResult(true, "Đặt bàn thành công! Chúng tôi sẽ xác nhận sớm.", _mapper.Map<ReservationDTO>(reservation));
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // GET BY CUSTOMER
-        // ──────────────────────────────────────────────────────────────
         public async Task<ReservationResult> GetByCustomerAsync(Guid customerPublicId)
         {
             var customer = await _context.Customers
@@ -96,9 +84,6 @@ namespace WebAPI.Services.Implementations
                 reservations: _mapper.Map<List<ReservationDTO>>(reservations));
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // GET ALL (admin)
-        // ──────────────────────────────────────────────────────────────
         public async Task<ReservationResult> GetAllAsync()
         {
             var reservations = await _context.Reservations
@@ -111,9 +96,6 @@ namespace WebAPI.Services.Implementations
                 reservations: _mapper.Map<List<ReservationDTO>>(reservations));
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // GET BY ID
-        // ──────────────────────────────────────────────────────────────
         public async Task<ReservationResult> GetByIdAsync(int reservationId)
         {
             var reservation = await _context.Reservations
@@ -127,9 +109,6 @@ namespace WebAPI.Services.Implementations
             return new ReservationResult(true, "Lấy thông tin đặt bàn thành công.", _mapper.Map<ReservationDTO>(reservation));
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // UPDATE (admin: xác nhận / huỷ / hoàn thành & gán bàn)
-        // ──────────────────────────────────────────────────────────────
         public async Task<ReservationResult> UpdateAsync(int reservationId, UpdateReservationDTO dto)
         {
             var allowedStatuses = new[] { "Pending", "Confirmed", "Cancelled", "Completed" };
@@ -144,7 +123,6 @@ namespace WebAPI.Services.Implementations
             if (reservation == null)
                 return new ReservationResult(false, "Đặt bàn không tồn tại.");
 
-            // Gán bàn mới nếu được chỉ định
             if (dto.TableId.HasValue)
             {
                 var table = await _context.TableEntities
@@ -162,16 +140,12 @@ namespace WebAPI.Services.Implementations
             reservation.Status = dto.Status;
             await _context.SaveChangesAsync();
 
-            // Reload để trả về dữ liệu mới nhất
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
             await _context.Entry(reservation.Table).Reference(t => t.Area).LoadAsync();
 
             return new ReservationResult(true, "Cập nhật đặt bàn thành công.", _mapper.Map<ReservationDTO>(reservation));
         }
 
-        // ──────────────────────────────────────────────────────────────
-        // CANCEL BY CUSTOMER (chỉ khi còn Pending)
-        // ──────────────────────────────────────────────────────────────
         public async Task<ReservationResult> CancelAsync(int reservationId, Guid customerPublicId)
         {
             var reservation = await _context.Reservations
