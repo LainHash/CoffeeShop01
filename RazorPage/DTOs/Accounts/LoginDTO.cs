@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RazorPage.DTOs.Accounts.Customers
+namespace RazorPage.DTOs.Accounts
 {
     public class LoginDTO
     {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace RazorPage.Pages
+namespace RazorPage.Pages.Home
 {
     public class AboutModel : PageModel
     {

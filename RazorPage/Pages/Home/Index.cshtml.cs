@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using RazorPage.DTOs.Products;
 using System.Text.Json;
 
-namespace RazorPage.Pages
+namespace RazorPage.Pages.Home
 {
 
     public class IndexModel : PageModel

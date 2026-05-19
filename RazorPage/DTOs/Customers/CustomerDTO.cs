@@ -1,4 +1,6 @@
-namespace RazorPage.DTOs.Accounts.Customers
+using RazorPage.DTOs.Accounts;
+
+namespace RazorPage.DTOs.Customers
 {
     public class CustomerDTO
     {

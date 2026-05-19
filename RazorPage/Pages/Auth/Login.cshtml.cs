@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using RazorPage.DTOs.Accounts.Customers;
 using RazorPage.Helpers.Constants.Sessions;
 using System.Text;
 using System.Text.Json;
+using RazorPage.DTOs.Auth;
+using RazorPage.DTOs.Accounts;
 
 namespace RazorPage.Pages.Auth
 {
@@ -48,29 +49,41 @@ namespace RazorPage.Pages.Auth
                 var json = JsonSerializer.Serialize(payload);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await client.PostAsync("/api/Customer/Login", content);
+                var response = await client.PostAsync("/api/Auth/Login", content);
                 var responseBody = await response.Content.ReadAsStringAsync();
 
-                var result = JsonSerializer.Deserialize<LoginApiResponse>(responseBody, new JsonSerializerOptions
+                var result = JsonSerializer.Deserialize<AuthApiResponse>(responseBody, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                if (result?.Success == true && result.Customer != null)
+                if (response.IsSuccessStatusCode && result?.Success == true)
                 {
-                    var customer = result.Customer;
-                    HttpContext.Session
-                        .SetString(AccountConstants.CustomerId, customer.PublicId.ToString());
-                    HttpContext.Session
-                        .SetString(AccountConstants.Email, customer.User.Email);
-                    HttpContext.Session
-                        .SetString(AccountConstants.Username, customer.User.Username);
-                    HttpContext.Session
-                        .SetString(AccountConstants.FullName, customer.FullName);
-                    HttpContext.Session
-                        .SetString(AccountConstants.Phone, customer.Phone);
+                    HttpContext.Session.SetInt32(AccountConstants.RoleId, result.RoleId);
 
-                    return RedirectToPage("/Index");
+                    if (result.RoleId == 1 && result.Customer != null)
+                    {
+                        var customer = result.Customer;
+                        HttpContext.Session.SetString(AccountConstants.CustomerId, customer.PublicId.ToString());
+                        HttpContext.Session.SetString(AccountConstants.Email, customer.Email);
+                        HttpContext.Session.SetString(AccountConstants.Username, customer.Username);
+                        HttpContext.Session.SetString(AccountConstants.FullName, customer.FullName);
+                        HttpContext.Session.SetString(AccountConstants.Phone, customer.Phone);
+
+                        return RedirectToPage("/Index");
+                    }
+                    else if (result.RoleId != 1 && result.Manager != null)
+                    {
+                        var manager = result.Manager;
+                        HttpContext.Session.SetString("ManagerId", manager.PublicId.ToString());
+                        HttpContext.Session.SetString(AccountConstants.Email, manager.Email);
+                        HttpContext.Session.SetString(AccountConstants.Username, manager.Username);
+                        HttpContext.Session.SetString(AccountConstants.FullName, manager.FullName);
+                        HttpContext.Session.SetString(AccountConstants.Phone, manager.Phone);
+                        HttpContext.Session.SetString("Position", manager.Position ?? "");
+
+                        return RedirectToPage("/Manager/POS");
+                    }
                 }
 
                 ErrorMessage = result?.Message ?? "Đăng nhập thất bại. Vui lòng thử lại.";

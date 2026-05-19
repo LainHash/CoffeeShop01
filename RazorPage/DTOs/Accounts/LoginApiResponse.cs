@@ -1,4 +1,6 @@
-﻿namespace RazorPage.DTOs.Accounts.Customers
+﻿using RazorPage.DTOs.Customers;
+
+namespace RazorPage.DTOs.Accounts
 {
     public class LoginApiResponse
     {

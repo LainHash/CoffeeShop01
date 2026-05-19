@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace RazorPage.Pages
+namespace RazorPage.Pages.Home
 {
-    public class ContactModel : PageModel
+    public class ServiceModel : PageModel
     {
         public void OnGet() { }
     }

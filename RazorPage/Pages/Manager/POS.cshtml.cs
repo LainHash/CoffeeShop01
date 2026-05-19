@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
 using System.Text;
+using RazorPage.DTOs.Manager;
 
 namespace RazorPage.Pages.Manager
 {
@@ -15,7 +16,7 @@ namespace RazorPage.Pages.Manager
         }
 
         public List<TableEntityDTO> Tables { get; set; } = new();
-        public List<ProductDTO> Products { get; set; } = new();
+        public List<POSProductDTO> Products { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
@@ -91,46 +92,5 @@ namespace RazorPage.Pages.Manager
                 if (prodJson?.List != null) Products = prodJson.List;
             }
         }
-    }
-
-    public class CreateOrderInput
-    {
-        public int TableId { get; set; }
-        public int EmployeeId { get; set; }
-        public string Status { get; set; } = "Pending";
-        public decimal DiscountAmount { get; set; } = 0;
-        public List<CreateOrderDetailInput> OrderDetails { get; set; } = new();
-    }
-
-    public class CreateOrderDetailInput
-    {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
-    }
-
-    public class TableResponse
-    {
-        public List<TableEntityDTO> List { get; set; } = new();
-    }
-
-    public class TableEntityDTO
-    {
-        public int TableId { get; set; }
-        public string Shape { get; set; } = "";
-        public int TableNumber { get; set; }
-        public int FloorNumber { get; set; }
-    }
-
-    public class ProductResponse
-    {
-        public List<ProductDTO> List { get; set; } = new();
-    }
-
-    public class ProductDTO
-    {
-        public int ProductId { get; set; }
-        public string ProductName { get; set; } = "";
-        public decimal Price { get; set; }
-        public string ImageUrl { get; set; } = "";
     }
 }

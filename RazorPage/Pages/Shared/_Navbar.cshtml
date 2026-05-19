@@ -8,7 +8,7 @@
 <!-- Navbar Start -->
 <div class="container-fluid p-0 nav-bar">
     <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
-        <a asp-page="/Index" class="navbar-brand px-lg-4 m-0">
+        <a asp-page="/" class="navbar-brand px-lg-4 m-0">
             <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
         </a>
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -17,15 +17,15 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
             <div class="navbar-nav ml-auto p-4">
                 <a class="nav-item nav-link"
-                   asp-page="/Index">
+                   asp-page="/">
                     @RouteDisplayNames.HomePage
                 </a>
                 <a class="nav-item nav-link"
-                   asp-page="/About">
+                   asp-page="/Home/About">
                     @RouteDisplayNames.AboutPage
                 </a>
                 <a class="nav-item nav-link"
-                   asp-page="/Service">
+                   asp-page="/Home/Service">
                     @RouteDisplayNames.Service
                 </a>
                 <a class="nav-item nav-link"
@@ -43,12 +43,12 @@
                             @RouteDisplayNames.ReservationPage
                         </a>
                         <a class="dropdown-item"
-                           asp-page="/Testimonial">
+                           asp-page="/Home/Testimonial">
                             @RouteDisplayNames.TestimonialPage
                         </a>
                     </div>
                 </div>
-                <a asp-page="/Contact" class="nav-item nav-link">Liên Hệ</a>
+                <a asp-page="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
                 @if (username != null)
                 {
                     <div class="nav-item dropdown ml-3">

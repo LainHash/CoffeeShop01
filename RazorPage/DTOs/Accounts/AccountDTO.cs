@@ -1,6 +1,6 @@
 using System;
 
-namespace RazorPage.DTOs.Accounts.Customers
+namespace RazorPage.DTOs.Accounts
 {
     public class AccountDTO
     {

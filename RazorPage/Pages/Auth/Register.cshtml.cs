@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using RazorPage.DTOs.Accounts.Customers;
+using RazorPage.DTOs.Accounts;
 using RazorPage.Helpers.Constants.Sessions;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
