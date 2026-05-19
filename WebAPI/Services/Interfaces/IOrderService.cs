@@ -1,4 +1,5 @@
-﻿using WebAPI.DTOs.Results;
+using WebAPI.DTOs.Results;
+using WebAPI.DTOs.Orders.Create;
 
 namespace WebAPI.Services.Interfaces
 {
@@ -6,5 +7,6 @@ namespace WebAPI.Services.Interfaces
     {
         Task<OrderResult> GetAllAsync();
         Task<OrderResult> GetOneAsync(Guid id);
+        Task<OrderResult> CreateAsync(CreateOrderDTO request);
     }
 }

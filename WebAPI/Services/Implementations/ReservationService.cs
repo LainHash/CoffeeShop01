@@ -26,21 +26,27 @@ namespace WebAPI.Services.Implementations
                 .FirstOrDefaultAsync(c => c.PublicId == dto.CustomerPublicId);
 
             if (customer == null)
+            {
                 return new ReservationResult(false, "Khách hàng không tồn tại.");
+            }
 
             if (dto.ReservationTime <= DateTime.Now.AddMinutes(30))
+            {
                 return new ReservationResult(false, "Thời gian đặt bàn phải ít nhất 30 phút trong tương lai.");
+            }
 
             if (dto.NumberOfGuests <= 0)
+            {
                 return new ReservationResult(false, "Số lượng khách phải lớn hơn 0.");
+            }
 
             var reservation = new Reservation
             {
                 CustomerId = customer.CustomerId,
-                TableId    = 0,          
+                TableId = 0,
                 ReservationTime = dto.ReservationTime,
-                NumberOfGuests  = dto.NumberOfGuests,
-                Note   = dto.Note,
+                NumberOfGuests = dto.NumberOfGuests,
+                Note = dto.Note,
                 Status = "Pending",
             };
 

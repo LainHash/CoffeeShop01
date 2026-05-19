@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.DTOs.Orders.Create;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -30,6 +31,36 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetOne(Guid id)
         {
             var result = await _orderService.GetOneAsync(id);
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = result.Message
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                order = result.Order
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateOrderDTO request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Dữ liệu không hợp lệ."
+                });
+            }
+
+            var result = await _orderService.CreateAsync(request);
             if (!result.Success)
             {
                 return BadRequest(new

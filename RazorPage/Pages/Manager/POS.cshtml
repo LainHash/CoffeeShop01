@@ -1,0 +1,166 @@
+@page
+@model RazorPage.Pages.Manager.POSModel
+@{
+    ViewData["Title"] = "Point of Sale (POS)";
+}
+
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Hệ thống POS</h4>
+            <h1 class="display-4">Tạo Hóa Đơn Mới</h1>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success">@Model.SuccessMessage</div>
+        }
+
+        <div class="row">
+            <!-- Products Selection -->
+            <div class="col-lg-8">
+                <h4 class="mb-4">Danh sách sản phẩm</h4>
+                <div class="row">
+                    @foreach (var p in Model.Products)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <img src="@p.ImageUrl" class="card-img-top" alt="@p.ProductName" style="height: 200px; object-fit: cover;">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">@p.ProductName</h5>
+                                    <p class="card-text font-weight-bold text-primary">@p.Price.ToString("N0") VNĐ</p>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-to-cart-btn" 
+                                            data-id="@p.ProductId" 
+                                            data-name="@p.ProductName" 
+                                            data-price="@p.Price">
+                                        <i class="fa fa-plus"></i> Thêm món
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Order Sidebar -->
+            <div class="col-lg-4">
+                <h4 class="mb-4">Chi tiết hóa đơn</h4>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form method="post" id="posForm">
+                            <div class="form-group">
+                                <label>Chọn bàn phục vụ</label>
+                                <select asp-for="Input.TableId" class="form-control" required>
+                                    <option value="">-- Chọn bàn --</option>
+                                    @foreach(var t in Model.Tables)
+                                    {
+                                        <option value="@t.TableId">Bàn @t.TableNumber (Tầng @t.FloorNumber)</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <hr />
+                            <h5 class="mb-3">Các món đã chọn</h5>
+                            <div id="cart-items">
+                                <p class="text-muted text-center empty-cart-msg">Chưa có món nào.</p>
+                                <!-- Cart items will be appended here by JS -->
+                            </div>
+
+                            <hr />
+                            <div class="d-flex justify-content-between font-weight-bold mb-3">
+                                <span>Tổng cộng:</span>
+                                <span id="cart-total" class="text-primary">0 VNĐ</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Giảm giá (VNĐ)</label>
+                                <input type="number" asp-for="Input.DiscountAmount" class="form-control" value="0" min="0" id="discount-input" />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block font-weight-bold py-3 mt-4" id="submitOrderBtn" disabled>XÁC NHẬN TẠO HÓA ĐƠN</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let cart = [];
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const submitBtn = document.getElementById('submitOrderBtn');
+            const emptyMsg = document.querySelector('.empty-cart-msg');
+            
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center empty-cart-msg">Chưa có món nào.</p>';
+                submitBtn.disabled = true;
+            } else {
+                submitBtn.disabled = false;
+                
+                cart.forEach((item, index) => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+
+                    const itemHtml = `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="my-0">${item.name}</h6>
+                                <small class="text-muted">${item.price.toLocaleString()} x ${item.quantity}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="mr-3">${itemTotal.toLocaleString()} đ</span>
+                                <button type="button" class="btn btn-sm btn-danger px-2 py-1 remove-item-btn" data-index="${index}">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            <!-- Hidden inputs to submit to ASP.NET Core -->
+                            <input type="hidden" name="Input.OrderDetails[${index}].ProductId" value="${item.id}" />
+                            <input type="hidden" name="Input.OrderDetails[${index}].Quantity" value="${item.quantity}" />
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            }
+
+            totalEl.innerText = total.toLocaleString() + ' VNĐ';
+
+            // Bind remove events
+            document.querySelectorAll('.remove-item-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.getAttribute('data-index'));
+                    cart.splice(idx, 1);
+                    updateCartUI();
+                });
+            });
+        }
+
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = parseInt(this.getAttribute('data-id'));
+                const name = this.getAttribute('data-name');
+                const price = parseFloat(this.getAttribute('data-price'));
+
+                const existingItem = cart.find(x => x.id === id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ id, name, price, quantity: 1 });
+                }
+
+                updateCartUI();
+            });
+        });
+    </script>
+}

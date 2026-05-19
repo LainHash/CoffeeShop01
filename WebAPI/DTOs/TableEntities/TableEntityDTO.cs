@@ -1,8 +1,8 @@
-﻿namespace WebAPI.DTOs.TableEntities
+namespace WebAPI.DTOs.TableEntities
 {
     public class TableEntityDTO
     {
-
+        public int TableId { get; set; }
         public string Shape { get; set; } = null!;
 
         public int TableNumber { get; set; }
