@@ -20,6 +20,8 @@ public partial class CoffeeShopDbContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
+    public virtual DbSet<Discount> Discounts { get; set; }
+
     public virtual DbSet<Employee> Employees { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
@@ -73,6 +75,18 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasConstraintName("FK_Customers_Users");
         });
 
+        modelBuilder.Entity<Discount>(entity =>
+        {
+            entity.HasIndex(e => e.DiscountCode, "IX_Discounts").IsUnique();
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.DiscountCode).HasMaxLength(50);
+            entity.Property(e => e.Type)
+                .HasMaxLength(20)
+                .HasDefaultValue("Flat");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+        });
+
         modelBuilder.Entity<Employee>(entity =>
         {
             entity.HasKey(e => e.EmployeeId).HasName("PK__Employee__7AD04F11C2D61717");
@@ -99,7 +113,7 @@ public partial class CoffeeShopDbContext : DbContext
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF2EB59461");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
-            entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.DiscountId).HasDefaultValue(0);
             entity.Property(e => e.Note).HasMaxLength(255);
             entity.Property(e => e.OrderTime)
                 .HasDefaultValueSql("(getdate())")

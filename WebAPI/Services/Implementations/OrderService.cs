@@ -81,7 +81,7 @@ namespace WebAPI.Services.Implementations
                 }
 
                 order.SubTotal = subTotal;
-                order.TotalAmount = order.SubTotal - order.DiscountAmount;
+                //order.TotalAmount = order.SubTotal - order.DiscountAmount;
 
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();

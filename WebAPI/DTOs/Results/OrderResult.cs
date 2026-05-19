@@ -3,31 +3,22 @@ using WebAPI.DTOs.Orders;
 
 namespace WebAPI.DTOs.Results
 {
-    public class OrderResult
+    public class OrderResult : ResultBase
     {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
 
         public OrderDTO? Order { get; set; }
         public List<OrderDTO>? Orders { get; set; }
 
-        public OrderResult(bool success, string message)
-        {
-            Success = success;
-            Message = message;
-        }
+        public OrderResult(bool success, string message) : base(success, message) { }
 
-        public OrderResult(bool success, string message, OrderDTO? order)
+
+        public OrderResult(bool success, string message, OrderDTO? order) : base(success, message)
         {
-            Success = success;
-            Message = message;
             Order = order;
         }
 
-        public OrderResult(bool success, string message, List<OrderDTO>? orders)
+        public OrderResult(bool success, string message, List<OrderDTO>? orders) : base(success, message)
         {
-            Success = success;
-            Message = message;
             Orders = orders;
         }
     }

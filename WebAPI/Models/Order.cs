@@ -21,7 +21,7 @@ public partial class Order
 
     public decimal SubTotal { get; set; }
 
-    public decimal DiscountAmount { get; set; }
+    public int? DiscountId { get; set; }
 
     public decimal TotalAmount { get; set; }
 

@@ -2,16 +2,12 @@ using WebAPI.DTOs.Accounts.Customers;
 
 namespace WebAPI.DTOs.Results
 {
-    public class CustomerResult
+    public class CustomerResult : ResultBase
     {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
         public CustomerDTO? Customer { get; set; }
 
-        public CustomerResult(bool success, string message, CustomerDTO? customer = null)
+        public CustomerResult(bool success, string message, CustomerDTO? customer = null) : base(success, message)
         {
-            Success = success;
-            Message = message;
             Customer = customer;
         }
     }

@@ -2,17 +2,12 @@
 
 namespace WebAPI.DTOs.Results
 {
-    public class ManagerResult
+    public class ManagerResult : ResultBase
     {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-
         public ManagerDTO? Manager { get; set; }
 
-        public ManagerResult(bool succes, string message, ManagerDTO? manager = null)
+        public ManagerResult(bool succes, string message, ManagerDTO? manager = null) : base(succes, message)
         {
-            Success = succes;
-            Message = message;
             Manager = manager;
         }
     }

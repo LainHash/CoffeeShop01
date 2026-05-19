@@ -3,32 +3,24 @@ using WebAPI.DTOs.TableEntities;
 
 namespace WebAPI.DTOs.Results
 {
-    public class TableResult
+    public class TableResult : ResultBase
     {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
         public TableEntityDTO? TableEntity { get; set; }
         public List<TableEntityDTO>? TableEntities { get; set; }
 
-        public TableResult(bool succes, string message)
+        public TableResult(bool succes, string message) : base(succes, message)
         {
-            Success = succes;
-            Message = message;
         }
 
         public TableResult(bool success, string message,
-            TableEntityDTO? table = null)
+            TableEntityDTO? table = null) : base(success, message)
         {
-            Success = success;
-            Message = message;
             TableEntity = table;
         }
 
         public TableResult(bool success, string message,
-            List<TableEntityDTO>? tables = null)
+            List<TableEntityDTO>? tables = null) : base(success, message)
         {
-            Success = success;
-            Message = message;
             TableEntities = tables;
         }
     }
