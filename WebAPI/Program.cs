@@ -32,6 +32,7 @@ builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IDiscountService, DiscountService>();
 
 var app = builder.Build();
 
