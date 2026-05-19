@@ -1,4 +1,4 @@
-﻿namespace WebAPI.DTOs.Orders.Create
+namespace WebAPI.DTOs.Orders.Create
 {
     public class CreateOrderDTO
     {
@@ -12,7 +12,7 @@
 
         public decimal SubTotal { get; set; }
 
-        public decimal DiscountAmount { get; set; }
+        public int? DiscountId { get; set; }
 
         public decimal TotalAmount { get; set; }
 

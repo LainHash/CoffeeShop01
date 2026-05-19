@@ -89,8 +89,22 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Giảm giá (VNĐ)</label>
-                                <input type="number" asp-for="Input.DiscountAmount" class="form-control" value="0" min="0" id="discount-input" />
+                                <label>Giảm giá</label>
+                                <select asp-for="Input.DiscountId" class="form-control" id="discount-select" onchange="updateCartUI()">
+                                    <option value="" data-type="none" data-value="0">-- Không có --</option>
+                                    @foreach (var d in Model.Discounts)
+                                    {
+                                        <option value="@d.DiscountId" data-type="@d.Type" data-value="@d.Value">
+                                            @d.DiscountCode - @(d.Type == "percent" ? d.Value + "%" : d.Value.ToString("N0") + " VNĐ")
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <hr />
+                            <div class="d-flex justify-content-between font-weight-bold mb-3">
+                                <span>Thành tiền:</span>
+                                <span id="final-total" class="text-danger h5">0 VNĐ</span>
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-block font-weight-bold py-3 mt-4" id="submitOrderBtn" disabled>XÁC NHẬN TẠO HÓA ĐƠN</button>
@@ -108,12 +122,14 @@
 
         function updateCartUI() {
             const container = document.getElementById('cart-items');
-            const totalEl = document.getElementById('cart-total');
+            const subtotalEl = document.getElementById('cart-total');
+            const finalTotalEl = document.getElementById('final-total');
             const submitBtn = document.getElementById('submitOrderBtn');
             const emptyMsg = document.querySelector('.empty-cart-msg');
+            const discountSelect = document.getElementById('discount-select');
             
             container.innerHTML = '';
-            let total = 0;
+            let subtotal = 0;
 
             if (cart.length === 0) {
                 container.innerHTML = '<p class="text-muted text-center empty-cart-msg">Chưa có món nào.</p>';
@@ -123,7 +139,7 @@
                 
                 cart.forEach((item, index) => {
                     const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
+                    subtotal += itemTotal;
 
                     const itemHtml = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -146,7 +162,24 @@
                 });
             }
 
-            totalEl.innerText = total.toLocaleString() + ' VNĐ';
+            subtotalEl.innerText = subtotal.toLocaleString() + ' VNĐ';
+
+            // Calculate Final Total
+            let finalTotal = subtotal;
+            if (discountSelect.selectedIndex > 0) {
+                const option = discountSelect.options[discountSelect.selectedIndex];
+                const type = option.getAttribute('data-type').toLowerCase();
+                const value = parseFloat(option.getAttribute('data-value'));
+
+                if (type === 'flat') {
+                    finalTotal -= value;
+                } else if (type === 'percent') {
+                    finalTotal -= subtotal * (value / 100.0);
+                }
+            }
+
+            if (finalTotal < 0) finalTotal = 0;
+            finalTotalEl.innerText = finalTotal.toLocaleString() + ' VNĐ';
 
             // Bind remove events
             document.querySelectorAll('.remove-item-btn').forEach(btn => {

@@ -81,8 +81,30 @@ namespace WebAPI.Services.Implementations
                 }
 
                 order.SubTotal = subTotal;
-                //order.TotalAmount = order.SubTotal - order.DiscountAmount;
+                
+                decimal discountAmount = 0;
+                if (order.DiscountId.HasValue)
+                {
+                    var discount = await _context.Discounts.FindAsync(order.DiscountId.Value);
+                    if (discount != null)
+                    {
+                        if (discount.Type.ToLower() == "flat")
+                        {
+                            discountAmount = (decimal)discount.Value;
+                        }
+                        else if (discount.Type.ToLower() == "percent")
+                        {
+                            discountAmount = subTotal * (decimal)(discount.Value / 100.0);
+                        }
+                    }
+                    else
+                    {
+                        return new OrderResult(false, "Mã giảm giá không tồn tại.");
+                    }
+                }
 
+                order.TotalAmount = order.SubTotal - discountAmount;
+                if (order.TotalAmount < 0) order.TotalAmount = 0;
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 

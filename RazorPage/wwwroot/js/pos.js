@@ -1,13 +1,15 @@
-﻿let cart = [];
+let cart = [];
 
 function updateCartUI() {
     const container = document.getElementById('cart-items');
-    const totalEl = document.getElementById('cart-total');
+    const subtotalEl = document.getElementById('cart-total');
+    const finalTotalEl = document.getElementById('final-total');
     const submitBtn = document.getElementById('submitOrderBtn');
     const emptyMsg = document.querySelector('.empty-cart-msg');
+    const discountSelect = document.getElementById('discount-select');
 
     container.innerHTML = '';
-    let total = 0;
+    let subtotal = 0;
 
     if (cart.length === 0) {
         container.innerHTML = '<p class="text-muted text-center empty-cart-msg">Chưa có món nào.</p>';
@@ -17,7 +19,7 @@ function updateCartUI() {
 
         cart.forEach((item, index) => {
             const itemTotal = item.price * item.quantity;
-            total += itemTotal;
+            subtotal += itemTotal;
 
             const itemHtml = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -40,7 +42,26 @@ function updateCartUI() {
         });
     }
 
-    totalEl.innerText = total.toLocaleString() + ' VNĐ';
+    subtotalEl.innerText = subtotal.toLocaleString() + ' VNĐ';
+
+    // Calculate Final Total
+    let finalTotal = subtotal;
+    if (discountSelect && discountSelect.selectedIndex > 0) {
+        const option = discountSelect.options[discountSelect.selectedIndex];
+        const type = option.getAttribute('data-type').toLowerCase();
+        const value = parseFloat(option.getAttribute('data-value'));
+
+        if (type === 'flat') {
+            finalTotal -= value;
+        } else if (type === 'percent') {
+            finalTotal -= subtotal * (value / 100.0);
+        }
+    }
+
+    if (finalTotal < 0) finalTotal = 0;
+    if (finalTotalEl) {
+        finalTotalEl.innerText = finalTotal.toLocaleString() + ' VNĐ';
+    }
 
     // Bind remove events
     document.querySelectorAll('.remove-item-btn').forEach(btn => {

@@ -17,6 +17,7 @@ namespace RazorPage.Pages.Manager
 
         public List<TableEntityDTO> Tables { get; set; } = new();
         public List<POSProductDTO> Products { get; set; } = new();
+        public List<POSDiscountDTO> Discounts { get; set; } = new();
 
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
@@ -45,9 +46,6 @@ namespace RazorPage.Pages.Manager
                 await LoadData();
                 return Page();
             }
-
-
-
 
             Input.Status = "Pending";
 
@@ -90,6 +88,14 @@ namespace RazorPage.Pages.Manager
                 var prodStr = await prodResp.Content.ReadAsStringAsync();
                 var prodJson = JsonSerializer.Deserialize<ProductResponse>(prodStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (prodJson?.List != null) Products = prodJson.List;
+            }
+
+            var discountResp = await client.GetAsync("/api/Discount");
+            if (discountResp.IsSuccessStatusCode)
+            {
+                var discountStr = await discountResp.Content.ReadAsStringAsync();
+                var discountJson = JsonSerializer.Deserialize<DiscountResponse>(discountStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (discountJson?.List != null) Discounts = discountJson.List;
             }
         }
     }

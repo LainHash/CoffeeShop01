@@ -7,7 +7,7 @@ namespace RazorPage.DTOs.Manager
         public int TableId { get; set; }
         public int EmployeeId { get; set; }
         public string Status { get; set; } = "Pending";
-        public decimal DiscountAmount { get; set; } = 0;
+        public int? DiscountId { get; set; }
         public List<CreateOrderDetailInput> OrderDetails { get; set; } = new();
     }
 
@@ -41,5 +41,18 @@ namespace RazorPage.DTOs.Manager
         public string ProductName { get; set; } = "";
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = "";
+    }
+
+    public class DiscountResponse
+    {
+        public List<POSDiscountDTO> List { get; set; } = new();
+    }
+
+    public class POSDiscountDTO
+    {
+        public int DiscountId { get; set; }
+        public string DiscountCode { get; set; } = "";
+        public string Type { get; set; } = "";
+        public double Value { get; set; }
     }
 }
