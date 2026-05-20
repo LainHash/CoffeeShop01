@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
 using System.Text;
 using RazorPage.DTOs.Manager;
+using RazorPage.Helpers.Constants.Orders;
 
 namespace RazorPage.Pages.Manager
 {
@@ -33,6 +34,16 @@ namespace RazorPage.Pages.Manager
 
         public async Task<IActionResult> OnPostAsync()
         {
+            var managerIdStr = HttpContext.Session.GetString("ManagerId");
+            if (string.IsNullOrEmpty(managerIdStr) || !Guid.TryParse(managerIdStr, out Guid managerId))
+            {
+                ErrorMessage = "Không tìm thấy thông tin nhân viên (chưa đăng nhập hoặc phiên hết hạn).";
+                await LoadData();
+                return Page();
+            }
+
+            Input.EmployeePublicId = managerId;
+
             if (Input.TableId == 0)
             {
                 ErrorMessage = "Vui lòng chọn bàn.";
@@ -47,7 +58,7 @@ namespace RazorPage.Pages.Manager
                 return Page();
             }
 
-            Input.Status = "Pending";
+            Input.Status = InvoiceStatuses.Unpaid;
 
             var client = _httpClientFactory.CreateClient("WebAPI");
             var json = JsonSerializer.Serialize(Input);

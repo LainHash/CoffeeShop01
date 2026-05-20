@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs.Orders;
 using WebAPI.DTOs.Orders.Create;
+using WebAPI.DTOs.Orders.Update;
 using WebAPI.DTOs.Results;
+using WebAPI.Helpers.Constants.Orders;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
@@ -33,7 +35,7 @@ namespace WebAPI.Services.Implementations
             var order = await _context.Orders
                 .Include(od => od.OrderDetails)
                 .FirstOrDefaultAsync(od => od.PublicId == id);
-            if (order == null) 
+            if (order == null)
             {
                 return new OrderResult(false, "Hóa đơn không tồn tại!");
             }
@@ -46,29 +48,30 @@ namespace WebAPI.Services.Implementations
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var table = await _context.TableEntities.FindAsync(request.TableId);
+                var table = await _context.TableEntities
+                    .FirstOrDefaultAsync(t => t.TableId == request.TableId);
                 if (table == null)
                 {
                     return new OrderResult(false, "Bàn không tồn tại.");
                 }
 
-                var employee = await _context.Employees.FindAsync(request.EmployeeId);
+                var employee = await _context.Employees
+                    .FirstOrDefaultAsync(e => e.PublicId == request.EmployeePublicId);
                 if (employee == null)
                 {
                     return new OrderResult(false, "Nhân viên không tồn tại.");
                 }
 
                 var order = _mapper.Map<Order>(request);
-                order.PublicId = Guid.NewGuid();
-                order.OrderTime = DateTime.UtcNow;
-                order.CreatedAt = DateTime.UtcNow;
+                order.EmployeeId = employee.EmployeeId;
 
                 decimal subTotal = 0;
                 if (order.OrderDetails != null)
                 {
                     foreach (var detail in order.OrderDetails)
                     {
-                        var product = await _context.Products.FindAsync(detail.ProductId);
+                        var product = await _context.Products
+                            .FirstOrDefaultAsync(p => p.ProductId == detail.ProductId);
                         if (product == null)
                         {
                             return new OrderResult(false, $"Sản phẩm có ID {detail.ProductId} không tồn tại.");
@@ -81,20 +84,20 @@ namespace WebAPI.Services.Implementations
                 }
 
                 order.SubTotal = subTotal;
-                
+
                 decimal discountAmount = 0;
                 if (order.DiscountId.HasValue)
                 {
                     var discount = await _context.Discounts.FindAsync(order.DiscountId.Value);
                     if (discount != null)
                     {
-                        if (discount.Type.ToLower() == "flat")
+                        if (discount.Type.ToLower() == DiscountType.Flat)
                         {
                             discountAmount = (decimal)discount.Value;
                         }
-                        else if (discount.Type.ToLower() == "percent")
+                        else if (discount.Type.ToLower() == DiscountType.Percent)
                         {
-                            discountAmount = subTotal * (decimal)(discount.Value / 100.0);
+                            discountAmount = subTotal * (decimal)(discount.Value);
                         }
                     }
                     else
@@ -118,6 +121,29 @@ namespace WebAPI.Services.Implementations
                 await transaction.RollbackAsync();
                 return new OrderResult(false, $"Lỗi khi tạo hóa đơn: {ex.Message}");
             }
+        }
+
+        public Task<OrderResult> UpdateAsync(Guid id, UpdateOrderDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<OrderResult> Checkout(Guid id, UpdateOrderDTO request, bool confirm)
+        {
+            var order = await _context.Orders
+                .Include(od => od.OrderDetails)
+                .FirstOrDefaultAsync(od => od.PublicId == id);
+
+            if (order == null)
+            {
+                return new OrderResult(false, "Hóa đơn không tồn tại!");
+            }
+
+            return new OrderResult(
+                confirm,
+                confirm ? "Thanh toán hóa đơn thành công" : "Hóa đơn đã bị hủy",
+                _mapper.Map<OrderDTO>(order)
+            );
         }
     }
 }

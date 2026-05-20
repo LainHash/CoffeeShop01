@@ -15,6 +15,7 @@ namespace WebAPI.Controllers
             _discountService = discountService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var result = await _discountService.GetAllAsync();

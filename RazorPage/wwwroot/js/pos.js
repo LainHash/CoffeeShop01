@@ -51,10 +51,10 @@ function updateCartUI() {
         const type = option.getAttribute('data-type').toLowerCase();
         const value = parseFloat(option.getAttribute('data-value'));
 
-        if (type === 'flat') {
+        if (type === 'Flat') {
             finalTotal -= value;
-        } else if (type === 'percent') {
-            finalTotal -= subtotal * (value / 100.0);
+        } else if (type === 'Percent') {
+            finalTotal -= subtotal * (value);
         }
     }
 

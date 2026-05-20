@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace RazorPage.DTOs.Manager
@@ -5,7 +6,7 @@ namespace RazorPage.DTOs.Manager
     public class CreateOrderInput
     {
         public int TableId { get; set; }
-        public int EmployeeId { get; set; }
+        public Guid EmployeePublicId { get; set; }
         public string Status { get; set; } = "Pending";
         public int? DiscountId { get; set; }
         public List<CreateOrderDetailInput> OrderDetails { get; set; } = new();

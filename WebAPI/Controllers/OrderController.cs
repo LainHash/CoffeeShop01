@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Orders.Create;
+using WebAPI.DTOs.Orders.Update;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -17,7 +18,8 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() {
+        public async Task<IActionResult> GetAll()
+        {
             var result = await _orderService.GetAllAsync();
             return Ok(new
             {
@@ -61,6 +63,27 @@ namespace WebAPI.Controllers
             }
 
             var result = await _orderService.CreateAsync(request);
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = result.Message
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                order = result.Order
+            });
+        }
+
+        [HttpPost("{id}/Checkout")]
+        public async Task<IActionResult> Checkout(Guid id, UpdateOrderDTO request, bool confirm)
+        {
+            var result = await _orderService.Checkout(id, request, confirm);
             if (!result.Success)
             {
                 return BadRequest(new

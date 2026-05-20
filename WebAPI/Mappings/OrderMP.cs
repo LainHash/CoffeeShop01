@@ -10,7 +10,8 @@ namespace WebAPI.Mappings
         public OrderMP() { 
             CreateMap<Order, OrderDTO>();
             CreateMap<OrderDetail, OrderDetailDTO>();
-            CreateMap<CreateOrderDTO, Order>();
+            CreateMap<CreateOrderDTO, Order>()
+                .ForMember(dest => dest.EmployeeId, opt => opt.Ignore());
             CreateMap<CreateOrderDetailDTO, OrderDetail>();
         }
     }

@@ -1,5 +1,6 @@
 @page
 @model RazorPage.Pages.Manager.POSModel
+@using RazorPage.Helpers.Constants.Orders
 @{
     ViewData["Title"] = "Point of Sale (POS)";
     Layout = "~/Pages/Shared/_Layout.cshtml";
@@ -45,9 +46,9 @@
                                 <div class="card-body text-center">
                                     <h5 class="card-title">@p.ProductName</h5>
                                     <p class="card-text font-weight-bold text-primary">@p.Price.ToString("N0") VNĐ</p>
-                                    <button type="button" class="btn btn-outline-primary btn-sm add-to-cart-btn" 
-                                            data-id="@p.ProductId" 
-                                            data-name="@p.ProductName" 
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-to-cart-btn"
+                                            data-id="@p.ProductId"
+                                            data-name="@p.ProductName"
                                             data-price="@p.Price">
                                         <i class="fa fa-plus"></i> Thêm món
                                     </button>
@@ -68,7 +69,7 @@
                                 <label>Chọn bàn phục vụ</label>
                                 <select asp-for="Input.TableId" class="form-control" required>
                                     <option value="">-- Chọn bàn --</option>
-                                    @foreach(var t in Model.Tables)
+                                    @foreach (var t in Model.Tables)
                                     {
                                         <option value="@t.TableId">Bàn @t.TableNumber (Tầng @t.FloorNumber)</option>
                                     }
@@ -90,12 +91,17 @@
 
                             <div class="form-group">
                                 <label>Giảm giá</label>
-                                <select asp-for="Input.DiscountId" class="form-control" id="discount-select" onchange="updateCartUI()">
+                                <select asp-for="Input.DiscountId"
+                                        class="form-control"
+                                        id="discount-select"
+                                        onchange="updateCartUI()">
                                     <option value="" data-type="none" data-value="0">-- Không có --</option>
                                     @foreach (var d in Model.Discounts)
                                     {
-                                        <option value="@d.DiscountId" data-type="@d.Type" data-value="@d.Value">
-                                            @d.DiscountCode - @(d.Type == "percent" ? d.Value + "%" : d.Value.ToString("N0") + " VNĐ")
+                                        <option value="@d.DiscountId"
+                                                data-type="@d.Type"
+                                                data-value="@d.Value">
+                                            @d.DiscountCode - @(d.Type == "Percent" ? d.Value * 100 + "%" : d.Value.ToString("N0") + " VNĐ")
                                         </option>
                                     }
                                 </select>
@@ -104,10 +110,17 @@
                             <hr />
                             <div class="d-flex justify-content-between font-weight-bold mb-3">
                                 <span>Thành tiền:</span>
-                                <span id="final-total" class="text-danger h5">0 VNĐ</span>
+                                <span id="final-total"
+                                      class="text-danger h5">
+                                    0 VNĐ
+                                </span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-block font-weight-bold py-3 mt-4" id="submitOrderBtn" disabled>XÁC NHẬN TẠO HÓA ĐƠN</button>
+                            <button type="submit"
+                                    class="btn btn-primary btn-block font-weight-bold py-3 mt-4"
+                                    id="submitOrderBtn" disabled>
+                                XÁC NHẬN TẠO HÓA ĐƠN
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -127,7 +140,7 @@
             const submitBtn = document.getElementById('submitOrderBtn');
             const emptyMsg = document.querySelector('.empty-cart-msg');
             const discountSelect = document.getElementById('discount-select');
-            
+
             container.innerHTML = '';
             let subtotal = 0;
 
@@ -136,7 +149,7 @@
                 submitBtn.disabled = true;
             } else {
                 submitBtn.disabled = false;
-                
+
                 cart.forEach((item, index) => {
                     const itemTotal = item.price * item.quantity;
                     subtotal += itemTotal;
@@ -171,10 +184,10 @@
                 const type = option.getAttribute('data-type').toLowerCase();
                 const value = parseFloat(option.getAttribute('data-value'));
 
-                if (type === 'flat') {
+                if (type === @DiscountType.Flat) {
                     finalTotal -= value;
-                } else if (type === 'percent') {
-                    finalTotal -= subtotal * (value / 100.0);
+                } else if (type === @DiscountType.Percent) {
+                    finalTotal -= subtotal * (value);
                 }
             }
 

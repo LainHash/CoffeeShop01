@@ -1,6 +1,6 @@
-namespace WebAPI.DTOs.Orders.Create
+﻿namespace WebAPI.DTOs.Orders.Update
 {
-    public class CreateOrderDTO
+    public class UpdateOrderDTO
     {
         public int TableId { get; set; }
 
@@ -18,6 +18,6 @@ namespace WebAPI.DTOs.Orders.Create
 
         public string? Note { get; set; }
 
-        public List<CreateOrderDetailDTO> OrderDetails { get; set; } = new List<CreateOrderDetailDTO>(); 
+        public List<UpdateOrderDetailDTO> OrderDetails { get; set; } = new List<UpdateOrderDetailDTO>();
     }
 }
