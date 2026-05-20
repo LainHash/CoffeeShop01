@@ -1,0 +1,193 @@
+@page
+@model RazorPage.Pages.Manager.OrdersModel
+@{
+    ViewData["Title"] = "Quản lý Hóa đơn";
+}
+<vc:page-header title="Quản lý Hóa đơn"></vc:page-header>
+
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+            <h1 class="display-4">Quản Lý Hóa Đơn</h1>
+            <span class="text-primary font-weight-bold">Danh sách hóa đơn của quán</span>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fa fa-exclamation-circle mr-2"></i> @Model.ErrorMessage
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <!-- Quick Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                    <div class="card-body">
+                        <i class="fa fa-receipt fa-2x text-primary mb-2"></i>
+                        <h5 class="text-muted font-weight-normal mb-1">Tổng Đơn Hàng</h5>
+                        <h3 class="font-weight-bold text-dark mb-0">@Model.Orders.Count</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                    <div class="card-body">
+                        <i class="fa fa-clock fa-2x text-warning mb-2"></i>
+                        <h5 class="text-muted font-weight-normal mb-1">Chưa Thanh Toán</h5>
+                        <h3 class="font-weight-bold text-warning mb-0">@Model.Orders.Count(o => o.Status == "Unpaid")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                    <div class="card-body">
+                        <i class="fa fa-check-circle fa-2x text-success mb-2"></i>
+                        <h5 class="text-muted font-weight-normal mb-1">Đã Thanh Toán</h5>
+                        <h3 class="font-weight-bold text-success mb-0">@Model.Orders.Count(o => o.Status == "Paid")</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                    <div class="card-body">
+                        <i class="fa fa-wallet fa-2x text-info mb-2"></i>
+                        <h5 class="text-muted font-weight-normal mb-1">Tổng Doanh Thu</h5>
+                        <h3 class="font-weight-bold text-info mb-0">@Model.Orders.Where(o => o.Status == "Paid").Sum(o => o.TotalAmount).ToString("N0") đ</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 text-white"><i class="fa fa-list mr-2 text-primary"></i>Danh Sách Hóa Đơn</h5>
+                <a href="/Manager/POS" class="btn btn-primary btn-sm rounded-pill"><i class="fa fa-plus mr-1"></i>Tạo Đơn (POS)</a>
+            </div>
+            <div class="card-body bg-light">
+                <!-- Search and Filter Bar -->
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0"><i class="fa fa-search text-muted"></i></span>
+                            </div>
+                            <input type="text" id="searchInput" class="form-control border-left-0" placeholder="Tìm theo Mã đơn, Bàn, Nhân viên..." />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <select id="statusFilter" class="form-control">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Unpaid">Chưa thanh toán</option>
+                            <option value="Paid">Đã thanh toán</option>
+                            <option value="Cancelled">Đã hủy</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover bg-white mb-0" id="ordersTable">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col" class="py-3">Mã Đơn</th>
+                                <th scope="col" class="py-3">Bàn</th>
+                                <th scope="col" class="py-3">Nhân Viên</th>
+                                <th scope="col" class="py-3">Trạng Thái</th>
+                                <th scope="col" class="py-3 text-right">Tổng Tiền</th>
+                                <th scope="col" class="py-3 text-center">Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Orders == null || !Model.Orders.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="fa fa-box-open fa-3x mb-3 text-light"></i>
+                                        <p class="mb-0">Chưa có hóa đơn nào trong hệ thống.</p>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var order in Model.Orders)
+                                {
+                                    <tr class="order-row" data-status="@order.Status">
+                                        <td class="font-weight-bold text-dark py-3">#@order.OrderId</td>
+                                        <td class="py-3">
+                                            @if (order.TableNumber > 0)
+                                            {
+                                                <span class="badge badge-light border px-2 py-1">Bàn @order.TableNumber (Tầng @order.FloorNumber)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td class="py-3 text-secondary">@order.EmployeeName</td>
+                                        <td class="py-3">
+                                            @if (order.Status == "Unpaid")
+                                            {
+                                                <span class="badge badge-warning text-dark px-3 py-1 font-weight-normal"><i class="fa fa-spinner fa-spin mr-1"></i>Chưa thanh toán</span>
+                                            }
+                                            else if (order.Status == "Paid")
+                                            {
+                                                <span class="badge badge-success px-3 py-1 font-weight-normal"><i class="fa fa-check mr-1"></i>Đã thanh toán</span>
+                                            }
+                                            else if (order.Status == "Cancelled")
+                                            {
+                                                <span class="badge badge-secondary px-3 py-1 font-weight-normal"><i class="fa fa-times mr-1"></i>Đã hủy</span>
+                                            }
+                                        </td>
+                                        <td class="font-weight-bold text-dark text-right py-3">@order.TotalAmount.ToString("N0") đ</td>
+                                        <td class="text-center py-3">
+                                            <div class="btn-group" role="group">
+                                                <a href="/Manager/Details?id=@order.PublicId" class="btn btn-outline-info btn-sm rounded-left" title="Xem chi tiết">
+                                                    <i class="fa fa-eye"></i> Xem chi tiết
+                                                </a>
+                                                @if (order.Status == "Unpaid")
+                                                {
+                                                    <a href="/Manager/Checkout?id=@order.PublicId" class="btn btn-primary btn-sm rounded-right" title="Thanh toán">
+                                                        <i class="fa fa-credit-card mr-1"></i> Thanh toán
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Live Search and Filter
+            $("#searchInput, #statusFilter").on("keyup change", function() {
+                var searchText = $("#searchInput").val().toLowerCase();
+                var statusVal = $("#statusFilter").val();
+
+                $(".order-row").each(function() {
+                    var rowText = $(this).text().toLowerCase();
+                    var rowStatus = $(this).attr("data-status");
+
+                    var matchesSearch = rowText.indexOf(searchText) > -1;
+                    var matchesStatus = statusVal === "" || rowStatus === statusVal;
+
+                    if (matchesSearch && matchesStatus) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -25,22 +25,46 @@ namespace WebAPI.Services.Implementations
         public async Task<OrderResult> GetAllAsync()
         {
             var orders = await _context.Orders
+                .Include(o => o.Table)
+                .Include(o => o.Employee)
                 .Include(od => od.OrderDetails)
+                    .ThenInclude(od => od.Product)
                 .ToListAsync();
-            return new OrderResult(true, "Lấy danh sách hóa đơn thành công", _mapper.Map<List<OrderDTO>>(orders));
+
+            var orderDtos = _mapper.Map<List<OrderDTO>>(orders);
+            foreach (var dto in orderDtos)
+            {
+                if (dto.DiscountId.HasValue && dto.DiscountId.Value > 0)
+                {
+                    var discount = await _context.Discounts.FindAsync(dto.DiscountId.Value);
+                    if (discount != null) dto.DiscountCode = discount.DiscountCode;
+                }
+            }
+
+            return new OrderResult(true, "Lấy danh sách hóa đơn thành công", orderDtos);
         }
 
         public async Task<OrderResult> GetOneAsync(Guid id)
         {
             var order = await _context.Orders
+                .Include(o => o.Table)
+                .Include(o => o.Employee)
                 .Include(od => od.OrderDetails)
+                    .ThenInclude(od => od.Product)
                 .FirstOrDefaultAsync(od => od.PublicId == id);
             if (order == null)
             {
                 return new OrderResult(false, "Hóa đơn không tồn tại!");
             }
 
-            return new OrderResult(true, "Lấy hóa đơn thành công", _mapper.Map<OrderDTO>(order));
+            var orderDto = _mapper.Map<OrderDTO>(order);
+            if (order.DiscountId.HasValue && order.DiscountId.Value > 0)
+            {
+                var discount = await _context.Discounts.FindAsync(order.DiscountId.Value);
+                if (discount != null) orderDto.DiscountCode = discount.DiscountCode;
+            }
+
+            return new OrderResult(true, "Lấy hóa đơn thành công", orderDto);
         }
 
         public async Task<OrderResult> CreateAsync(CreateOrderDTO request)
@@ -91,11 +115,11 @@ namespace WebAPI.Services.Implementations
                     var discount = await _context.Discounts.FindAsync(order.DiscountId.Value);
                     if (discount != null)
                     {
-                        if (discount.Type.ToLower() == DiscountType.Flat)
+                        if (discount.Type.Equals(DiscountType.Flat, StringComparison.OrdinalIgnoreCase))
                         {
                             discountAmount = (decimal)discount.Value;
                         }
-                        else if (discount.Type.ToLower() == DiscountType.Percent)
+                        else if (discount.Type.Equals(DiscountType.Percent, StringComparison.OrdinalIgnoreCase))
                         {
                             discountAmount = subTotal * (decimal)(discount.Value);
                         }
@@ -128,10 +152,13 @@ namespace WebAPI.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task<OrderResult> Checkout(Guid id, UpdateOrderDTO request, bool confirm)
+        public async Task<OrderResult> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null)
         {
             var order = await _context.Orders
+                .Include(o => o.Table)
+                .Include(o => o.Employee)
                 .Include(od => od.OrderDetails)
+                    .ThenInclude(od => od.Product)
                 .FirstOrDefaultAsync(od => od.PublicId == id);
 
             if (order == null)
@@ -139,10 +166,38 @@ namespace WebAPI.Services.Implementations
                 return new OrderResult(false, "Hóa đơn không tồn tại!");
             }
 
+            if (confirm)
+            {
+                order.Status = InvoiceStatuses.Paid;
+                
+                var payment = new Payment
+                {
+                    OrderId = order.OrderId,
+                    PaymentTime = DateTime.Now,
+                    PaymentMethod = paymentMethod,
+                    PaidAmount = order.TotalAmount,
+                    Note = note ?? "Thanh toán hóa đơn"
+                };
+                _context.Payments.Add(payment);
+            }
+            else
+            {
+                order.Status = InvoiceStatuses.Cancelled;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var orderDto = _mapper.Map<OrderDTO>(order);
+            if (order.DiscountId.HasValue && order.DiscountId.Value > 0)
+            {
+                var discount = await _context.Discounts.FindAsync(order.DiscountId.Value);
+                if (discount != null) orderDto.DiscountCode = discount.DiscountCode;
+            }
+
             return new OrderResult(
-                confirm,
+                true,
                 confirm ? "Thanh toán hóa đơn thành công" : "Hóa đơn đã bị hủy",
-                _mapper.Map<OrderDTO>(order)
+                orderDto
             );
         }
     }

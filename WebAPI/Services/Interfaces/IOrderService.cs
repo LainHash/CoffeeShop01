@@ -12,7 +12,7 @@ namespace WebAPI.Services.Interfaces
         Task<OrderResult> CreateAsync(CreateOrderDTO request);
         Task<OrderResult> UpdateAsync(Guid id, UpdateOrderDTO request);
 
-        Task<OrderResult> Checkout(Guid id, UpdateOrderDTO request, bool isPaid);
+        Task<OrderResult> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null);
 
     }
 }

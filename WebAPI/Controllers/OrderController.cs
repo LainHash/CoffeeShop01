@@ -81,9 +81,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("{id}/Checkout")]
-        public async Task<IActionResult> Checkout(Guid id, UpdateOrderDTO request, bool confirm)
+        public async Task<IActionResult> Checkout(Guid id, [FromQuery] bool confirm, [FromQuery] string paymentMethod = "Cash", [FromQuery] string? note = null)
         {
-            var result = await _orderService.Checkout(id, request, confirm);
+            var result = await _orderService.Checkout(id, confirm, paymentMethod, note);
             if (!result.Success)
             {
                 return BadRequest(new

@@ -3,6 +3,7 @@
 @using RazorPage.Helpers.Globals
 @{
     var username = Context.Session.GetString(AccountConstants.Username);
+    var roleId = Context.Session.GetInt32(AccountConstants.RoleId);
 }
 
 <!-- Navbar Start -->
@@ -49,6 +50,20 @@
                     </div>
                 </div>
                 <a asp-page="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
+                
+                @if (roleId.HasValue && roleId.Value != 1)
+                {
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle text-warning font-weight-bold" data-toggle="dropdown">
+                            <i class="fa fa-cog mr-1"></i>Quản lý
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" asp-page="/Manager/POS"><i class="fa fa-cash-register mr-2"></i>Hệ thống POS</a>
+                            <a class="dropdown-item" asp-page="/Manager/Orders"><i class="fa fa-list mr-2"></i>Quản lý hóa đơn</a>
+                        </div>
+                    </div>
+                }
+
                 @if (username != null)
                 {
                     <div class="nav-item dropdown ml-3">

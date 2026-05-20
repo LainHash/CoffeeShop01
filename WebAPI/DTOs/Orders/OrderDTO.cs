@@ -22,6 +22,11 @@ namespace WebAPI.DTOs.Orders
 
         public string? Note { get; set; }
 
+        public int TableNumber { get; set; }
+        public int FloorNumber { get; set; }
+        public string? EmployeeName { get; set; }
+        public string? DiscountCode { get; set; }
+
         public List<OrderDetailDTO> OrderDetails { get; set; } = new List<OrderDetailDTO>();
     }
 }

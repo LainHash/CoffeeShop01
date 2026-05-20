@@ -1,4 +1,4 @@
-﻿using WebAPI.Models;
+using WebAPI.Models;
 
 namespace WebAPI.DTOs.Orders
 {
@@ -15,5 +15,9 @@ namespace WebAPI.DTOs.Orders
         public decimal UnitPrice { get; set; }
 
         public decimal LineTotal { get; set; }
+
+        public string? ProductName { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

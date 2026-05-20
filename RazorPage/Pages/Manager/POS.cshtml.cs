@@ -69,6 +69,12 @@ namespace RazorPage.Pages.Manager
 
             if (response.IsSuccessStatusCode)
             {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<OrderResult>(responseBody, options);
+                if (result?.Order?.PublicId != null)
+                {
+                    return RedirectToPage("/Manager/Details", new { id = result.Order.PublicId });
+                }
                 SuccessMessage = "Tạo hóa đơn thành công!";
                 Input = new CreateOrderInput();
             }
