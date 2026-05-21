@@ -1,6 +1,6 @@
 @page
 @model RazorPage.Pages.Employee.POSModel
-@using RazorPage.Helpers.Constants.Orders
+@using RazorPage.Helpers
 @{
     ViewData["Title"] = "Point of Sale (POS)";
     Layout = "~/Pages/Shared/_Layout.cshtml";
@@ -65,9 +65,24 @@
                                     <i class="fa fa-table me-1"></i> Chọn bàn phục vụ
                                 </label>
 
-                                @if (!tablesByFloor.Any())
+                                @{
+                                    var selectedTable = Model.Input.TableId > 0 ? tablesByFloor.SelectMany(f => f).FirstOrDefault(t => t.TableId == Model.Input.TableId) : null;
+                                }
+
+                                @if (selectedTable != null)
+                                {
+                                    <div class="alert alert-info d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <i class="fa fa-info-circle mr-1"></i> Bàn đang chọn: <strong>Bàn @selectedTable.TableNumber (Tầng @selectedTable.FloorNumber)</strong>
+                                        </div>
+                                        <a href="/Employee/TableMap" class="btn btn-sm btn-outline-info">Đổi bàn</a>
+                                    </div>
+                                    <input type="hidden" asp-for="Input.TableId" id="selected-table-id" />
+                                }
+                                else if (!tablesByFloor.Any())
                                 {
                                     <div class="alert alert-warning py-2">Chưa có bàn nào.</div>
+                                    <input type="hidden" asp-for="Input.TableId" id="selected-table-id" value="0" />
                                 }
                                 else
                                 {
@@ -94,12 +109,12 @@
                                                              data-table-id="@t.TableId"
                                                              data-table-num="@t.TableNumber"
                                                              data-floor="@t.FloorNumber"
-                                                             data-shape="@t.Shape">
+                                                             data-status="@t.Status">
                                                             <span class="table-icon">🪑</span>
                                                             <div class="table-num">Bàn @t.TableNumber</div>
-                                                            @if (!string.IsNullOrEmpty(t.Shape))
+                                                            @if (!string.IsNullOrEmpty(t.Status))
                                                             {
-                                                                <div class="table-shape">@t.Shape</div>
+                                                                <div class="table-status text-muted small">@StatusTranslator.TranslateTableStatus(t.Status)</div>
                                                             }
                                                         </div>
                                                     </div>
@@ -112,9 +127,8 @@
                                         <i class="fa fa-check-circle me-1"></i>
                                         <span id="selected-table-text">Chưa chọn bàn</span>
                                     </div>
+                                    <input type="hidden" asp-for="Input.TableId" id="selected-table-id" value="0" />
                                 }
-
-                                <input type="hidden" asp-for="Input.TableId" id="selected-table-id" value="0" />
                             </div>
 
                             <hr />
@@ -214,6 +228,18 @@
                 var hasCart  = cart.length > 0;
                 document.getElementById('submitOrderBtn').disabled = !(hasTable && hasCart);
             };
+
+            // Pre-select table if Input.TableId is set
+            var initialTableId = document.getElementById('selected-table-id').value;
+            if (initialTableId && initialTableId !== '0') {
+                var tableToSelect = document.querySelector('.table-card[data-table-id="' + initialTableId + '"]');
+                if (tableToSelect) {
+                    tableToSelect.click();
+                    var floor = tableToSelect.getAttribute('data-floor');
+                    var tabToSelect = document.querySelector('.floor-tab-btn[data-floor="' + floor + '"]');
+                    if(tabToSelect) tabToSelect.click();
+                }
+            }
         })();
 
         let cart = [];

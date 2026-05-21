@@ -33,22 +33,10 @@
                    asp-page="/Product/Index">
                     @RouteDisplayNames.MenuPage
                 </a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle"
-                       data-toggle="dropdown">
-                        Trang
-                    </a>
-                    <div class="dropdown-menu text-capitalize">
-                        <a class="dropdown-item"
-                           asp-page="/Order/Reservation">
-                            @RouteDisplayNames.ReservationPage
-                        </a>
-                        <a class="dropdown-item"
-                           asp-page="/Home/Testimonial">
-                            @RouteDisplayNames.TestimonialPage
-                        </a>
-                    </div>
-                </div>
+                <a class="nav-item nav-link"
+                   asp-page="/Home/Testimonial">
+                    @RouteDisplayNames.TestimonialPage
+                </a>
                 <a asp-page="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
 
                 @if (roleId.HasValue && roleId.Value != 1)
@@ -61,6 +49,7 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" asp-page="/Employee/POS"><i class="fa fa-cash-register mr-2"></i>Hệ thống POS</a>
                             <a class="dropdown-item" asp-page="/Employee/Orders"><i class="fa fa-list mr-2"></i>Quản lý hóa đơn</a>
+                            <a class="dropdown-item" asp-page="/Employee/TableMap"><i class="fa fa-list mr-2"></i>Sơ đồ bàn</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-page="/Order/ReservationSchedule"><i class="fa fa-calendar-week mr-2"></i>Lịch đặt bàn</a>
                             <a class="dropdown-item" asp-page="/Order/Reservation"><i class="fa fa-calendar-plus mr-2"></i>Tạo đặt bàn</a>

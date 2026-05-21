@@ -23,9 +23,13 @@ namespace RazorPage.Pages.Employee
         public string? ErrorMessage { get; set; }
         public string? SuccessMessage { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync([FromQuery] int? tableId)
         {
             await LoadData();
+            if (tableId.HasValue)
+            {
+                Input.TableId = tableId.Value;
+            }
             return Page();
         }
 

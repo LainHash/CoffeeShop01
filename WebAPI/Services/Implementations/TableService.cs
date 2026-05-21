@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs.Results;
@@ -42,6 +42,23 @@ namespace WebAPI.Services.Implementations
                 .Where(t => t.FloorNumber == floorNumber)
                 .ToListAsync();
             return new TableResult(true, "Lấy danh sách bàn theo tầng thành công", _mapper.Map<List<TableEntityDTO>>(tables));
+        }
+
+        public async Task<TableResult> UpdateStatusAsync(int tableId, string status)
+        {
+            var table = await _context.TableEntities.FindAsync(tableId);
+            if (table == null)
+            {
+                return new TableResult(false, "Không tìm thấy bàn!");
+            }
+
+            // Có thể kiểm tra status có hợp lệ không (ví dụ kiểm tra danh sách hằng số),
+            // nhưng tạm thời cập nhật trực tiếp.
+            table.Status = status;
+            _context.TableEntities.Update(table);
+            await _context.SaveChangesAsync();
+
+            return new TableResult(true, "Cập nhật trạng thái bàn thành công", _mapper.Map<TableEntityDTO>(table));
         }
     }
 }

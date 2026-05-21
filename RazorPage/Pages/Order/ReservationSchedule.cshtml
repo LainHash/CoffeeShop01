@@ -1,5 +1,6 @@
 @page
 @model RazorPage.Pages.Order.ReservationScheduleModel
+@using RazorPage.Helpers
 @{
     ViewData["Title"] = "Lịch Đặt Bàn - KOPPEE Coffee Shop";
     ViewData["ActivePage"] = "ReservationSchedule";
@@ -52,10 +53,10 @@
 
         <!-- Legend -->
         <div class="d-flex flex-wrap gap-2 mb-3">
-            <span class="badge badge-warning px-2 py-1"><i class="fa fa-clock mr-1"></i>Pending</span>
-            <span class="badge badge-info px-2 py-1"><i class="fa fa-check mr-1"></i>Confirmed</span>
-            <span class="badge badge-success px-2 py-1"><i class="fa fa-star mr-1"></i>Completed</span>
-            <span class="badge badge-secondary px-2 py-1"><i class="fa fa-times mr-1"></i>Cancelled</span>
+            <span class="badge badge-warning px-2 py-1"><i class="fa fa-clock mr-1"></i>Chờ xác nhận</span>
+            <span class="badge badge-info px-2 py-1"><i class="fa fa-check mr-1"></i>Đã xác nhận</span>
+            <span class="badge badge-success px-2 py-1"><i class="fa fa-star mr-1"></i>Hoàn thành</span>
+            <span class="badge badge-secondary px-2 py-1"><i class="fa fa-times mr-1"></i>Đã hủy</span>
             <span class="ml-auto text-muted small align-self-center">
                 Tổng: <strong>@Model.TotalReservations</strong> lịch đặt trong tuần
             </span>
@@ -119,7 +120,7 @@
                                         <div class="res-table">
                                             <i class="fa fa-chair"></i> Bàn @r.TableNumber · @r.NumberOfGuests khách
                                         </div>
-                                        <span class="res-status-badge status-badge-@r.Status.ToLower()">@r.Status</span>
+                                        <span class="res-status-badge status-badge-@r.Status.ToLower()">@StatusTranslator.TranslateReservationStatus(r.Status)</span>
                                     </div>
                                 }
                             }

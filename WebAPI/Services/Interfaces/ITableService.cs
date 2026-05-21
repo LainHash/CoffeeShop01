@@ -1,4 +1,4 @@
-﻿using WebAPI.DTOs.Results;
+using WebAPI.DTOs.Results;
 
 namespace WebAPI.Services.Interfaces
 {
@@ -7,5 +7,6 @@ namespace WebAPI.Services.Interfaces
         Task<TableResult> GetAllAsync();
         Task<TableResult> GetOneAsync(int floorNumber, int tableNumber);
         Task<TableResult> GetAllByFloorAsync(int floorNumber);
+        Task<TableResult> UpdateStatusAsync(int tableId, string status);
     }
 }
