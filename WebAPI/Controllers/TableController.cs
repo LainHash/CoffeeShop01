@@ -27,10 +27,10 @@ namespace WebAPI.Controllers
             });
         }
 
-        [HttpGet("{tableNumber}/{floorNumber}")]
-        public async Task<IActionResult> GetOne(int tableNumber, int floorNumber)
+        [HttpGet("{floorNumber}/{tableNumber}")]
+        public async Task<IActionResult> GetOne(int floorNumber, int tableNumber)
         {
-            var result = await _tableService.GetOneAsync(tableNumber, floorNumber);
+            var result = await _tableService.GetOneAsync(floorNumber, tableNumber);
             if (!result.Success)
             {
                 return BadRequest(new

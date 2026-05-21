@@ -1,8 +1,10 @@
 @page
-@model RazorPage.Pages.Manager.DetailsModel
+@model RazorPage.Pages.Order.DetailsModel
 @{
     ViewData["Title"] = "Chi tiết hóa đơn #" + Model.Order?.OrderId;
 }
+<vc:page-header title="Chi tiết Hóa đơn"></vc:page-header>
+
 
 <div class="container-fluid pt-5">
     <div class="container no-print">
@@ -172,7 +174,7 @@
                         <div class="card-body p-4 text-center">
                             @if (Model.Order.Status == "Unpaid")
                             {
-                                <a href="/Manager/Checkout?id=@Model.Order.PublicId" class="btn btn-primary btn-block btn-lg mb-3 py-3 rounded-pill shadow-sm">
+                                <a href="/Employee/Checkout?id=@Model.Order.PublicId" class="btn btn-primary btn-block btn-lg mb-3 py-3 rounded-pill shadow-sm">
                                     <i class="fa fa-credit-card mr-2"></i>Thanh Toán Ngay
                                 </a>
 

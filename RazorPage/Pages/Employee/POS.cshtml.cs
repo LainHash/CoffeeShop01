@@ -5,7 +5,7 @@ using System.Text;
 using RazorPage.DTOs.Manager;
 using RazorPage.Helpers.Constants.Orders;
 
-namespace RazorPage.Pages.Manager
+namespace RazorPage.Pages.Employee
 {
     public class POSModel : PageModel
     {
@@ -73,7 +73,7 @@ namespace RazorPage.Pages.Manager
                 var result = JsonSerializer.Deserialize<OrderResult>(responseBody, options);
                 if (result?.Order?.PublicId != null)
                 {
-                    return RedirectToPage("/Manager/Details", new { id = result.Order.PublicId });
+                    return RedirectToPage("/Order/Details", new { id = result.Order.PublicId });
                 }
                 SuccessMessage = "Tạo hóa đơn thành công!";
                 Input = new CreateOrderInput();

@@ -28,7 +28,7 @@ namespace RazorPage.Pages.Auth
         {
             if (HttpContext.Session.GetString(AccountConstants.Email) != null)
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Home/Index");
             }
             return Page();
         }
@@ -70,7 +70,7 @@ namespace RazorPage.Pages.Auth
                         HttpContext.Session.SetString(AccountConstants.FullName, customer.FullName);
                         HttpContext.Session.SetString(AccountConstants.Phone, customer.Phone);
 
-                        return RedirectToPage("/Index");
+                        return RedirectToPage("/Home/Index");
                     }
                     else if (result.RoleId != 1 && result.Manager != null)
                     {
@@ -82,7 +82,7 @@ namespace RazorPage.Pages.Auth
                         HttpContext.Session.SetString(AccountConstants.Phone, manager.Phone);
                         HttpContext.Session.SetString("Position", manager.Position ?? "");
 
-                        return RedirectToPage("/Manager/POS");
+                        return RedirectToPage("/Employee/POS");
                     }
                 }
 

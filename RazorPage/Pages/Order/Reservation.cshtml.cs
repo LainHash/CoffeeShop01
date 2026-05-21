@@ -21,31 +21,33 @@ namespace RazorPage.Pages.Order
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
+        /// <summary>
+        /// Exposed for the Razor view — true when the current user is staff/manager (roleId != 1).
+        /// </summary>
+        public bool IsStaff { get; private set; }
+
+        private bool CheckIsStaff()
+        {
+            var roleId = HttpContext.Session.GetInt32(AccountConstants.RoleId);
+            return roleId.HasValue && roleId.Value != 1;
+        }
+
         public IActionResult OnGet()
         {
-            var customerId = HttpContext.Session.GetString(AccountConstants.CustomerId);
-            if (string.IsNullOrEmpty(customerId))
-            {
-                return RedirectToPage("/Auth/Login");
-            }
-
-            var email = HttpContext.Session.GetString(AccountConstants.Email);
-            var fullName = HttpContext.Session.GetString(AccountConstants.FullName);
-            var phone = HttpContext.Session.GetString(AccountConstants.Phone);
-
-            if (email != null) Input.Email = email;
-            if (fullName != null) Input.FullName = fullName;
-            if (phone != null) Input.Phone = phone;
-
+            // All roles (and guests) can visit the page.
+            // Staff will see the form; customers/guests will see the contact info view.
+            IsStaff = CheckIsStaff();
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var customerIdStr = HttpContext.Session.GetString(AccountConstants.CustomerId);
-            if (string.IsNullOrEmpty(customerIdStr))
+            IsStaff = CheckIsStaff();
+
+            // Only staff members are allowed to submit the reservation form.
+            if (!IsStaff)
             {
-                return RedirectToPage("/Auth/Login");
+                return Forbid();
             }
 
             if (!ModelState.IsValid)
@@ -62,13 +64,17 @@ namespace RazorPage.Pages.Order
 
             if (!DateTime.TryParse($"{Input.Date} {Input.Time}", out DateTime reservationTime))
             {
-                ErrorMessage = "Ngày giờ không hợp lệ.";
+                ErrorMessage = "Ngày giờ không hợp lệ. Vui lòng kiểm tra lại.";
                 return Page();
             }
 
+            // Build payload – staff creates reservations on behalf of customers;
+            // we pass customer info from the form rather than from session.
             var payload = new
             {
-                CustomerPublicId = Guid.Parse(customerIdStr),
+                FullName = Input.FullName,
+                Email = Input.Email,
+                Phone = Input.Phone,
                 ReservationTime = reservationTime,
                 NumberOfGuests = Input.NumberOfGuests,
                 Note = Input.Note
@@ -81,11 +87,14 @@ namespace RazorPage.Pages.Order
             var response = await client.PostAsync("/api/Reservation", content);
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            var result = System.Text.Json.JsonSerializer.Deserialize<ReservationApiResponse>(responseBody, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var result = System.Text.Json.JsonSerializer.Deserialize<ReservationApiResponse>(
+                responseBody,
+                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
 
             if (response.IsSuccessStatusCode && result?.Success == true)
             {
-                SuccessMessage = $"Cảm ơn bạn, {Input.FullName}! Bàn cho {Input.NumberOfGuests} người đã được đặt thành công. Chúng tôi sẽ gửi email xác nhận đến {Input.Email}.";
+                SuccessMessage = $"Đặt bàn thành công! Bàn cho {Input.NumberOfGuests} người vào lúc {reservationTime:dd/MM/yyyy HH:mm} đã được ghi nhận cho khách hàng {Input.FullName}.";
                 Input = new ReservationInputModel();
                 ModelState.Clear();
             }

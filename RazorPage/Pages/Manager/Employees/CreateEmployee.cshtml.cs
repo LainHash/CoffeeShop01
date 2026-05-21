@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text;
 using RazorPage.DTOs.Manager;
 
-namespace RazorPage.Pages.Manager
+namespace RazorPage.Pages.Manager.Employees
 {
     public class CreateEmployeeModel : PageModel
     {

@@ -5,6 +5,6 @@ namespace WebAPI.Services.Interfaces
     public interface ITableService
     {
         Task<TableResult> GetAllAsync();
-        Task<TableResult> GetOneAsync(int tableNumber, int floorNumber);
+        Task<TableResult> GetOneAsync(int floorNumber, int tableNumber);
     }
 }

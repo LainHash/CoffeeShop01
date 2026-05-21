@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using RazorPage.DTOs.Manager;
 
-namespace RazorPage.Pages.Manager
+namespace RazorPage.Pages.Employee
 {
     public class OrdersModel : PageModel
     {

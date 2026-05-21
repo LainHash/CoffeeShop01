@@ -25,7 +25,7 @@ namespace WebAPI.Services.Implementations
             return new TableResult(true, "Lấy danh sách bàn thành công", _mapper.Map<List<TableEntityDTO>>(tables));
         }
 
-        public async Task<TableResult> GetOneAsync(int tableNumber, int floorNumber)
+        public async Task<TableResult> GetOneAsync(int floorNumber, int tableNumber)
         {
             var table = await _context.TableEntities
                 .FirstOrDefaultAsync(t => t.TableNumber == tableNumber && t.FloorNumber == floorNumber);

@@ -6,25 +6,20 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using RazorPage.DTOs.Manager;
 
-namespace RazorPage.Pages.Manager
+namespace RazorPage.Pages.Order
 {
-    public class CheckoutModel : PageModel
+    public class DetailsModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public CheckoutModel(IHttpClientFactory httpClientFactory)
+        public DetailsModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
         public OrderDTO? Order { get; set; }
         public string? ErrorMessage { get; set; }
-
-        [BindProperty]
-        public string PaymentMethod { get; set; } = "Cash";
-
-        [BindProperty]
-        public string? Note { get; set; }
+        public string? SuccessMessage { get; set; }
 
         public async Task<IActionResult> OnGetAsync(Guid? id)
         {
@@ -46,15 +41,10 @@ namespace RazorPage.Pages.Manager
                 return RedirectToPage("/Manager/Orders");
             }
 
-            if (Order.Status != "Unpaid")
-            {
-                return RedirectToPage("/Manager/Details", new { id = Order.PublicId });
-            }
-
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(Guid id)
+        public async Task<IActionResult> OnPostCancelAsync(Guid id)
         {
             var managerIdStr = HttpContext.Session.GetString("ManagerId");
             if (string.IsNullOrEmpty(managerIdStr))
@@ -65,20 +55,16 @@ namespace RazorPage.Pages.Manager
             var client = _httpClientFactory.CreateClient("WebAPI");
             try
             {
-                // Call Checkout with confirm=true and pass payment method + notes
-                var response = await client.PostAsync(
-                    $"/api/Order/{id}/Checkout?confirm=true&paymentMethod={Uri.EscapeDataString(PaymentMethod)}&note={Uri.EscapeDataString(Note ?? "")}", 
-                    null
-                );
-
+                // Call Checkout with confirm=false to cancel the order
+                var response = await client.PostAsync($"/api/Order/{id}/Checkout?confirm=false", null);
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToPage("/Manager/Details", new { id = id });
+                    SuccessMessage = "Hóa đơn đã được hủy thành công.";
                 }
                 else
                 {
                     var errorMsg = await response.Content.ReadAsStringAsync();
-                    ErrorMessage = "Thanh toán thất bại: " + errorMsg;
+                    ErrorMessage = "Không thể hủy hóa đơn: " + errorMsg;
                 }
             }
             catch (Exception ex)
@@ -111,12 +97,12 @@ namespace RazorPage.Pages.Manager
                 }
                 else
                 {
-                    ErrorMessage = "Không thể tìm thấy hóa đơn cần thanh toán.";
+                    ErrorMessage = "Không thể tìm thấy hóa đơn.";
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Lỗi kết nối hệ thống API: " + ex.Message;
+                ErrorMessage = "Lỗi kết nối đến hệ thống API: " + ex.Message;
             }
         }
     }
