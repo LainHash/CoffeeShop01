@@ -37,9 +37,6 @@ namespace RazorPage.DTOs.Order
         [Required(ErrorMessage = "Vui lòng nhập họ tên")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Vui lòng nhập email")]
-        [EmailAddress(ErrorMessage = "Định dạng email không hợp lệ")]
-        public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         public string Phone { get; set; } = string.Empty;

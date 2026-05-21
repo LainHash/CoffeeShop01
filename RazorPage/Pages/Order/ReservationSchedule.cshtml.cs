@@ -19,55 +19,29 @@ namespace RazorPage.Pages.Order
             _httpClientFactory = httpClientFactory;
         }
 
-        // ────────────────────────────────────────────────────
-        // Properties for the view
-        // ────────────────────────────────────────────────────
-
-        /// <summary>Ngày đầu tuần (Thứ Hai) đang xem</summary>
         public DateTime WeekStart { get; private set; }
-
-        /// <summary>Ngày đầu tuần hiện tại (để nút "Tuần này")</summary>
         public DateTime CurrentWeekStart { get; private set; }
-
-        /// <summary>Lịch đặt bàn nhóm theo ngày</summary>
         public Dictionary<DateTime, List<ReservationApiItem>> ReservationsByDay { get; private set; } = new();
-
-        /// <summary>Tổng số lịch đặt trong tuần</summary>
         public int TotalReservations { get; private set; }
 
         public string? ErrorMessage { get; private set; }
-
-        // ────────────────────────────────────────────────────
-        // Helpers
-        // ────────────────────────────────────────────────────
-
-        /// <summary>Tính ngày Thứ Hai của tuần chứa <paramref name="date"/>.</summary>
         private static DateTime GetMondayOf(DateTime date)
         {
             int diff = ((int)date.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
             return date.Date.AddDays(-diff);
         }
-
-        // ────────────────────────────────────────────────────
-        // Handlers
-        // ────────────────────────────────────────────────────
-
         public async Task<IActionResult> OnGetAsync([FromQuery] string? weekStart)
         {
-            // Tính ngày Thứ Hai của tuần hiện tại
             CurrentWeekStart = GetMondayOf(DateTime.Today);
 
-            // Parse weekStart từ query hoặc dùng tuần hiện tại
             if (DateTime.TryParse(weekStart, out var parsedWeek))
                 WeekStart = GetMondayOf(parsedWeek);
             else
                 WeekStart = CurrentWeekStart;
 
-            // Khởi tạo dict 7 ngày rỗng
             for (int i = 0; i < 7; i++)
                 ReservationsByDay[WeekStart.AddDays(i).Date] = new List<ReservationApiItem>();
 
-            // Gọi API
             try
             {
                 var client = _httpClientFactory.CreateClient("WebAPI");

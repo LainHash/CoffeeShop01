@@ -21,9 +21,6 @@ namespace RazorPage.Pages.Order
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
-        /// <summary>
-        /// Exposed for the Razor view — true when the current user is staff/manager (roleId != 1).
-        /// </summary>
         public bool IsStaff { get; private set; }
 
         private bool CheckIsStaff()
@@ -34,8 +31,6 @@ namespace RazorPage.Pages.Order
 
         public IActionResult OnGet()
         {
-            // All roles (and guests) can visit the page.
-            // Staff will see the form; customers/guests will see the contact info view.
             IsStaff = CheckIsStaff();
             return Page();
         }
@@ -44,7 +39,6 @@ namespace RazorPage.Pages.Order
         {
             IsStaff = CheckIsStaff();
 
-            // Only staff members are allowed to submit the reservation form.
             if (!IsStaff)
             {
                 return Forbid();
@@ -68,12 +62,9 @@ namespace RazorPage.Pages.Order
                 return Page();
             }
 
-            // Build payload – staff creates reservations on behalf of customers;
-            // we pass customer info from the form rather than from session.
             var payload = new
             {
                 FullName = Input.FullName,
-                Email = Input.Email,
                 Phone = Input.Phone,
                 ReservationTime = reservationTime,
                 NumberOfGuests = Input.NumberOfGuests,
@@ -97,6 +88,7 @@ namespace RazorPage.Pages.Order
                 SuccessMessage = $"Đặt bàn thành công! Bàn cho {Input.NumberOfGuests} người vào lúc {reservationTime:dd/MM/yyyy HH:mm} đã được ghi nhận cho khách hàng {Input.FullName}.";
                 Input = new ReservationInputModel();
                 ModelState.Clear();
+                return Redirect("/Order/ReservationSchedule");
             }
             else
             {
