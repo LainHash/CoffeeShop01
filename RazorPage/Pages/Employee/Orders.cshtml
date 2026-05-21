@@ -144,7 +144,7 @@
                                         <td class="font-weight-bold text-dark text-right py-3">@order.TotalAmount.ToString("N0") đ</td>
                                         <td class="text-center py-3">
                                             <div class="btn-group" role="group">
-                                                <a href="/Manager/Details?id=@order.PublicId" class="btn btn-outline-info btn-sm rounded-left" title="Xem chi tiết">
+                                                <a href="/Order/Details?id=@order.PublicId" class="btn btn-outline-info btn-sm rounded-left" title="Xem chi tiết">
                                                     <i class="fa fa-eye"></i> Xem chi tiết
                                                 </a>
                                                 @if (order.Status == "Unpaid")
