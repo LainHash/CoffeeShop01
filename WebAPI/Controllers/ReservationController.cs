@@ -90,6 +90,18 @@ namespace WebAPI.Controllers
             });
         }
 
+        [HttpGet("Week")]
+        public async Task<IActionResult> GetByWeek([FromQuery] DateTime weekStart)
+        {
+            var result = await _reservationService.GetByWeekAsync(weekStart);
+            return Ok(new
+            {
+                success = result.Success,
+                message = result.Message,
+                reservations = result.Reservations
+            });
+        }
+
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto)
         {

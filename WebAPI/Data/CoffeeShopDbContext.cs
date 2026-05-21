@@ -42,7 +42,7 @@ public partial class CoffeeShopDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=localhost; Initial Catalog=CoffeeShopDb; Integrated Security=True; Trust Server Certificate=True;");
+        => optionsBuilder.UseSqlServer("Data Source=localhost; Initial Catalog=CoffeeShopDb; Persist Security Info=True; User ID=sa; Password=123456; Trust Server Certificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,18 +61,12 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.HasIndex(e => e.Phone, "IX_Customers").IsUnique();
 
-            entity.HasIndex(e => e.UserId, "IX_Customers_1").IsUnique();
-
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
-
-            entity.HasOne(d => d.User).WithOne(p => p.Customer)
-                .HasForeignKey<Customer>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Customers_Users");
         });
 
         modelBuilder.Entity<Discount>(entity =>
@@ -143,7 +137,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36CD1203DB3");
+            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36CCCA3EACF");
 
             entity.Property(e => e.LineTotal).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Quantity).HasDefaultValue(1);
@@ -162,7 +156,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A3810009DE9");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A38FF40E808");
 
             entity.Property(e => e.Note).HasMaxLength(255);
             entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 2)");
@@ -202,7 +196,7 @@ public partial class CoffeeShopDbContext : DbContext
 
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => e.ReservationId).HasName("PK__Reservat__B7EE5F24583A8EB4");
+            entity.HasKey(e => e.ReservationId).HasName("PK__Reservat__B7EE5F245D900F43");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")

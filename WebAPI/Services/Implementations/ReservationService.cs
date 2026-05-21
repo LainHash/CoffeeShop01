@@ -50,13 +50,28 @@ namespace WebAPI.Services.Implementations
                 Status = "Pending",
             };
 
+            // Tìm bàn phù hợp và KHÔNG bị trùng lịch trong khoảng ±2 giờ
+            var conflictWindowStart = dto.ReservationTime.AddHours(-2);
+            var conflictWindowEnd = dto.ReservationTime.AddHours(2);
+
+            var busyTableIds = await _context.Reservations
+                .Where(r => r.Status != "Cancelled"
+                         && r.ReservationTime >= conflictWindowStart
+                         && r.ReservationTime <= conflictWindowEnd)
+                .Select(r => r.TableId)
+                .Distinct()
+                .ToListAsync();
+
             var availableTable = await _context.TableEntities
-                .Where(t => t.IsActive == true && t.Status == "Available" && t.RecommendedCapacity >= dto.NumberOfGuests)
+                .Where(t => t.IsActive == true
+                         && t.Status == "Available"
+                         && t.RecommendedCapacity >= dto.NumberOfGuests
+                         && !busyTableIds.Contains(t.TableId))
                 .OrderBy(t => t.RecommendedCapacity)
                 .FirstOrDefaultAsync();
 
             if (availableTable == null)
-                return new ReservationResult(false, "Hiện không có bàn trống phù hợp với số lượng khách. Vui lòng thử lại sau.");
+                return new ReservationResult(false, "Hiện không có bàn trống phù hợp với số lượng khách trong khung giờ này. Vui lòng chọn giờ khác.");
 
             reservation.TableId = availableTable.TableId;
 
@@ -148,6 +163,23 @@ namespace WebAPI.Services.Implementations
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
 
             return new ReservationResult(true, "Cập nhật đặt bàn thành công.", _mapper.Map<ReservationDTO>(reservation));
+        }
+
+        public async Task<ReservationResult> GetByWeekAsync(DateTime weekStart)
+        {
+            // Đảm bảo weekStart là đầu ngày thứ Hai
+            var startOfWeek = weekStart.Date;
+            var endOfWeek = startOfWeek.AddDays(7);
+
+            var reservations = await _context.Reservations
+                .Include(r => r.Customer).ThenInclude(c => c.User)
+                .Include(r => r.Table)
+                .Where(r => r.ReservationTime >= startOfWeek && r.ReservationTime < endOfWeek)
+                .OrderBy(r => r.ReservationTime)
+                .ToListAsync();
+
+            return new ReservationResult(true, "Lấy lịch đặt bàn theo tuần thành công.",
+                reservations: _mapper.Map<List<ReservationDTO>>(reservations));
         }
 
         public async Task<ReservationResult> CancelAsync(int reservationId, Guid customerPublicId)
