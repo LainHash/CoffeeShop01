@@ -2,23 +2,22 @@
 
 namespace WebAPI.DTOs.Results
 {
-    public class CategoryResult
+    public class CategoryResult : ResultBase
     {
-        public bool Sucess { get; set; }
-        public string? Message { get; set; }
         public CategoryDTO? Category { get; set; }
+        public List<CategoryDTO>? Categories { get; set; }
 
-        public CategoryResult(bool success, string message)
+        public CategoryResult(bool success, string message) : base(success, message) { }
+
+
+        public CategoryResult(bool success, string message, CategoryDTO dto) : base(success, message)
         {
-            Sucess = success;
-            Message = message;
+            Category = dto;
         }
 
-        public CategoryResult(bool success, string message, CategoryDTO dto)
+        public CategoryResult(bool success, string message, List<CategoryDTO> categories) : base(success, message)
         {
-            Sucess = success;
-            Message = message;
-            Category = dto;
+            Categories = categories;
         }
     }
 }

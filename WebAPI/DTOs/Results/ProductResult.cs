@@ -2,23 +2,24 @@
 
 namespace WebAPI.DTOs.Results
 {
-    public class ProductResult
+    public class ProductResult : ResultBase
     {
-        public bool Success { get; set; }
-        public string? Message { get; set; }
-
         public ProductDTO? Product { get; set; }
+        public List<ProductDTO>? Products { get; set; }
 
-        public ProductResult(bool success, string message)
+        public ProductResult(bool success, string message) : base(success, message)
         {
-            this.Success = success;
-            this.Message = message;
+
         }
-        public ProductResult(bool success, string message, ProductDTO? product)
+
+        public ProductResult(bool success, string message, List<ProductDTO>? products) : base(success, message) 
         {
-            this.Success = success;
-            this.Message = message;
-            this.Product = product;
+            Products = products;
+        }
+
+        public ProductResult(bool success, string message, ProductDTO? product = null) : base(success, message) 
+        {
+            Product = product;
         }
     }
 }

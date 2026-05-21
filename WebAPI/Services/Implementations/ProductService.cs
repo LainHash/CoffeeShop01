@@ -21,13 +21,12 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<ProductDTO>> GetAllAsync()
+        public async Task<ProductResult> GetAllAsync()
         {
             var products = await _context.Products
                 .Where(p => p.IsAvailable == true)
                 .ToListAsync();
-            var dtos = _mapper.Map<List<ProductDTO>>(products);
-            return dtos;
+            return new ProductResult(true, "Lấy danh sách sản phẩm thành công.", _mapper.Map<List<ProductDTO>>(products));
         }
 
         public async Task<ProductResult> GetOneAsync(Guid id)

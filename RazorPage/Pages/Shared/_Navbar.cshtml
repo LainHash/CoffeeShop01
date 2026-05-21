@@ -3,12 +3,13 @@
 @using RazorPage.Helpers.Globals
 @{
     var username = Context.Session.GetString(AccountConstants.Username);
+    var roleId = Context.Session.GetInt32(AccountConstants.RoleId);
 }
 
 <!-- Navbar Start -->
 <div class="container-fluid p-0 nav-bar">
     <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
-        <a asp-page="/Index" class="navbar-brand px-lg-4 m-0">
+        <a asp-page="/" class="navbar-brand px-lg-4 m-0">
             <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
         </a>
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
@@ -17,19 +18,19 @@
         <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
             <div class="navbar-nav ml-auto p-4">
                 <a class="nav-item nav-link"
-                   asp-page="/Index">
+                   asp-page="/">
                     @RouteDisplayNames.HomePage
                 </a>
                 <a class="nav-item nav-link"
-                   asp-page="/About">
+                   asp-page="/Home/About">
                     @RouteDisplayNames.AboutPage
                 </a>
                 <a class="nav-item nav-link"
-                   asp-page="/Service">
+                   asp-page="/Home/Service">
                     @RouteDisplayNames.Service
                 </a>
                 <a class="nav-item nav-link"
-                   asp-page="/Menu">
+                   asp-page="/Product/Index">
                     @RouteDisplayNames.MenuPage
                 </a>
                 <div class="nav-item dropdown">
@@ -39,20 +40,36 @@
                     </a>
                     <div class="dropdown-menu text-capitalize">
                         <a class="dropdown-item"
-                           asp-page="/Reservation">
+                           asp-page="/Order/Reservation">
                             @RouteDisplayNames.ReservationPage
                         </a>
                         <a class="dropdown-item"
-                           asp-page="/Testimonial">
+                           asp-page="/Home/Testimonial">
                             @RouteDisplayNames.TestimonialPage
                         </a>
                     </div>
                 </div>
-                <a asp-page="/Contact" class="nav-item nav-link">Liên Hệ</a>
+                <a asp-page="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
+
+                @if (roleId.HasValue && roleId.Value != 1)
+                {
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-warning font-weight-bold"
+                           data-toggle="dropdown">
+                            <i class="fa fa-cog mr-1"></i>Quản lý
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" asp-page="/Employee/POS"><i class="fa fa-cash-register mr-2"></i>Hệ thống POS</a>
+                            <a class="dropdown-item" asp-page="/Manager/Orders"><i class="fa fa-list mr-2"></i>Quản lý hóa đơn</a>
+                        </div>
+                    </div>
+                }
+
                 @if (username != null)
                 {
                     <div class="nav-item dropdown ml-3">
-                        <a href="#" class="nav-link dropdown-toggle text-primary font-weight-bold" data-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle text-primary font-weight-bold"
+                           data-toggle="dropdown">
                             <i class="fa fa-user mr-1"></i>@username
                         </a>
                         <div class="dropdown-menu">

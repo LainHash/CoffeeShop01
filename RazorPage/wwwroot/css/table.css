@@ -1,0 +1,96 @@
+﻿/* ── Floor Tabs ── */
+.floor-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.floor-tab-btn {
+    padding: 6px 18px;
+    border: 2px solid #dee2e6;
+    border-radius: 20px;
+    background: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all .2s;
+    color: #495057;
+}
+
+    .floor-tab-btn:hover {
+        border-color: #0d6efd;
+        color: #0d6efd;
+    }
+
+    .floor-tab-btn.active {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+
+/* ── Table Cards ── */
+.table-floor-panel {
+    display: none;
+}
+
+    .table-floor-panel.active {
+        display: block;
+    }
+
+.table-card {
+    cursor: pointer;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    transition: all .2s;
+    background: #fff;
+    user-select: none;
+}
+
+    .table-card:hover {
+        border-color: #0d6efd;
+        box-shadow: 0 4px 12px rgba(13,110,253,.15);
+        transform: translateY(-2px);
+    }
+
+    .table-card.selected {
+        border-color: #0d6efd;
+        background: #0d6efd;
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(13,110,253,.35);
+    }
+
+    .table-card .table-icon {
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .table-card .table-num {
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .table-card .table-shape {
+        font-size: 0.72rem;
+        opacity: .7;
+    }
+
+    .table-card.selected .table-shape {
+        opacity: .85;
+    }
+
+/* Selected badge shown above the grid */
+#selected-table-badge {
+    display: none;
+    padding: 6px 14px;
+    background: #e8f0fe;
+    border: 1px solid #0d6efd;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #0d6efd;
+    font-weight: 600;
+    margin-top: 8px;
+}

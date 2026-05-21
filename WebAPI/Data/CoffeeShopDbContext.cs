@@ -16,11 +16,11 @@ public partial class CoffeeShopDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Area> Areas { get; set; }
-
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Customer> Customers { get; set; }
+
+    public virtual DbSet<Discount> Discounts { get; set; }
 
     public virtual DbSet<Employee> Employees { get; set; }
 
@@ -34,6 +34,8 @@ public partial class CoffeeShopDbContext : DbContext
 
     public virtual DbSet<Reservation> Reservations { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<TableEntity> TableEntities { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -44,14 +46,6 @@ public partial class CoffeeShopDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Area>(entity =>
-        {
-            entity.HasKey(e => e.AreaId).HasName("PK__Areas__70B8204819B7CB47");
-
-            entity.Property(e => e.AreaName).HasMaxLength(100);
-            entity.Property(e => e.Description).HasMaxLength(255);
-        });
-
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0BCCD8340B");
@@ -81,6 +75,18 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasConstraintName("FK_Customers_Users");
         });
 
+        modelBuilder.Entity<Discount>(entity =>
+        {
+            entity.HasIndex(e => e.DiscountCode, "IX_Discounts").IsUnique();
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.DiscountCode).HasMaxLength(50);
+            entity.Property(e => e.Type)
+                .HasMaxLength(20)
+                .HasDefaultValue("Flat");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
+        });
+
         modelBuilder.Entity<Employee>(entity =>
         {
             entity.HasKey(e => e.EmployeeId).HasName("PK__Employee__7AD04F11C2D61717");
@@ -106,11 +112,13 @@ public partial class CoffeeShopDbContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF2EB59461");
 
-            entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+            entity.Property(e => e.DiscountId).HasDefaultValue(0);
             entity.Property(e => e.Note).HasMaxLength(255);
             entity.Property(e => e.OrderTime)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false)
@@ -184,6 +192,7 @@ public partial class CoffeeShopDbContext : DbContext
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ProductName).HasMaxLength(150);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.UnitsInStock).HasDefaultValue(0);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -216,40 +225,41 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasConstraintName("FK_Reservations_Tables");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.RoleName).HasMaxLength(20);
+        });
+
         modelBuilder.Entity<TableEntity>(entity =>
         {
             entity.HasKey(e => e.TableId).HasName("PK__TableEnt__7D5F01EE20E26DB1");
 
-            entity.HasIndex(e => e.TableCode, "UQ__TableEnt__896A432310E76BBC").IsUnique();
+            entity.HasIndex(e => new { e.TableNumber, e.FloorNumber }, "IX_TableEntities").IsUnique();
 
-            entity.Property(e => e.Capacity).HasDefaultValue(2);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.MaxCapacity).HasDefaultValue(2);
+            entity.Property(e => e.RecommendedCapacity).HasDefaultValue(2);
+            entity.Property(e => e.Shape).HasMaxLength(50);
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasDefaultValue("Available");
-            entity.Property(e => e.TableCode)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.TableName).HasMaxLength(50);
-
-            entity.HasOne(d => d.Area).WithMany(p => p.TableEntities)
-                .HasForeignKey(d => d.AreaId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Tables_Areas");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.Property(e => e.UserId).ValueGeneratedNever();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.IsActive).HasDefaultValue(false);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .HasDefaultValue("Customer");
+            entity.Property(e => e.RoleId).HasDefaultValue(1);
             entity.Property(e => e.Username).HasMaxLength(100);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Users_Roles");
         });
 
         OnModelCreatingPartial(modelBuilder);

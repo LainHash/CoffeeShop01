@@ -1,4 +1,4 @@
-﻿namespace RazorPage.Helpers.Constants.Sessions
+namespace RazorPage.Helpers.Constants.Sessions
 {
     public static class AccountConstants
     {
@@ -7,5 +7,6 @@
         public const string Username = "Username";
         public const string FullName = "Fullname";
         public const string Phone = "Phone";
+        public const string RoleId = "RoleId";
     }
 }

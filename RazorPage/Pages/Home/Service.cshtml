@@ -1,0 +1,69 @@
+@page
+@{
+    ViewData["Title"] = "Services - KOPPEE Coffee Shop";
+    ViewData["ActivePage"] = "Service";
+}
+
+<vc:page-header title="Dịch Vụ"></vc:page-header>
+
+<!-- Services Start -->
+<div class="container-fluid pt-5 pb-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Dịch Vụ Của Chúng Tôi</h4>
+            <h1 class="display-4">Hạt Cà Phê Tươi & Hữu Cơ</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-sm-5">
+                        <img class="img-fluid mb-3 mb-sm-0" src="~/img/service-1.jpg" alt="Giao hàng">
+                    </div>
+                    <div class="col-sm-7">
+                        <h4><i class="fa fa-truck service-icon"></i>Giao Hàng Nhanh Chóng</h4>
+                        <p class="m-0">Nhận cà phê yêu thích của bạn được giao nóng hổi và tươi mới đến tận cửa trong vòng 30 phút, bất cứ nơi nào trong thành phố. Theo dõi đơn hàng theo thời gian thực.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-sm-5">
+                        <img class="img-fluid mb-3 mb-sm-0" src="~/img/service-2.jpg" alt="Hạt cà phê">
+                    </div>
+                    <div class="col-sm-7">
+                        <h4><i class="fa fa-coffee service-icon"></i>Hạt Cà Phê Tươi</h4>
+                        <p class="m-0">Được lấy trực tiếp từ các trang trại cao nguyên ở Đà Lạt và Buôn Ma Thuột, hạt cà phê của chúng tôi được rang tươi mỗi sáng để có hương vị thơm ngon nhất.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-sm-5">
+                        <img class="img-fluid mb-3 mb-sm-0" src="~/img/service-3.jpg" alt="Chất lượng">
+                    </div>
+                    <div class="col-sm-7">
+                        <h4><i class="fa fa-award service-icon"></i>Cà Phê Chất Lượng Nhất</h4>
+                        <p class="m-0">Công thức đạt giải thưởng được hoàn thiện trong hơn 70 năm qua. Mỗi tách cà phê đều được chế biến bởi các barista chuyên nghiệp để mang lại trải nghiệm nhất quán.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-sm-5">
+                        <img class="img-fluid mb-3 mb-sm-0" src="~/img/service-4.jpg" alt="Đặt bàn">
+                    </div>
+                    <div class="col-sm-7">
+                        <h4><i class="fa fa-table service-icon"></i>Đặt Bàn Trực Tuyến</h4>
+                        <p class="m-0">Đặt chỗ ngồi hoàn hảo của bạn trong vài giây. Giảm ngay 30% khi đặt bàn trực tuyến. Lý tưởng cho các cuộc họp kinh doanh, hẹn hò và tụ họp gia đình.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a asp-page="/Order/Reservation" class="btn btn-primary font-weight-bold py-3 px-5">
+                <i class="fa fa-calendar-check mr-2"></i>Đặt Bàn Ngay
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Services End -->

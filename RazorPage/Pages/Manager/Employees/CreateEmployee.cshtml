@@ -1,0 +1,89 @@
+@page
+@model RazorPage.Pages.Manager.Employees.CreateEmployeeModel
+@{
+    ViewData["Title"] = "Thêm Nhân Viên";
+}
+<vc:page-header title="Thêm Nhân Viên"></vc:page-header>
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5 align-items-center mb-5">
+            <div class="col-lg-6">
+                <h1 class="display-5 mb-4">Quản lý Nhân Viên</h1>
+                <p class="mb-4">Tạo tài khoản cho nhân viên mới để họ có thể đăng nhập vào hệ thống POS và thực hiện các nghiệp vụ quản lý.</p>
+                <a asp-page="/Employee/POS" class="btn btn-primary py-3 px-5">Quay lại POS</a>
+            </div>
+            <div class="col-lg-6">
+                <div class="bg-light rounded p-5 p-sm-5">
+                    <h2 class="mb-4">Tạo tài khoản Nhân Viên</h2>
+                    
+                    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                    {
+                        <div class="alert alert-success">@Model.SuccessMessage</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@Model.ErrorMessage</div>
+                    }
+
+                    <form method="post">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.FullName" class="form-control" placeholder="Họ và tên" />
+                                    <label asp-for="Input.FullName">Họ và tên</label>
+                                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Username" class="form-control" placeholder="Tên đăng nhập" />
+                                    <label asp-for="Input.Username">Tên đăng nhập</label>
+                                    <span asp-validation-for="Input.Username" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Email" type="email" class="form-control" placeholder="Email" />
+                                    <label asp-for="Input.Email">Email</label>
+                                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Phone" class="form-control" placeholder="Số điện thoại" />
+                                    <label asp-for="Input.Phone">Số điện thoại</label>
+                                    <span asp-validation-for="Input.Phone" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Position" class="form-control" placeholder="Chức vụ" />
+                                    <label asp-for="Input.Position">Chức vụ (vd: Thu ngân, Phục vụ, Quản lý)</label>
+                                    <span asp-validation-for="Input.Position" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Password" type="password" class="form-control" placeholder="Mật khẩu" />
+                                    <label asp-for="Input.Password">Mật khẩu</label>
+                                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-floating">
+                                    <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Xác nhận mật khẩu" />
+                                    <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
+                                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button class="btn btn-primary py-3 px-5" type="submit">Tạo tài khoản</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

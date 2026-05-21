@@ -7,6 +7,8 @@ public partial class Order
 {
     public int OrderId { get; set; }
 
+    public Guid? PublicId { get; set; }
+
     public int TableId { get; set; }
 
     public int EmployeeId { get; set; }
@@ -19,11 +21,13 @@ public partial class Order
 
     public decimal SubTotal { get; set; }
 
-    public decimal DiscountAmount { get; set; }
+    public int? DiscountId { get; set; }
 
     public decimal TotalAmount { get; set; }
 
     public string? Note { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 
     public virtual Employee Employee { get; set; } = null!;
 
