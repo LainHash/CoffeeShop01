@@ -29,6 +29,8 @@ namespace RazorPage.DTOs.Manager
         public string Shape { get; set; } = "";
         public int TableNumber { get; set; }
         public int FloorNumber { get; set; }
+        public string Status { get; set; } = "";
+        public int RecommendedCapacity { get; set; }
     }
 
     public class ProductResponse

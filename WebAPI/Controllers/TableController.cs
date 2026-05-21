@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Services.Interfaces;
 
@@ -27,10 +27,47 @@ namespace WebAPI.Controllers
             });
         }
 
+        [HttpGet("floor/{floorNumber}")]
+        public async Task<IActionResult> GetAllByFloor(int floorNumber)
+        {
+            var result = await _tableService.GetAllByFloorAsync(floorNumber);
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                list = result.TableEntities
+            });
+        }
+
         [HttpGet("{floorNumber}/{tableNumber}")]
         public async Task<IActionResult> GetOne(int floorNumber, int tableNumber)
         {
             var result = await _tableService.GetOneAsync(floorNumber, tableNumber);
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = result.Message
+                });
+            }
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                table = result.TableEntity
+            });
+        }
+
+        public class UpdateStatusRequest
+        {
+            public string Status { get; set; } = string.Empty;
+        }
+
+        [HttpPut("{tableId}/status")]
+        public async Task<IActionResult> UpdateStatus(int tableId, [FromBody] UpdateStatusRequest req)
+        {
+            var result = await _tableService.UpdateStatusAsync(tableId, req.Status);
             if (!result.Success)
             {
                 return BadRequest(new

@@ -90,6 +90,18 @@ namespace WebAPI.Controllers
             });
         }
 
+        [HttpGet("Week")]
+        public async Task<IActionResult> GetByWeek([FromQuery] DateTime weekStart)
+        {
+            var result = await _reservationService.GetByWeekAsync(weekStart);
+            return Ok(new
+            {
+                success = result.Success,
+                message = result.Message,
+                reservations = result.Reservations
+            });
+        }
+
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto)
         {
@@ -111,24 +123,5 @@ namespace WebAPI.Controllers
             });
         }
 
-        [HttpDelete("{id:int}/Cancel")]
-        public async Task<IActionResult> Cancel(int id, [FromQuery] Guid customerPublicId)
-        {
-            var result = await _reservationService.CancelAsync(id, customerPublicId);
-            if (!result.Success)
-            {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
-            }
-
-            return Ok(new
-            {
-                success = true,
-                message = result.Message
-            });
-        }
     }
 }

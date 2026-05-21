@@ -1,0 +1,165 @@
+@page
+@model RazorPage.Pages.Employee.TableMapModel
+@using RazorPage.Helpers.Constants.Orders
+@using RazorPage.Helpers
+@{
+    ViewData["Title"] = "Sơ Đồ Bàn";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+
+    var tablesByFloor = Model.Tables
+        .GroupBy(t => t.FloorNumber)
+        .OrderBy(g => g.Key)
+        .ToList();
+}
+
+<style>
+    .floor-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+    }
+    .floor-tab-btn {
+        padding: 8px 20px;
+        border: none;
+        background: #f8f9fa;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .floor-tab-btn.active {
+        background: #DA9F5B;
+        color: white;
+    }
+    .table-floor-panel {
+        display: none;
+    }
+    .table-floor-panel.active {
+        display: block;
+    }
+    .table-map-card {
+        border: 2px solid #ddd;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        background: white;
+        transition: transform 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .table-map-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .table-map-card.status-Available { border-color: #28a745; border-top-width: 5px; }
+    .table-map-card.status-Occupied { border-color: #dc3545; border-top-width: 5px; }
+    .table-map-card.status-Reserved { border-color: #ffc107; border-top-width: 5px; }
+    .table-map-card.status-Unavailable { border-color: #6c757d; border-top-width: 5px; }
+    
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+    .badge-Available { background-color: #d4edda; color: #155724; }
+    .badge-Occupied { background-color: #f8d7da; color: #721c24; }
+    .badge-Reserved { background-color: #fff3cd; color: #856404; }
+    .badge-Unavailable { background-color: #e2e3e5; color: #383d41; }
+</style>
+
+<vc:page-header title="Sơ Đồ Bàn"></vc:page-header>
+
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Quản Lý Bàn</h4>
+            <h1 class="display-4">Sơ Đồ Từng Tầng</h1>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success">@Model.SuccessMessage</div>
+        }
+
+        @if (!tablesByFloor.Any())
+        {
+            <div class="alert alert-warning text-center">Chưa có dữ liệu bàn nào trong hệ thống.</div>
+        }
+        else
+        {
+            <div class="floor-tabs" id="floorTabs">
+                @foreach (var floor in tablesByFloor)
+                {
+                    <button type="button" class="floor-tab-btn @(floor == tablesByFloor.First() ? "active" : "")" data-floor="@floor.Key">
+                        Tầng @floor.Key
+                    </button>
+                }
+            </div>
+
+            @foreach (var floor in tablesByFloor)
+            {
+                <div class="table-floor-panel @(floor == tablesByFloor.First() ? "active" : "")" id="floor-panel-@floor.Key">
+                    <div class="row">
+                        @foreach (var t in floor.OrderBy(x => x.TableNumber))
+                        {
+                            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                <div class="table-map-card status-@t.Status">
+                                    <div>
+                                        <div class="status-badge badge-@t.Status">@StatusTranslator.TranslateTableStatus(t.Status)</div>
+                                        <h4>Bàn @t.TableNumber</h4>
+                                        <p class="text-muted mb-3"><i class="fa fa-users text-primary mr-1"></i> Sức chứa: @t.RecommendedCapacity</p>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-column gap-2" style="gap: 10px;">
+                                        <form method="post" asp-page-handler="UpdateStatus" class="d-flex w-100" style="gap: 5px;">
+                                            <input type="hidden" name="tableId" value="@t.TableId" />
+                                            <select name="status" class="form-control form-control-sm" style="font-size: 0.85rem;" onchange="this.form.submit()">
+                                                <option value="@TableStatuses.Available" selected="@(t.Status == TableStatuses.Available ? "selected" : null)">@StatusTranslator.TranslateTableStatus(TableStatuses.Available)</option>
+                                                <option value="@TableStatuses.Occupied" selected="@(t.Status == TableStatuses.Occupied ? "selected" : null)">@StatusTranslator.TranslateTableStatus(TableStatuses.Occupied)</option>
+                                                <option value="@TableStatuses.Reserved" selected="@(t.Status == TableStatuses.Reserved ? "selected" : null)">@StatusTranslator.TranslateTableStatus(TableStatuses.Reserved)</option>
+                                                <option value="@TableStatuses.Unavailable" selected="@(t.Status == TableStatuses.Unavailable ? "selected" : null)">@StatusTranslator.TranslateTableStatus(TableStatuses.Unavailable)</option>
+                                            </select>
+                                        </form>
+                                        
+                                        <a href="/Employee/POS?tableId=@t.TableId" class="btn btn-outline-primary btn-sm btn-block">
+                                            <i class="fa fa-file-invoice mr-1"></i> Tạo Hóa Đơn
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.floor-tab-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var floor = this.getAttribute('data-floor');
+                document.querySelectorAll('.floor-tab-btn').forEach(function (b) {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                document.querySelectorAll('.table-floor-panel').forEach(function (p) {
+                    p.classList.remove('active');
+                });
+                var panel = document.getElementById('floor-panel-' + floor);
+                if (panel) panel.classList.add('active');
+            });
+        });
+    </script>
+}

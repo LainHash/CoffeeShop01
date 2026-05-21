@@ -1,0 +1,232 @@
+@page
+@model RazorPage.Pages.Order.ReservationScheduleModel
+@using RazorPage.Helpers
+@{
+    ViewData["Title"] = "Lịch Đặt Bàn - KOPPEE Coffee Shop";
+    ViewData["ActivePage"] = "ReservationSchedule";
+
+    var days = new[] { "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật" };
+}
+
+<vc:page-header title="Lịch Đặt Bàn"></vc:page-header>
+
+<section class="schedule-section py-5">
+    <div class="container-xl">
+
+        <!-- Header Controls -->
+        <div class="schedule-header d-flex align-items-center justify-content-between flex-wrap mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a asp-page="/Order/ReservationSchedule"
+                   asp-route-weekStart="@Model.WeekStart.AddDays(-7).ToString("yyyy-MM-dd")"
+                   class="btn btn-outline-primary btn-sm px-3"
+                   id="prev-week-btn">
+                    <i class="fa fa-chevron-left mr-1"></i> Tuần trước
+                </a>
+
+                <div class="week-label text-center px-3">
+                    <span class="badge badge-primary px-3 py-2" style="font-size:0.95rem;">
+                        <i class="fa fa-calendar-week mr-1"></i>
+                        @Model.WeekStart.ToString("dd/MM") – @Model.WeekStart.AddDays(6).ToString("dd/MM/yyyy")
+                    </span>
+                </div>
+
+                <a asp-page="/Order/ReservationSchedule"
+                   asp-route-weekStart="@Model.WeekStart.AddDays(7).ToString("yyyy-MM-dd")"
+                   class="btn btn-outline-primary btn-sm px-3"
+                   id="next-week-btn">
+                    Tuần sau <i class="fa fa-chevron-right ml-1"></i>
+                </a>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a asp-page="/Order/ReservationSchedule"
+                   asp-route-weekStart="@Model.CurrentWeekStart.ToString("yyyy-MM-dd")"
+                   class="btn btn-secondary btn-sm px-3"
+                   id="today-btn">
+                    <i class="fa fa-home mr-1"></i> Tuần này
+                </a>
+                <a asp-page="/Order/Reservation" class="btn btn-primary btn-sm px-3" id="create-reservation-btn">
+                    <i class="fa fa-plus mr-1"></i> Tạo đặt bàn
+                </a>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge badge-warning px-2 py-1"><i class="fa fa-clock mr-1"></i>Chờ xác nhận</span>
+            <span class="badge badge-info px-2 py-1"><i class="fa fa-check mr-1"></i>Đã xác nhận</span>
+            <span class="badge badge-success px-2 py-1"><i class="fa fa-star mr-1"></i>Hoàn thành</span>
+            <span class="badge badge-secondary px-2 py-1"><i class="fa fa-times mr-1"></i>Đã hủy</span>
+            <span class="ml-auto text-muted small align-self-center">
+                Tổng: <strong>@Model.TotalReservations</strong> lịch đặt trong tuần
+            </span>
+        </div>
+
+        <!-- Weekly Calendar Grid -->
+        <div class="weekly-calendar">
+            <div class="calendar-grid">
+                @for (int i = 0; i < 7; i++)
+                {
+                    var dayDate = Model.WeekStart.AddDays(i);
+                    var isToday = dayDate.Date == DateTime.Today;
+                    var dayReservations = Model.ReservationsByDay.ContainsKey(dayDate.Date)
+                        ? Model.ReservationsByDay[dayDate.Date]
+                        : new List<RazorPage.DTOs.Order.ReservationApiItem>();
+
+                    <div class="day-column @(isToday ? "today" : "")" id="day-col-@i">
+                        <!-- Day Header -->
+                        <div class="day-header @(isToday ? "today-header" : "")">
+                            <div class="day-name">@days[i]</div>
+                            <div class="day-date @(isToday ? "text-white font-weight-bold" : "")">
+                                @dayDate.ToString("dd/MM")
+                            </div>
+                            @if (dayReservations.Any())
+                            {
+                                <span class="day-count-badge">@dayReservations.Count</span>
+                            }
+                        </div>
+
+                        <!-- Reservations List -->
+                        <div class="day-body">
+                            @if (!dayReservations.Any())
+                            {
+                                <div class="no-reservation-placeholder">
+                                    <i class="fa fa-calendar-times"></i>
+                                    <span>Chưa có lịch</span>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var r in dayReservations)
+                                {
+                                    <div class="reservation-card status-@r.Status.ToLower()"
+                                         id="res-card-@r.ReservationId"
+                                         data-toggle="modal"
+                                         data-target="#detailModal"
+                                         data-id="@r.ReservationId"
+                                         data-customer="@r.CustomerFullName"
+                                         data-phone="@r.CustomerPhone"
+                                         data-table="@r.TableName (Bàn @r.TableNumber - Tầng @r.FloorNumber)"
+                                         data-time="@r.ReservationTime.ToString("HH:mm dd/MM/yyyy")"
+                                         data-guests="@r.NumberOfGuests"
+                                         data-status="@r.Status"
+                                         data-note="@(r.Note ?? "—")">
+                                        <div class="res-time">
+                                            <i class="fa fa-clock"></i> @r.ReservationTime.ToString("HH:mm")
+                                        </div>
+                                        <div class="res-customer">
+                                            <i class="fa fa-user"></i> @r.CustomerFullName
+                                        </div>
+                                        <div class="res-table">
+                                            <i class="fa fa-chair"></i> Bàn @r.TableNumber · @r.NumberOfGuests khách
+                                        </div>
+                                        <span class="res-status-badge status-badge-@r.Status.ToLower()">@StatusTranslator.TranslateReservationStatus(r.Status)</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger mt-3">
+                <i class="fa fa-exclamation-circle mr-2"></i>@Model.ErrorMessage
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius:16px; overflow:hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #6f4e37, #c8a97e);">
+                <h5 class="modal-title text-white" id="detailModalLabel">
+                    <i class="fa fa-calendar-check mr-2"></i>Chi Tiết Đặt Bàn
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-hashtag text-primary mr-1"></i>Mã đặt bàn</span>
+                        <span class="detail-value font-weight-bold" id="modal-id"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-user text-primary mr-1"></i>Khách hàng</span>
+                        <span class="detail-value" id="modal-customer"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-phone text-primary mr-1"></i>Điện thoại</span>
+                        <span class="detail-value" id="modal-phone"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-chair text-primary mr-1"></i>Bàn</span>
+                        <span class="detail-value" id="modal-table"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-clock text-primary mr-1"></i>Thời gian</span>
+                        <span class="detail-value" id="modal-time"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-users text-primary mr-1"></i>Số khách</span>
+                        <span class="detail-value" id="modal-guests"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fa fa-info-circle text-primary mr-1"></i>Trạng thái</span>
+                        <span class="detail-value" id="modal-status"></span>
+                    </div>
+                    <div class="detail-item detail-item-full">
+                        <span class="detail-label"><i class="fa fa-sticky-note text-primary mr-1"></i>Ghi chú</span>
+                        <span class="detail-value text-muted" id="modal-note"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            // Open detail modal with data from card
+            $('#detailModal').on('show.bs.modal', function (event) {
+                var card = $(event.relatedTarget);
+                var modal = $(this);
+
+                modal.find('#modal-id').text('#' + card.data('id'));
+                modal.find('#modal-customer').text(card.data('customer'));
+                modal.find('#modal-phone').text(card.data('phone'));
+                modal.find('#modal-table').text(card.data('table'));
+                modal.find('#modal-time').text(card.data('time'));
+                modal.find('#modal-guests').text(card.data('guests') + ' người');
+                modal.find('#modal-note').text(card.data('note'));
+
+                var status = card.data('status');
+                var statusColors = {
+                    'Pending':   'warning',
+                    'Confirmed': 'info',
+                    'Completed': 'success',
+                    'Cancelled': 'secondary'
+                };
+                var statusLabels = {
+                    'Pending':   'Chờ xác nhận',
+                    'Confirmed': 'Đã xác nhận',
+                    'Completed': 'Hoàn thành',
+                    'Cancelled': 'Đã hủy'
+                };
+                var color = statusColors[status] || 'secondary';
+                var label = statusLabels[status] || status;
+                modal.find('#modal-status').html('<span class="badge badge-' + color + ' px-3 py-1">' + label + '</span>');
+            });
+        });
+    </script>
+}

@@ -15,6 +15,6 @@ namespace WebAPI.Services.Interfaces
 
         Task<ReservationResult> UpdateAsync(int reservationId, UpdateReservationDTO dto);
 
-        Task<ReservationResult> CancelAsync(int reservationId, Guid customerPublicId);
+        Task<ReservationResult> GetByWeekAsync(DateTime weekStart);
     }
 }

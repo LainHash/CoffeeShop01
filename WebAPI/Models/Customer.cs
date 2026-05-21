@@ -9,13 +9,11 @@ public partial class Customer
 
     public Guid? PublicId { get; set; }
 
-    public int UserId { get; set; }
-
     public string FullName { get; set; } = null!;
 
     public string Phone { get; set; } = null!;
 
-    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public DateTime? CreatedAt { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 }

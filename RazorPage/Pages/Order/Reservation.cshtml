@@ -9,12 +9,10 @@
 
 @if (Model.IsStaff)
 {
-    <!-- ===== STAFF FORM VIEW ===== -->
     <div class="container-fluid py-5">
         <div class="container">
             <div class="reservation position-relative overlay-top overlay-bottom">
                 <div class="row align-items-center">
-                    <!-- Left Info Panel -->
                     <div class="col-lg-6 my-5 my-lg-0">
                         <div class="p-5">
                             <div class="mb-4">
@@ -33,7 +31,6 @@
                         </div>
                     </div>
 
-                    <!-- Right Form Panel -->
                     <div class="col-lg-6">
                         <div class="text-center p-5" style="background: rgba(51, 33, 29, .85); border-radius: 12px;">
                             <h2 class="text-white mb-4">
@@ -69,18 +66,7 @@
                                     <span asp-validation-for="Input.FullName" class="text-warning small"></span>
                                 </div>
 
-                                <!-- Email -->
-                                <div class="form-group">
-                                    <label class="text-white small font-weight-bold mb-1">
-                                        <i class="fa fa-envelope text-primary mr-1"></i>Email Khách Hàng <span class="text-danger">*</span>
-                                    </label>
-                                    <input asp-for="Input.Email"
-                                           type="email"
-                                           class="form-control bg-transparent border-primary p-4 text-white"
-                                           placeholder="ten@email.com"
-                                           required />
-                                    <span asp-validation-for="Input.Email" class="text-warning small"></span>
-                                </div>
+
 
                                 <!-- Phone -->
                                 <div class="form-group">
@@ -94,7 +80,6 @@
                                            required />
                                 </div>
 
-                                <!-- Date & Time Row -->
                                 <div class="form-row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -128,26 +113,31 @@
                                     </div>
                                 </div>
 
-                                <!-- Number of Guests -->
                                 <div class="form-group">
                                     <label class="text-white small font-weight-bold mb-1">
                                         <i class="fa fa-users text-primary mr-1"></i>Số Lượng Khách <span class="text-danger">*</span>
                                     </label>
-                                    <select asp-for="Input.NumberOfGuests"
-                                            class="custom-select bg-transparent border-primary px-4 text-white"
-                                            style="height: 56px;">
-                                        <option value="" disabled selected>Chọn số người</option>
-                                        <option value="1">1 Người</option>
-                                        <option value="2">2 Người</option>
-                                        <option value="3">3 Người</option>
-                                        <option value="4">4 Người</option>
-                                        <option value="5">5 Người</option>
-                                        <option value="6">6 Người</option>
-                                        <option value="7">7+ Người</option>
+                                    <input asp-for="Input.NumberOfGuests"
+                                           class="custom-select bg-transparent border-primary px-4 text-white"
+                                           style="height: 56px;" 
+                                           type="number" min="1" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="text-white small font-weight-bold mb-1">
+                                        <i class="fa fa-chair text-primary mr-1"></i>Chọn Bàn
+                                    </label>
+                                    <select asp-for="Input.TableId" class="custom-select bg-transparent border-primary px-4 text-white" style="height: 56px;">
+                                        <option value="" style="color: black;">-- Tự động chọn bàn --</option>
+                                        @foreach (var table in Model.Tables)
+                                        {
+                                            <option value="@table.TableId" style="color: black;">
+                                                Bàn @table.TableNumber - Tầng @table.FloorNumber (Sức chứa: @table.RecommendedCapacity)
+                                            </option>
+                                        }
                                     </select>
                                 </div>
 
-                                <!-- Note -->
                                 <div class="form-group">
                                     <label class="text-white small font-weight-bold mb-1">
                                         <i class="fa fa-sticky-note text-primary mr-1"></i>Ghi Chú
