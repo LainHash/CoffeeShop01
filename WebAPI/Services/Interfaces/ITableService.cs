@@ -6,5 +6,6 @@ namespace WebAPI.Services.Interfaces
     {
         Task<TableResult> GetAllAsync();
         Task<TableResult> GetOneAsync(int floorNumber, int tableNumber);
+        Task<TableResult> GetAllByFloorAsync(int floorNumber);
     }
 }

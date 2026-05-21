@@ -74,18 +74,40 @@ namespace WebAPI.Services.Implementations
                 .Distinct()
                 .ToListAsync();
 
-            var availableTable = await _context.TableEntities
-                .Where(t => t.IsActive == true
-                         && t.Status == "Available"
-                         && t.RecommendedCapacity >= dto.NumberOfGuests
-                         && !busyTableIds.Contains(t.TableId))
-                .OrderBy(t => t.RecommendedCapacity)
-                .FirstOrDefaultAsync();
+            var availableTableId = 0;
 
-            if (availableTable == null)
-                return new ReservationResult(false, "Hiện không có bàn trống phù hợp với số lượng khách trong khung giờ này. Vui lòng chọn giờ khác.");
+            if (dto.TableId.HasValue)
+            {
+                var table = await _context.TableEntities
+                    .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value && t.IsActive == true && t.Status == "Available");
 
-            reservation.TableId = availableTable.TableId;
+                if (table == null)
+                    return new ReservationResult(false, "Bàn được chọn không tồn tại hoặc không ở trạng thái sẵn sàng.");
+
+                if (busyTableIds.Contains(table.TableId))
+                    return new ReservationResult(false, "Bàn được chọn đã có người đặt trong khung giờ này.");
+
+                availableTableId = table.TableId;
+            }
+            else
+            {
+                var availableTable = await _context.TableEntities
+                    .Where(t => t.IsActive == true
+                             && t.Status == "Available"
+                             && t.RecommendedCapacity >= dto.NumberOfGuests
+                             && !busyTableIds.Contains(t.TableId))
+                    .OrderBy(t => t.RecommendedCapacity)
+                    .FirstOrDefaultAsync();
+
+                if (availableTable == null)
+                    return new ReservationResult(false, "Hiện không có bàn trống phù hợp với số lượng khách trong khung giờ này. Vui lòng chọn giờ khác.");
+
+                availableTableId = availableTable.TableId;
+            }
+
+            reservation.TableId = availableTableId;
+
+
 
             _context.Reservations.Add(reservation);
             await _context.SaveChangesAsync();

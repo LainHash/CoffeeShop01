@@ -30,7 +30,6 @@
         }
 
         <div class="row">
-            <!-- ── Product Grid ── -->
             <div class="col-lg-8">
                 <h4 class="mb-4">Danh sách sản phẩm</h4>
                 <div class="row">
@@ -55,14 +54,12 @@
                 </div>
             </div>
 
-            <!-- ── Order Sidebar ── -->
             <div class="col-lg-4">
                 <h4 class="mb-4">Chi tiết hóa đơn</h4>
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <form method="post" id="posForm">
 
-                            <!-- ══ Table Picker (floor tabs + card grid) ══ -->
                             <div class="form-group mb-3">
                                 <label class="fw-bold mb-2">
                                     <i class="fa fa-table me-1"></i> Chọn bàn phục vụ
@@ -74,7 +71,6 @@
                                 }
                                 else
                                 {
-                                    <!-- Floor tab buttons -->
                                     <div class="floor-tabs" id="floorTabs">
                                         @foreach (var floor in tablesByFloor)
                                         {
@@ -86,7 +82,6 @@
                                         }
                                     </div>
 
-                                    <!-- Table card panels, one per floor -->
                                     @foreach (var floor in tablesByFloor)
                                     {
                                         <div class="table-floor-panel @(floor == tablesByFloor.First() ? "active" : "")"
@@ -113,23 +108,19 @@
                                         </div>
                                     }
 
-                                    <!-- Badge shows currently selected table -->
                                     <div id="selected-table-badge">
                                         <i class="fa fa-check-circle me-1"></i>
                                         <span id="selected-table-text">Chưa chọn bàn</span>
                                     </div>
                                 }
 
-                                <!-- Hidden input carries the TableId on submit -->
                                 <input type="hidden" asp-for="Input.TableId" id="selected-table-id" value="0" />
                             </div>
-                            <!-- ════════════════════════════════════════════ -->
 
                             <hr />
                             <h5 class="mb-3">Các món đã chọn</h5>
                             <div id="cart-items">
                                 <p class="text-muted text-center empty-cart-msg">Chưa có món nào.</p>
-                                <!-- Cart items will be appended here by JS -->
                             </div>
 
                             <hr />
@@ -177,22 +168,16 @@
 
 @section Scripts {
     <script>
-        /* ═══════════════════════════════════════
-           Floor-tab + Table-card picker
-        ═══════════════════════════════════════ */
         (function () {
-            // Tab switching
             document.querySelectorAll('.floor-tab-btn').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     var floor = this.getAttribute('data-floor');
 
-                    // Toggle active tab button
                     document.querySelectorAll('.floor-tab-btn').forEach(function (b) {
                         b.classList.remove('active');
                     });
                     this.classList.add('active');
 
-                    // Show matching panel
                     document.querySelectorAll('.table-floor-panel').forEach(function (p) {
                         p.classList.remove('active');
                     });
@@ -201,24 +186,19 @@
                 });
             });
 
-            // Table card selection
             document.querySelectorAll('.table-card').forEach(function (card) {
                 card.addEventListener('click', function () {
                     var tableId  = this.getAttribute('data-table-id');
                     var tableNum = this.getAttribute('data-table-num');
                     var floor    = this.getAttribute('data-floor');
 
-                    // Deselect all cards
                     document.querySelectorAll('.table-card').forEach(function (c) {
                         c.classList.remove('selected');
                     });
-                    // Select clicked card
                     this.classList.add('selected');
 
-                    // Update hidden input
                     document.getElementById('selected-table-id').value = tableId;
 
-                    // Show badge
                     var badge = document.getElementById('selected-table-badge');
                     var text  = document.getElementById('selected-table-text');
                     badge.style.display = 'block';
@@ -228,7 +208,6 @@
                 });
             });
 
-            // Re-evaluate submit button when cart or table changes
             window.checkSubmitBtn = function () {
                 var tableId  = document.getElementById('selected-table-id').value;
                 var hasTable = tableId && tableId !== '0';
@@ -237,9 +216,6 @@
             };
         })();
 
-        /* ═══════════════════════════════════════
-           Cart logic
-        ═══════════════════════════════════════ */
         let cart = [];
 
         function updateCartUI() {
@@ -280,7 +256,6 @@
 
             subtotalEl.innerText = subtotal.toLocaleString() + ' VNĐ';
 
-            // Discount
             let finalTotal = subtotal;
             if (discountSelect.selectedIndex > 0) {
                 const option = discountSelect.options[discountSelect.selectedIndex];
@@ -292,7 +267,6 @@
             if (finalTotal < 0) finalTotal = 0;
             finalTotalEl.innerText = finalTotal.toLocaleString() + ' VNĐ';
 
-            // Remove button handlers
             document.querySelectorAll('.remove-item-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const idx = parseInt(this.getAttribute('data-index'));

@@ -35,5 +35,13 @@ namespace WebAPI.Services.Implementations
             }
             return new TableResult(true, "Lấy bàn thành công.", _mapper.Map<TableEntityDTO>(table));
         }
+
+        public async Task<TableResult> GetAllByFloorAsync(int floorNumber)
+        {
+            var tables = await _context.TableEntities
+                .Where(t => t.FloorNumber == floorNumber)
+                .ToListAsync();
+            return new TableResult(true, "Lấy danh sách bàn theo tầng thành công", _mapper.Map<List<TableEntityDTO>>(tables));
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace WebAPI.DTOs.Reservations
         public DateTime ReservationTime { get; set; }
         public int NumberOfGuests { get; set; }
         public string? Note { get; set; }
+        public int? TableId { get; set; }
     }
 }

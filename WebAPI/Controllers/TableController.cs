@@ -27,6 +27,18 @@ namespace WebAPI.Controllers
             });
         }
 
+        [HttpGet("floor/{floorNumber}")]
+        public async Task<IActionResult> GetAllByFloor(int floorNumber)
+        {
+            var result = await _tableService.GetAllByFloorAsync(floorNumber);
+            return Ok(new
+            {
+                success = true,
+                message = result.Message,
+                list = result.TableEntities
+            });
+        }
+
         [HttpGet("{floorNumber}/{tableNumber}")]
         public async Task<IActionResult> GetOne(int floorNumber, int tableNumber)
         {

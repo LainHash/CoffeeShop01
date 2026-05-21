@@ -46,5 +46,22 @@ namespace RazorPage.DTOs.Order
 
         public int NumberOfGuests { get; set; } = 1;
         public string? Note { get; set; }
+        public int? TableId { get; set; }
+    }
+
+    public class TableApiItem
+    {
+        public int TableId { get; set; }
+        public int TableNumber { get; set; }
+        public int FloorNumber { get; set; }
+        public int RecommendedCapacity { get; set; }
+        public string Status { get; set; } = string.Empty;
+    }
+
+    public class TableListApiResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public List<TableApiItem> List { get; set; } = new();
     }
 }

@@ -21,6 +21,8 @@ namespace RazorPage.Pages.Order
         public string? SuccessMessage { get; set; }
         public string? ErrorMessage { get; set; }
 
+        public List<TableApiItem> Tables { get; set; } = new();
+
         public bool IsStaff { get; private set; }
 
         private bool CheckIsStaff()
@@ -29,10 +31,32 @@ namespace RazorPage.Pages.Order
             return roleId.HasValue && roleId.Value != 1;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
             IsStaff = CheckIsStaff();
+            await LoadTablesAsync();
             return Page();
+        }
+
+        private async Task LoadTablesAsync()
+        {
+            var client = _httpClientFactory.CreateClient("WebAPI");
+            var response = await client.GetAsync("/api/Table");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                var result = System.Text.Json.JsonSerializer.Deserialize<TableListApiResponse>(
+                    content, 
+                    new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+                if (result?.Success == true)
+                {
+                    Tables = result.List.Where(t => t.Status == "Available")
+                                        .OrderBy(t => t.FloorNumber)
+                                        .ThenBy(t => t.TableNumber)
+                                        .ToList();
+                }
+            }
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -47,18 +71,21 @@ namespace RazorPage.Pages.Order
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "Vui lòng điền đầy đủ các thông tin bắt buộc.";
+                await LoadTablesAsync();
                 return Page();
             }
 
             if (string.IsNullOrEmpty(Input.Date) || string.IsNullOrEmpty(Input.Time))
             {
                 ErrorMessage = "Vui lòng chọn ngày và giờ đặt bàn.";
+                await LoadTablesAsync();
                 return Page();
             }
 
             if (!DateTime.TryParse($"{Input.Date} {Input.Time}", out DateTime reservationTime))
             {
                 ErrorMessage = "Ngày giờ không hợp lệ. Vui lòng kiểm tra lại.";
+                await LoadTablesAsync();
                 return Page();
             }
 
@@ -68,7 +95,8 @@ namespace RazorPage.Pages.Order
                 Phone = Input.Phone,
                 ReservationTime = reservationTime,
                 NumberOfGuests = Input.NumberOfGuests,
-                Note = Input.Note
+                Note = Input.Note,
+                TableId = Input.TableId
             };
 
             var client = _httpClientFactory.CreateClient("WebAPI");
@@ -95,6 +123,7 @@ namespace RazorPage.Pages.Order
                 ErrorMessage = result?.Message ?? "Có lỗi xảy ra khi đặt bàn. Vui lòng thử lại.";
             }
 
+            await LoadTablesAsync();
             return Page();
         }
     }
