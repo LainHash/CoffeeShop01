@@ -107,7 +107,6 @@
 
 @section Scripts {
     <script>
-        // Toggle password visibility
         document.getElementById('toggle-pwd').addEventListener('click', function () {
             var field = document.getElementById('password-field');
             var icon = document.getElementById('eye-icon');
@@ -120,7 +119,6 @@
             }
         });
 
-        // Loading state on submit
         document.getElementById('login-form').addEventListener('submit', function () {
             document.getElementById('login-btn').innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Đang đăng nhập...';
             document.getElementById('login-btn').disabled = true;
