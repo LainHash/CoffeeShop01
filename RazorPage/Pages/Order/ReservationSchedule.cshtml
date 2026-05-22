@@ -71,7 +71,7 @@
                     var isToday = dayDate.Date == DateTime.Today;
                     var dayReservations = Model.ReservationsByDay.ContainsKey(dayDate.Date)
                         ? Model.ReservationsByDay[dayDate.Date]
-                        : new List<RazorPage.DTOs.Order.ReservationApiItem>();
+                        : new List<RazorPage.DTOs.Orders.Reservations.ReservationApiItem>();
 
                     <div class="day-column @(isToday ? "today" : "")" id="day-col-@i">
                         <!-- Day Header -->
