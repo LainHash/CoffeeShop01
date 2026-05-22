@@ -33,7 +33,7 @@ namespace WebAPI.Controllers
                 return BadRequest(new { success = false, message = "Email hoặc mật khẩu không đúng." });
             }
 
-            if (user.RoleId == 1) // roleId = 1 used to be Customer
+            if (user.RoleId == 1) 
             {
                 return BadRequest(new { success = false, message = "Hệ thống chỉ dành cho nhân viên." });
             }
