@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using RazorPage.DTOs.Order;
+using RazorPage.DTOs.Orders.Reservations;
 using System.Text.Json;
 
 namespace RazorPage.Pages.Order

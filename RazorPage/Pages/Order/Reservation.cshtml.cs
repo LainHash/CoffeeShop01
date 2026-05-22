@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RazorPage.Helpers.Constants.Sessions;
 using System.ComponentModel.DataAnnotations;
-using RazorPage.DTOs.Order;
+using RazorPage.DTOs.Orders.Reservations;
+using RazorPage.DTOs.Orders.Tables;
 
 namespace RazorPage.Pages.Order
 {
