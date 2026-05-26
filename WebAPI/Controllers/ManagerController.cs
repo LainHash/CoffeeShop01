@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Http;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.DTOs.Accounts;
 using WebAPI.DTOs.Accounts.Managers;
 using WebAPI.DTOs.Accounts.Managers.Update;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -18,103 +18,23 @@ namespace WebAPI.Controllers
             _managerService = managerService;
         }
 
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetInfo(Guid id)
-        //{
-        //    var result = await _managerService.GetInfoAsync(id);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message,
-        //        manager = result.Manager
-        //    });
-        //}
-
         [HttpPost("Create/Employee")]
-        public async Task<IActionResult> CreateEmployee(CreateEmployeeDTO dto)
+        public async Task<IActionResult> CreateEmployee(CreateEmployeeDTO dto,
+            [FromServices] IValidator<CreateEmployeeDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null)
+            {
+                return error;
+            }
+
             var result = await _managerService.CreateEmployeeAsync(dto);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message,
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                manager = result.Manager
-            });
+            return Ok(result);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Update(Guid id, UpdateManagerInfoDTO dto)
-        //{
-        //    var result = await _managerService.UpdateAsync(id, dto);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message,
-        //        manager = result.Manager
-        //    });
-        //}
-
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> Delete(Guid id)
-        //{
-        //    var result = await _managerService.DeleteAsync(id);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message
-        //    });
-        //}
-
-        //[HttpPut("{id}/change-password")]
-        //public async Task<IActionResult> ChangePassword(Guid id, PasswordChangeDTO dto)
-        //{
-        //    var result = await _managerService.ChangePasswordAsync(id, dto);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message,
-        //        manager = result.Manager
-        //    });
-        //}
     }
 }

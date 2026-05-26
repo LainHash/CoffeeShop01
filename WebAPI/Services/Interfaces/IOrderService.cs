@@ -1,18 +1,19 @@
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.DTOs.Orders.Create;
 using WebAPI.DTOs.Orders.Update;
+using WebAPI.DTOs.Orders;
 
 namespace WebAPI.Services.Interfaces
 {
     public interface IOrderService
     {
-        Task<OrderResult> GetAllAsync();
-        Task<OrderResult> GetOneAsync(Guid id);
+        Task<OrderResult<List<OrderDTO>>> GetAllAsync();
+        Task<OrderResult<OrderDTO>> GetOneAsync(Guid id);
 
-        Task<OrderResult> CreateAsync(CreateOrderDTO request);
-        Task<OrderResult> UpdateAsync(Guid id, UpdateOrderDTO request);
+        Task<OrderResult<OrderDTO>> CreateAsync(CreateOrderDTO request);
+        Task<OrderResult<OrderDTO>> UpdateAsync(Guid id, UpdateOrderDTO request);
 
-        Task<OrderResult> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null);
+        Task<OrderResult<OrderDTO>> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null);
 
     }
 }

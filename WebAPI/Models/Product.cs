@@ -25,6 +25,8 @@ public partial class Product
 
     public int? UnitsInStock { get; set; }
 
+    public bool IsMadeToOrder { get; set; }
+
     public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();

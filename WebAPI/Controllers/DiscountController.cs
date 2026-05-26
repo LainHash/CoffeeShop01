@@ -19,12 +19,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _discountService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                list = result.Discounts
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -33,18 +28,9 @@ namespace WebAPI.Controllers
             var result = await _discountService.GetOneAsync(id);
             if(!result.Success)
             {
-                return NotFound(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Discount
-            });
+            return Ok(result);
         }
     }
 }

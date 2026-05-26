@@ -1,10 +1,10 @@
 ﻿using WebAPI.DTOs.Categories;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 
 namespace WebAPI.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<CategoryResult> GetAllAsync();
+        Task<CategoryResult<List<CategoryDTO>>> GetAllAsync();
     }
 }

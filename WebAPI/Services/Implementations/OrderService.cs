@@ -4,7 +4,7 @@ using WebAPI.Data;
 using WebAPI.DTOs.Orders;
 using WebAPI.DTOs.Orders.Create;
 using WebAPI.DTOs.Orders.Update;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.Helpers.Constants.Orders;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
@@ -22,7 +22,7 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<OrderResult> GetAllAsync()
+        public async Task<OrderResult<List<OrderDTO>>> GetAllAsync()
         {
             var orders = await _context.Orders
                 .Include(o => o.Table)
@@ -41,10 +41,15 @@ namespace WebAPI.Services.Implementations
                 }
             }
 
-            return new OrderResult(true, "Lấy danh sách hóa đơn thành công", orderDtos);
+            return new OrderResult<List<OrderDTO>>
+            {
+                Success = true,
+                Message = "Lấy danh sách hóa đơn thành công",
+                Data = orderDtos
+            };
         }
 
-        public async Task<OrderResult> GetOneAsync(Guid id)
+        public async Task<OrderResult<OrderDTO>> GetOneAsync(Guid id)
         {
             var order = await _context.Orders
                 .Include(o => o.Table)
@@ -54,7 +59,11 @@ namespace WebAPI.Services.Implementations
                 .FirstOrDefaultAsync(od => od.PublicId == id);
             if (order == null)
             {
-                return new OrderResult(false, "Hóa đơn không tồn tại!");
+                return new OrderResult<OrderDTO>
+                {
+                    Success = false,
+                    Message = "Hóa đơn không tồn tại!"
+                };
             }
 
             var orderDto = _mapper.Map<OrderDTO>(order);
@@ -64,10 +73,15 @@ namespace WebAPI.Services.Implementations
                 if (discount != null) orderDto.DiscountCode = discount.DiscountCode;
             }
 
-            return new OrderResult(true, "Lấy hóa đơn thành công", orderDto);
+            return new OrderResult<OrderDTO>
+            {
+                Success = true,
+                Message = "Lấy hóa đơn thành công",
+                Data = orderDto
+            };
         }
 
-        public async Task<OrderResult> CreateAsync(CreateOrderDTO request)
+        public async Task<OrderResult<OrderDTO>> CreateAsync(CreateOrderDTO request)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -76,14 +90,22 @@ namespace WebAPI.Services.Implementations
                     .FirstOrDefaultAsync(t => t.TableId == request.TableId);
                 if (table == null)
                 {
-                    return new OrderResult(false, "Bàn không tồn tại.");
+                    return new OrderResult<OrderDTO>
+                    {
+                        Success = false,
+                        Message = "Bàn không tồn tại."
+                    };
                 }
 
                 var employee = await _context.Employees
                     .FirstOrDefaultAsync(e => e.PublicId == request.EmployeePublicId);
                 if (employee == null)
                 {
-                    return new OrderResult(false, "Nhân viên không tồn tại.");
+                    return new OrderResult<OrderDTO>
+                    {
+                        Success = false,
+                        Message = "Nhân viên không tồn tại."
+                    };
                 }
 
                 var order = _mapper.Map<Order>(request);
@@ -98,7 +120,11 @@ namespace WebAPI.Services.Implementations
                             .FirstOrDefaultAsync(p => p.ProductId == detail.ProductId);
                         if (product == null)
                         {
-                            return new OrderResult(false, $"Sản phẩm có ID {detail.ProductId} không tồn tại.");
+                            return new OrderResult<OrderDTO>
+                            {
+                                Success = false,
+                                Message = $"Sản phẩm có ID {detail.ProductId} không tồn tại."
+                            };
                         }
 
                         detail.UnitPrice = product.Price;
@@ -126,7 +152,11 @@ namespace WebAPI.Services.Implementations
                     }
                     else
                     {
-                        return new OrderResult(false, "Mã giảm giá không tồn tại.");
+                        return new OrderResult<OrderDTO>
+                        {
+                            Success = false,
+                            Message = "Mã giảm giá không tồn tại."
+                        };
                     }
                 }
 
@@ -138,21 +168,30 @@ namespace WebAPI.Services.Implementations
                 await transaction.CommitAsync();
 
                 var orderDto = _mapper.Map<OrderDTO>(order);
-                return new OrderResult(true, "Tạo hóa đơn thành công", orderDto);
+                return new OrderResult<OrderDTO>
+                {
+                    Success = true,
+                    Message = "Tạo hóa đơn thành công",
+                    Data = orderDto
+                };
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return new OrderResult(false, $"Lỗi khi tạo hóa đơn: {ex.Message}");
+                return new OrderResult<OrderDTO>
+                {
+                    Success = false,
+                    Message = $"Lỗi khi tạo hóa đơn: {ex.Message}"
+                };
             }
         }
 
-        public Task<OrderResult> UpdateAsync(Guid id, UpdateOrderDTO request)
+        public Task<OrderResult<OrderDTO>> UpdateAsync(Guid id, UpdateOrderDTO request)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<OrderResult> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null)
+        public async Task<OrderResult<OrderDTO>> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null)
         {
             var order = await _context.Orders
                 .Include(o => o.Table)
@@ -163,13 +202,17 @@ namespace WebAPI.Services.Implementations
 
             if (order == null)
             {
-                return new OrderResult(false, "Hóa đơn không tồn tại!");
+                return new OrderResult<OrderDTO>
+                {
+                    Success = false,
+                    Message = "Hóa đơn không tồn tại!"
+                };
             }
 
             if (confirm)
             {
                 order.Status = InvoiceStatuses.Paid;
-                
+
                 var payment = new Payment
                 {
                     OrderId = order.OrderId,
@@ -194,11 +237,12 @@ namespace WebAPI.Services.Implementations
                 if (discount != null) orderDto.DiscountCode = discount.DiscountCode;
             }
 
-            return new OrderResult(
-                true,
-                confirm ? "Thanh toán hóa đơn thành công" : "Hóa đơn đã bị hủy",
-                orderDto
-            );
+            return new OrderResult<OrderDTO>
+            {
+                Success = true,
+                Message = confirm ? "Thanh toán hóa đơn thành công" : "Hóa đơn đã bị hủy",
+                Data = orderDto
+            };
         }
     }
 }

@@ -1,5 +1,7 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Reservations;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -16,36 +18,26 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateReservationDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateReservationDTO dto,
+            [FromServices] IValidator<CreateReservationDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null) return error;
+
             var result = await _reservationService.CreateAsync(dto);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                reservation = result.Reservation
-            });
+            return Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var result = await _reservationService.GetAllAsync();
-            return Ok(new
-            {
-                success = result.Success,
-                message = result.Message,
-                reservations = result.Reservations
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")]
@@ -54,19 +46,10 @@ namespace WebAPI.Controllers
             var result = await _reservationService.GetByIdAsync(id);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                reservation = result.Reservation
-            });
+            return Ok(result);
         }
 
         [HttpGet("Customer/{customerPublicId:guid}")]
@@ -75,52 +58,33 @@ namespace WebAPI.Controllers
             var result = await _reservationService.GetByCustomerAsync(customerPublicId);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                reservations = result.Reservations
-            });
+            return Ok(result);
         }
 
         [HttpGet("Week")]
         public async Task<IActionResult> GetByWeek([FromQuery] DateTime weekStart)
         {
             var result = await _reservationService.GetByWeekAsync(weekStart);
-            return Ok(new
-            {
-                success = result.Success,
-                message = result.Message,
-                reservations = result.Reservations
-            });
+            return Ok(result);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto,
+            [FromServices] IValidator<UpdateReservationDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null) return error;
+
             var result = await _reservationService.UpdateAsync(id, dto);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                reservation = result.Reservation
-            });
+            return Ok(result);
         }
 
     }
