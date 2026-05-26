@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Http;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Orders.Create;
 using WebAPI.DTOs.Orders.Update;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -37,16 +38,11 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderDTO request)
+        public async Task<IActionResult> Create([FromBody] CreateOrderDTO request,
+            [FromServices] IValidator<CreateOrderDTO> validator)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Dữ liệu không hợp lệ."
-                });
-            }
+            var error = await validator.ValidateAndReturnError(request);
+            if (error != null) return error;
 
             var result = await _orderService.CreateAsync(request);
             if (!result.Success)

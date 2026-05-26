@@ -1,5 +1,7 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Reservations;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -16,8 +18,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateReservationDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateReservationDTO dto,
+            [FromServices] IValidator<CreateReservationDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null) return error;
+
             var result = await _reservationService.CreateAsync(dto);
             if (!result.Success)
             {
@@ -66,8 +72,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto,
+            [FromServices] IValidator<UpdateReservationDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null) return error;
+
             var result = await _reservationService.UpdateAsync(id, dto);
             if (!result.Success)
             {

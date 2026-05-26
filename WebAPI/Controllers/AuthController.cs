@@ -1,7 +1,7 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Data;
 using WebAPI.DTOs.Accounts;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -18,8 +18,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO dto)
+        public async Task<IActionResult> Login([FromBody] LoginDTO dto,
+            [FromServices] IValidator<LoginDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null)
+            {
+                return error;
+            }
+
             var result = await _authService.LoginAsync(dto);
             if (!result.Success)
             {

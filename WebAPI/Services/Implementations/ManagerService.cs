@@ -1,10 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
-using WebAPI.DTOs.Accounts;
-using WebAPI.DTOs.Accounts.Customers;
 using WebAPI.DTOs.Accounts.Managers;
-using WebAPI.DTOs.Accounts.Managers.Update;
 using WebAPI.ResultModels;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;

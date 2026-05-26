@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Http;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.DTOs.Accounts;
 using WebAPI.DTOs.Accounts.Managers;
 using WebAPI.DTOs.Accounts.Managers.Update;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -19,8 +19,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("Create/Employee")]
-        public async Task<IActionResult> CreateEmployee(CreateEmployeeDTO dto)
+        public async Task<IActionResult> CreateEmployee(CreateEmployeeDTO dto,
+            [FromServices] IValidator<CreateEmployeeDTO> validator)
         {
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null)
+            {
+                return error;
+            }
+
             var result = await _managerService.CreateEmployeeAsync(dto);
             if (!result.Success)
             {
