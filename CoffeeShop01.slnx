@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="BlazorApp/BlazorApp.csproj" Id="5de3cbec-5ae8-4b90-87ca-3fb5d0c6e498" />
   <Project Path="RazorPage/RazorPage.csproj" Id="c05870b7-a8de-46fe-b641-c4aab3bf9895" />
   <Project Path="WebAPI/WebAPI.csproj" />
 </Solution>
