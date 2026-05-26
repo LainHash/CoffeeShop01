@@ -18,26 +18,6 @@ namespace WebAPI.Controllers
             _managerService = managerService;
         }
 
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetInfo(Guid id)
-        //{
-        //    var result = await _managerService.GetInfoAsync(id);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message,
-        //        manager = result.Manager
-        //    });
-        //}
-
         [HttpPost("Create/Employee")]
         public async Task<IActionResult> CreateEmployee(CreateEmployeeDTO dto)
         {
@@ -54,67 +34,9 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                manager = result.Manager
+                manager = result.Data
             });
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Update(Guid id, UpdateManagerInfoDTO dto)
-        //{
-        //    var result = await _managerService.UpdateAsync(id, dto);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message,
-        //        manager = result.Manager
-        //    });
-        //}
-
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> Delete(Guid id)
-        //{
-        //    var result = await _managerService.DeleteAsync(id);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message
-        //    });
-        //}
-
-        //[HttpPut("{id}/change-password")]
-        //public async Task<IActionResult> ChangePassword(Guid id, PasswordChangeDTO dto)
-        //{
-        //    var result = await _managerService.ChangePasswordAsync(id, dto);
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            success = false,
-        //            message = result.Message
-        //        });
-        //    }
-        //    return Ok(new
-        //    {
-        //        success = true,
-        //        message = result.Message,
-        //        manager = result.Manager
-        //    });
-        //}
     }
 }

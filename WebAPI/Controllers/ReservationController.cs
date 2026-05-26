@@ -32,7 +32,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                reservation = result.Reservation
+                data = result.Data
             });
         }
 
@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
             {
                 success = result.Success,
                 message = result.Message,
-                reservations = result.Reservations
+                data = result.Data
             });
         }
 
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                reservation = result.Reservation
+                data = result.Data
             });
         }
 
@@ -86,7 +86,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                reservations = result.Reservations
+                data = result.Data
             });
         }
 
@@ -98,7 +98,7 @@ namespace WebAPI.Controllers
             {
                 success = result.Success,
                 message = result.Message,
-                reservations = result.Reservations
+                data = result.Data
             });
         }
 
@@ -119,7 +119,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                reservation = result.Reservation
+                data = result.Data
             });
         }
 

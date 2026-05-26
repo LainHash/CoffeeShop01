@@ -25,7 +25,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                orders = result.Orders
+                data = result.Data
             });
         }
 
@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                order = result.Order
+                data = result.Data
             });
         }
 
@@ -76,7 +76,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                order = result.Order
+                data = result.Data
             });
         }
 
@@ -97,7 +97,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                order = result.Order
+                data = result.Data
             });
         }
     }

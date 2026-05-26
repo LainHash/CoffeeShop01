@@ -23,7 +23,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                list = result.Discounts
+                data = result.Data
             });
         }
 
@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                data = result.Discount
+                data = result.Data
             });
         }
     }

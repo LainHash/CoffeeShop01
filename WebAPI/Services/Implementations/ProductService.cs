@@ -4,7 +4,7 @@ using WebAPI.Data;
 using WebAPI.DTOs.Products;
 using WebAPI.DTOs.Products.Create;
 using WebAPI.DTOs.Products.Update;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
@@ -21,69 +21,117 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ProductResult> GetAllAsync()
+        public async Task<ProductResult<List<ProductDTO>>> GetAllAsync()
         {
             var products = await _context.Products
                 .Where(p => p.IsAvailable == true)
                 .ToListAsync();
-            return new ProductResult(true, "Lấy danh sách sản phẩm thành công.", _mapper.Map<List<ProductDTO>>(products));
-        }
-
-        public async Task<ProductResult> GetOneAsync(Guid id)
-        {
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.PublicId == id);
-            if (product == null) 
+            return new ProductResult<List<ProductDTO>>
             {
-                return new ProductResult(false, "Sản phẩm không tồn tại!");
-            }
-            if (product.IsAvailable != true)
-            {
-                return new ProductResult(false, "Sản phẩm này đã bị xóa!");
-            }
-            return new ProductResult(true, "Lấy sản phẩm thành công", _mapper.Map<ProductDTO>(product));
+                Success = true,
+                Message = "Lấy danh sách sản phẩm thành công.",
+                Data = _mapper.Map<List<ProductDTO>>(products)
+            };
         }
 
-        public async Task<ProductResult> CreateAsync(CreateProductDTO dto)
-        {
-            var product = _mapper.Map<Product>(dto);
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            return new ProductResult(true, "Tạo sản phẩm thành công.", _mapper.Map<ProductDTO>(product));
-        }
-
-        public async Task<ProductResult> UpdateAsync(Guid id, UpdateProductDTO dto)
+        public async Task<ProductResult<ProductDTO>> GetOneAsync(Guid id)
         {
             var product = await _context.Products
                 .FirstOrDefaultAsync(p => p.PublicId == id);
             if (product == null)
             {
-                return new ProductResult(false, "Sản phẩm không tồn tại!");
+                return new ProductResult<ProductDTO>
+                {
+                    Success = false,
+                    Message = "Sản phẩm không tồn tại!"
+                };
             }
             if (product.IsAvailable != true)
             {
-                return new ProductResult(false, "Sản phẩm này đã bị xóa!");
+                return new ProductResult<ProductDTO>
+                {
+                    Success = false,
+                    Message = "Sản phẩm này đã bị xóa!"
+                };
+            }
+            return new ProductResult<ProductDTO>
+            {
+                Success = true,
+                Message = "Lấy sản phẩm thành công",
+                Data = _mapper.Map<ProductDTO>(product)
+            };
+        }
+
+        public async Task<ProductResult<ProductDTO>> CreateAsync(CreateProductDTO dto)
+        {
+            var product = _mapper.Map<Product>(dto);
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return new ProductResult<ProductDTO>
+            {
+                Success = true,
+                Message = "Tạo sản phẩm thành công.",
+                Data = _mapper.Map<ProductDTO>(product)
+            };
+        }
+
+        public async Task<ProductResult<ProductDTO>> UpdateAsync(Guid id, UpdateProductDTO dto)
+        {
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.PublicId == id);
+            if (product == null)
+            {
+                return new ProductResult<ProductDTO>
+                {
+                    Success = false,
+                    Message = "Sản phẩm không tồn tại!"
+                };
+            }
+            if (product.IsAvailable != true)
+            {
+                return new ProductResult<ProductDTO>
+                {
+                    Success = false,
+                    Message = "Sản phẩm này đã bị xóa!"
+                };
             }
             _mapper.Map(dto, product);
             await _context.SaveChangesAsync();
-            return new ProductResult(true, "Cập nhật sản phẩm thành công.", _mapper.Map<ProductDTO>(product));
+            return new ProductResult<ProductDTO>
+            {
+                Success = true,
+                Message = "Cập nhật sản phẩm thành công.",
+                Data = _mapper.Map<ProductDTO>(product)
+            };
         }
 
         public async Task<ProductResult> DeleteAsync(Guid id)
         {
             var product = await _context.Products
                 .FirstOrDefaultAsync(p => p.PublicId == id);
-            if(product == null)
+            if (product == null)
             {
-                return new ProductResult(false, "Sản phẩm không tồn tại!");
+                return new ProductResult
+                {
+                    Success = false,
+                    Message = "Sản phẩm không tồn tại!"
+                };
             }
-            if(product.IsAvailable != true)
+            if (product.IsAvailable != true)
             {
-                return new ProductResult(false, "Sản phẩm này đã bị xóa!");
+                return new ProductResult
+                {
+                    Success = false,
+                    Message = "Sản phẩm này đã bị xóa!"
+                };
             }
             product.IsAvailable = false;
             await _context.SaveChangesAsync();
-            return new ProductResult(true, "Sản phẩm đã bị xóa thành công");
+            return new ProductResult
+            {
+                Success = true,
+                Message = "Sản phẩm đã bị xóa thành công"
+            };
         }
     }
 }

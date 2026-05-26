@@ -1,12 +1,13 @@
-using WebAPI.DTOs.Results;
+using WebAPI.DTOs.TableEntities;
+using WebAPI.ResultModels;
 
 namespace WebAPI.Services.Interfaces
 {
     public interface ITableService
     {
-        Task<TableResult> GetAllAsync();
-        Task<TableResult> GetOneAsync(int floorNumber, int tableNumber);
-        Task<TableResult> GetAllByFloorAsync(int floorNumber);
-        Task<TableResult> UpdateStatusAsync(int tableId, string status);
+        Task<TableResult<List<TableEntityDTO>>> GetAllAsync();
+        Task<TableResult<TableEntityDTO>> GetOneAsync(int floorNumber, int tableNumber);
+        Task<TableResult<List<TableEntityDTO>>> GetAllByFloorAsync(int floorNumber);
+        Task<TableResult<TableEntityDTO>> UpdateStatusAsync(int tableId, string status);
     }
 }

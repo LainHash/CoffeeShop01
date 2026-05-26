@@ -31,7 +31,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                customers = result.Customers
+                data = result.Data
             });
         }
 
@@ -51,7 +51,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                customer = result.Customer
+                data = result.Data
             });
         }
 
@@ -71,7 +71,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                customer = result.Customer
+                data = result.Data
             });
         }
 

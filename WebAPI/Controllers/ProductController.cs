@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                list = result.Products
+                data = result.Data
             });
         }
 
@@ -47,7 +47,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                product = result.Product
+                data = result.Data
             });
         }
 
@@ -73,7 +73,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                product = result.Product
+                data = result.Data
             });
         }
 
@@ -99,7 +99,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                product = result.Product
+                data = result.Data
             });
         }
 

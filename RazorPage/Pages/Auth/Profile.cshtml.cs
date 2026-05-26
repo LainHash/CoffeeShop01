@@ -28,7 +28,7 @@ namespace RazorPage.Pages.Auth
 
             var client = _httpClientFactory.CreateClient("WebAPI");
 
-            if (roleId == 1) // Customer
+            if (roleId == 1)
             {
                 var customerId = HttpContext.Session.GetString(AccountConstants.CustomerId);
                 if (string.IsNullOrEmpty(customerId)) return RedirectToPage("/Auth/Login");

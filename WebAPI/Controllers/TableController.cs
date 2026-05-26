@@ -23,7 +23,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                list = result.TableEntities
+                data = result.Data
             });
         }
 
@@ -35,7 +35,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                list = result.TableEntities
+                data = result.Data
             });
         }
 
@@ -55,7 +55,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                table = result.TableEntity
+                data = result.Data
             });
         }
 
@@ -80,7 +80,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                table = result.TableEntity
+                data = result.Data
             });
         }
     }

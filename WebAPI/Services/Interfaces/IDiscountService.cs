@@ -1,10 +1,11 @@
-﻿using WebAPI.DTOs.Results;
+﻿using WebAPI.DTOs.Discounts;
+using WebAPI.ResultModels;
 
 namespace WebAPI.Services.Interfaces
 {
     public interface IDiscountService
     {
-        Task<DiscountResult> GetAllAsync();
-        Task<DiscountResult> GetOneAsync(int id);
+        Task<DiscountResult<List<DiscountDTO>>> GetAllAsync();
+        Task<DiscountResult<DiscountDTO>> GetOneAsync(int id);
     }
 }

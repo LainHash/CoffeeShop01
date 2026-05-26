@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs.Discounts;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services.Implementations
@@ -18,22 +18,37 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<DiscountResult> GetAllAsync()
+        public async Task<DiscountResult<List<DiscountDTO>>> GetAllAsync()
         {
             var discounts = await _context.Discounts
                 .ToListAsync();
-            return new DiscountResult(true, "Lấy danh sách phiếu giảm giá thành công.", _mapper.Map<List<DiscountDTO>>(discounts));
+            return new DiscountResult<List<DiscountDTO>>
+            {
+                Success = true,
+                Message = "Lấy danh sách phiếu giảm giá thành công.",
+                Data = _mapper.Map<List<DiscountDTO>>(discounts)
+            };
         }
 
-        public async Task<DiscountResult> GetOneAsync(int id)
+        public async Task<DiscountResult<DiscountDTO>> GetOneAsync(int id)
         {
             var discount = await _context.Discounts
                 .FirstOrDefaultAsync(d => d.DiscountId == id);
             if (discount == null)
             {
-                return new DiscountResult(false, "Phiếu giảm giá không tồn tại!");
+                return new DiscountResult<DiscountDTO>
+                {
+                    Success = false,
+                    Message = "Phiếu giảm giá không tồn tại!",
+                    Data = null
+                };
             }
-            return new DiscountResult(true, "Lấy phiếu giảm giá thành công.", _mapper.Map<DiscountDTO>(discount));
+            return new DiscountResult<DiscountDTO>
+            {
+                Success = true,
+                Message = "Lấy phiếu giảm giá thành công.",
+                Data = _mapper.Map<DiscountDTO>(discount)
+            };
         }
     }
 }

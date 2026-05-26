@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs.Categories;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Services.Implementations
@@ -18,11 +18,16 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<CategoryResult> GetAllAsync()
+        public async Task<CategoryResult<List<CategoryDTO>>> GetAllAsync()
         {
             var categories = await _context.Categories
                 .ToListAsync();
-            return new CategoryResult(true, "Lấy danh sách danh mục thành công.", _mapper.Map<List<CategoryDTO>>(categories));
+            return new CategoryResult<List<CategoryDTO>>
+            {
+                Success = true,
+                Message = "Lấy danh sách danh mục thành công.",
+                Data = _mapper.Map<List<CategoryDTO>>(categories)
+            };
         }
     }
 }

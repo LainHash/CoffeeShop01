@@ -7,6 +7,7 @@ namespace WebAPI.Mappings
     public class ManagerMP : Profile
     {
         public ManagerMP() {
+
             CreateMap<CreateEmployeeDTO, Employee>();
             CreateMap<CreateEmployeeDTO, User>();
 

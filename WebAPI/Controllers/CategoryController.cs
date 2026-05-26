@@ -23,7 +23,7 @@ namespace WebAPI.Controllers
             {
                 success = true,
                 message = result.Message,
-                categories = result.Categories
+                data = result.Data
             });
         }
     }
