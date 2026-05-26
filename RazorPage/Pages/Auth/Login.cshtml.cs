@@ -75,7 +75,7 @@ namespace RazorPage.Pages.Auth
                     else if (result.RoleId != 1 && result.Manager != null)
                     {
                         var manager = result.Manager;
-                        HttpContext.Session.SetString("ManagerId", manager.PublicId.ToString());
+                        HttpContext.Session.SetString(AccountConstants.ManagerId, manager.PublicId.ToString());
                         HttpContext.Session.SetString(AccountConstants.Email, manager.Email);
                         HttpContext.Session.SetString(AccountConstants.Username, manager.Username);
                         HttpContext.Session.SetString(AccountConstants.FullName, manager.FullName);

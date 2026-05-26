@@ -21,12 +21,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _orderService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -35,19 +30,10 @@ namespace WebAPI.Controllers
             var result = await _orderService.GetOneAsync(id);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpPost]
@@ -65,19 +51,10 @@ namespace WebAPI.Controllers
             var result = await _orderService.CreateAsync(request);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpPost("{id}/Checkout")]
@@ -86,19 +63,10 @@ namespace WebAPI.Controllers
             var result = await _orderService.Checkout(id, confirm, paymentMethod, note);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
     }
 }

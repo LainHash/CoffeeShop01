@@ -21,18 +21,9 @@ namespace WebAPI.Controllers
             var result = await _customerService.GetAllAsync();
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -41,18 +32,9 @@ namespace WebAPI.Controllers
             var result = await _customerService.GetInfoAsync(id);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
@@ -61,18 +43,9 @@ namespace WebAPI.Controllers
             var result = await _customerService.UpdateAsync(id, dto);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -81,17 +54,9 @@ namespace WebAPI.Controllers
             var result = await _customerService.DeleteAsync(id);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message
-            });
+            return Ok(result);
         }
     }
 }

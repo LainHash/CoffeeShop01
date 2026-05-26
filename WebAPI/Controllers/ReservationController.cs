@@ -21,31 +21,17 @@ namespace WebAPI.Controllers
             var result = await _reservationService.CreateAsync(dto);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var result = await _reservationService.GetAllAsync();
-            return Ok(new
-            {
-                success = result.Success,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")]
@@ -54,19 +40,10 @@ namespace WebAPI.Controllers
             var result = await _reservationService.GetByIdAsync(id);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("Customer/{customerPublicId:guid}")]
@@ -75,31 +52,17 @@ namespace WebAPI.Controllers
             var result = await _reservationService.GetByCustomerAsync(customerPublicId);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("Week")]
         public async Task<IActionResult> GetByWeek([FromQuery] DateTime weekStart)
         {
             var result = await _reservationService.GetByWeekAsync(weekStart);
-            return Ok(new
-            {
-                success = result.Success,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpPut("{id:int}")]
@@ -108,19 +71,10 @@ namespace WebAPI.Controllers
             var result = await _reservationService.UpdateAsync(id, dto);
             if (!result.Success)
             {
-                return Ok(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
     }

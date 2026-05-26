@@ -23,12 +23,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _productsService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -37,18 +32,9 @@ namespace WebAPI.Controllers
             var result = await _productsService.GetOneAsync(id);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpPost]
@@ -57,24 +43,15 @@ namespace WebAPI.Controllers
             var error = await validator.ValidateAndReturnError(dto);
             if (error != null)
             {
-                return error;
+                return BadRequest(error);
             }
 
             var result = await _productsService.CreateAsync(dto);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
@@ -83,24 +60,15 @@ namespace WebAPI.Controllers
             var error = await validator.ValidateAndReturnError(dto);
             if (error != null)
             {
-                return error;
+                return BadRequest(error);
             }
 
             var result = await _productsService.UpdateAsync(id, dto);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -109,17 +77,9 @@ namespace WebAPI.Controllers
             var result = await _productsService.DeleteAsync(id);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message
-            });
+            return Ok(result);
         }
     }
 }

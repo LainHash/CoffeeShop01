@@ -23,11 +23,7 @@ namespace WebAPI.Controllers
             var result = await _authService.LoginAsync(dto);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
             return Ok(new

@@ -19,24 +19,14 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _tableService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("floor/{floorNumber}")]
         public async Task<IActionResult> GetAllByFloor(int floorNumber)
         {
             var result = await _tableService.GetAllByFloorAsync(floorNumber);
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         [HttpGet("{floorNumber}/{tableNumber}")]
@@ -45,18 +35,9 @@ namespace WebAPI.Controllers
             var result = await _tableService.GetOneAsync(floorNumber, tableNumber);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
 
         public class UpdateStatusRequest
@@ -70,18 +51,9 @@ namespace WebAPI.Controllers
             var result = await _tableService.UpdateStatusAsync(tableId, req.Status);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Data
-            });
+            return Ok(result);
         }
     }
 }

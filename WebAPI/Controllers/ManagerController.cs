@@ -24,18 +24,9 @@ namespace WebAPI.Controllers
             var result = await _managerService.CreateEmployeeAsync(dto);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message,
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                manager = result.Data
-            });
+            return Ok(result);
         }
 
     }
