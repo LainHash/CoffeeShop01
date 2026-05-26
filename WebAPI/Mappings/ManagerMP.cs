@@ -12,6 +12,7 @@ namespace WebAPI.Mappings
             CreateMap<CreateEmployeeDTO, User>();
 
             CreateMap<Employee, ManagerDTO>();
+            CreateMap<User, ManagerDTO>();
         }
     }
 }

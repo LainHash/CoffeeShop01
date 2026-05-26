@@ -1,0 +1,114 @@
+@page "/employee/orders"
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IOrderApiService OrderApiService
+
+<PageTitle>Danh sách Hóa đơn - CoffeeShop</PageTitle>
+
+<h2>Quản lý Hóa đơn</h2>
+<hr />
+
+<AlertMessage @ref="alert" />
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <select class="form-select" @bind="statusFilter" @bind:after="FilterOrders">
+            <option value="">Tất cả trạng thái</option>
+            <option value="Unpaid">Chưa thanh toán</option>
+            <option value="Paid">Đã thanh toán</option>
+            <option value="Cancelled">Đã hủy</option>
+        </select>
+    </div>
+</div>
+
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && filteredOrders != null)
+{
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Mã ĐH</th>
+                    <th>Bàn</th>
+                    <th>Nhân viên</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end">Tổng tiền</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (filteredOrders.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Không tìm thấy hóa đơn nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var order in filteredOrders)
+                    {
+                        <tr>
+                            <td>#@order.OrderId</td>
+                            <td>Bàn @order.TableNumber (Tầng @order.FloorNumber)</td>
+                            <td>@order.EmployeeName</td>
+                            <td><span class="badge @order.StatusBadgeClass">@order.StatusLabel</span></td>
+                            <td class="text-end fw-bold">@order.TotalAmount.ToString("N0")đ</td>
+                            <td class="text-center">
+                                <a href="/order/details/@order.PublicId" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<OrderModel>? allOrders;
+    private List<OrderModel>? filteredOrders;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+    private string statusFilter = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        isLoading = true;
+        var result = await OrderApiService.GetAllAsync();
+        if (result != null && result.Success && result.Orders != null)
+        {
+            // Sort: Unpaid first, then by OrderId descending
+            allOrders = result.Orders
+                .OrderBy(o => o.Status != "Unpaid")
+                .ThenByDescending(o => o.OrderId)
+                .ToList();
+            FilterOrders();
+        }
+        else
+        {
+            alert.ShowError("Không thể tải danh sách hóa đơn.");
+        }
+        isLoading = false;
+    }
+
+    private void FilterOrders()
+    {
+        if (allOrders == null) return;
+        
+        if (string.IsNullOrEmpty(statusFilter))
+        {
+            filteredOrders = allOrders.ToList();
+        }
+        else
+        {
+            filteredOrders = allOrders.Where(o => o.Status == statusFilter).ToList();
+        }
+    }
+}

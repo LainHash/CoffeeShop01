@@ -1,0 +1,119 @@
+@page "/login"
+@layout BlazorApp.Components.Layout.MainLayout
+@inject IAuthApiService AuthApiService
+@inject SessionService SessionService
+@inject AppAuthStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white text-center py-3">
+                <h4 class="mb-0">Đăng nhập</h4>
+            </div>
+            <div class="card-body p-4">
+                <AlertMessage @ref="alert" />
+
+                <EditForm Model="input" OnValidSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText @bind-Value="input.Email" class="form-control" placeholder="Nhập email" />
+                        <ValidationMessage For="@(() => input.Email)" class="text-danger small" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Mật khẩu</label>
+                        <InputText @bind-Value="input.Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                        <ValidationMessage For="@(() => input.Password)" class="text-danger small" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span>Đang xử lý...</span>
+                        }
+                        else
+                        {
+                            <span>Đăng nhập</span>
+                        }
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginInput input = new();
+    private bool isLoading = false;
+    private AlertMessage alert = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await SessionService.IsLoggedInAsync())
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrEmpty(input.Email) || string.IsNullOrEmpty(input.Password))
+        {
+            alert.ShowError("Vui lòng nhập email và mật khẩu.");
+            return;
+        }
+
+        isLoading = true;
+        alert.Hide();
+
+        var result = await AuthApiService.LoginAsync(input);
+
+        if (result != null && result.Success)
+        {
+            UserSession session = new()
+            {
+                RoleId = result.RoleId
+            };
+
+            if (result.RoleId == 1 && result.Customer != null)
+            {
+                session.PublicId = result.Customer.PublicId;
+                session.Email = result.Customer.Email;
+                session.FullName = result.Customer.FullName;
+                session.Username = result.Customer.Username;
+                session.Phone = result.Customer.Phone;
+            }
+            else if (result.RoleId != 1 && result.Manager != null)
+            {
+                session.PublicId = result.Manager.PublicId;
+                session.Email = result.Manager.Email;
+                session.FullName = result.Manager.FullName;
+                session.Username = result.Manager.Username;
+                session.Phone = result.Manager.Phone;
+                session.Position = result.Manager.Position;
+            }
+
+            await SessionService.SetUserAsync(session);
+            AuthStateProvider.NotifyUserAuthentication(session);
+
+            if (session.IsCustomer)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/employee/pos");
+            }
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+        }
+
+        isLoading = false;
+    }
+}

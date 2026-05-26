@@ -1,0 +1,195 @@
+@page "/order/reservationschedule"
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IReservationApiService ReservationApiService
+
+<PageTitle>Lịch Đặt bàn - CoffeeShop</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Lịch Đặt bàn</h2>
+    <a href="/order/reservation" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Thêm đặt bàn mới
+    </a>
+</div>
+
+<AlertMessage @ref="alert" />
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && reservations != null)
+{
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Khách hàng</th>
+                    <th>Thời gian</th>
+                    <th>Bàn</th>
+                    <th>Số khách</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (reservations.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Chưa có lịch đặt bàn nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var res in reservations.OrderBy(r => r.ReservationTime))
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@res.CustomerFullName</div>
+                                <div class="small text-muted">@res.CustomerPhone</div>
+                            </td>
+                            <td>
+                                <div>@res.ReservationTime.ToString("dd/MM/yyyy")</div>
+                                <div class="text-primary fw-bold">@res.ReservationTime.ToString("HH:mm")</div>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(res.TableName))
+                                {
+                                    <span>@res.TableName (Tầng @res.FloorNumber)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Chưa xếp bàn</span>
+                                }
+                            </td>
+                            <td>@res.NumberOfGuests người</td>
+                            <td><span class="badge @res.StatusBadgeClass">@res.StatusLabel</span></td>
+                            <td class="text-center">
+                                @if (res.Status == "Pending" || res.Status == "Confirmed")
+                                {
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => ShowUpdateModal(res)">
+                                        <i class="bi bi-pencil"></i> Cập nhật
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (selectedReservation != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cập nhật lịch đặt bàn</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Khách hàng</label>
+                        <input type="text" class="form-control" value="@selectedReservation.CustomerFullName - @selectedReservation.CustomerPhone" disabled />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời gian</label>
+                        <input type="text" class="form-control" value="@selectedReservation.ReservationTime.ToString("dd/MM/yyyy HH:mm")" disabled />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái mới</label>
+                        <select class="form-select" @bind="updateInput.Status">
+                            <option value="Pending">Chờ xác nhận</option>
+                            <option value="Confirmed">Đã xác nhận</option>
+                            <option value="Completed">Hoàn thành</option>
+                            <option value="Cancelled">Đã huỷ</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea class="form-control" rows="2" @bind="updateInput.Note"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Hủy</button>
+                    <button type="button" class="btn btn-primary" @onclick="UpdateReservation" disabled="@isUpdating">
+                        @if (isUpdating)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span>Đang lưu...</span>
+                        }
+                        else
+                        {
+                            <span>Lưu thay đổi</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ReservationModel>? reservations;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    private ReservationModel? selectedReservation;
+    private UpdateReservationInput updateInput = new();
+    private bool isUpdating = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReservations();
+    }
+
+    private async Task LoadReservations()
+    {
+        isLoading = true;
+        var result = await ReservationApiService.GetAllAsync();
+        
+        if (result != null && result.Success)
+        {
+            reservations = result.List;
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Không thể tải danh sách đặt bàn.");
+        }
+        isLoading = false;
+    }
+
+    private void ShowUpdateModal(ReservationModel res)
+    {
+        selectedReservation = res;
+        updateInput = new UpdateReservationInput
+        {
+            Status = res.Status,
+            Note = res.Note
+            // Add TableId if you want to support assigning tables here
+        };
+    }
+
+    private void CloseModal()
+    {
+        selectedReservation = null;
+    }
+
+    private async Task UpdateReservation()
+    {
+        if (selectedReservation == null) return;
+        
+        isUpdating = true;
+        var result = await ReservationApiService.UpdateAsync(selectedReservation.ReservationId, updateInput);
+        
+        if (result != null && result.Success)
+        {
+            alert.ShowSuccess("Cập nhật lịch đặt bàn thành công.");
+            await LoadReservations();
+            CloseModal();
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Lỗi khi cập nhật.");
+        }
+        isUpdating = false;
+    }
+}
