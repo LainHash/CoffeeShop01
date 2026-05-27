@@ -1,0 +1,181 @@
+@page "/Product"
+@rendermode InteractiveServer
+@using BlazorApp.Models.Products
+@using BlazorApp.Services.Interfaces
+@inject IApiService ApiService
+
+<PageTitle>Menu - KOPPEE Coffee Shop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Thực Đơn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Thực Đơn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Menu Start -->
+<div class="container-fluid pt-5 pb-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Thực Đơn & Giá Cả</h4>
+            <h1 class="display-4">Giá Cả Cạnh Tranh</h1>
+        </div>
+
+        @if (ApiError != null)
+        {
+            <div class="alert alert-warning text-center">
+                <i class="fa fa-wifi mr-2"></i>@ApiError
+            </div>
+        }
+
+        <!-- Category Filter -->
+        @if (Categories.Any())
+        {
+            <div class="d-flex flex-wrap justify-content-center mb-5">
+                <button class="btn @(SelectedCategoryId == null ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
+                        @onclick="() => FilterByCategory(null)">
+                    Tất Cả
+                </button>
+                @foreach (var cat in Categories)
+                {
+                    <button class="btn @(SelectedCategoryId == cat.CategoryId ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
+                            @onclick="() => FilterByCategory(cat.CategoryId)">
+                        @cat.CategoryName
+                    </button>
+                }
+            </div>
+        }
+
+        <!-- Product Grid -->
+        <div class="row">
+            @if (FilteredProducts.Any())
+            {
+                @foreach (var product in FilteredProducts)
+                {
+                    <div class="col-lg-4 col-md-6 mb-5">
+                        <div class="card h-100 border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                            <div class="position-relative">
+                                <img class="card-img-top"
+                                     src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/img/menu-1.jpg" : product.ImageUrl)"
+                                     alt="@product.ProductName"
+                                     onerror="this.src='/img/menu-1.jpg'"
+                                     style="height: 220px; object-fit: cover;">
+                                @if (!product.IsAvailable)
+                                {
+                                    <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
+                                         style="top:0; left:0; background: rgba(0,0,0,0.5);">
+                                        <span class="badge badge-danger py-2 px-3" style="font-size:1rem;">Hết Hàng</span>
+                                    </div>
+                                }
+                                <div class="position-absolute" style="top: 15px; right: 15px;">
+                                    <span class="badge badge-primary py-2 px-3" style="font-size: 0.95rem; border-radius: 20px;">
+                                        @product.Price.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title font-weight-bold mb-2">@product.ProductName</h5>
+                                <p class="card-text text-muted small mb-3">
+                                    @(string.IsNullOrEmpty(product.Description)
+                                        ? "Không có mô tả."
+                                        : product.Description)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else if (ApiError == null && !isLoading)
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="fa fa-coffee fa-4x text-primary mb-4"></i>
+                    <h4>Hiện tại không có sản phẩm nào.</h4>
+                    <p class="text-muted">Vui lòng quay lại sau.</p>
+                </div>
+            }
+            else if (isLoading)
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Stats -->
+        @if (FilteredProducts.Any())
+        {
+            <div class="text-center mt-3 mb-3">
+                <small class="text-muted">
+                    Hiển thị <strong>@FilteredProducts.Count()</strong> sản phẩm
+                    &mdash; <strong>@FilteredProducts.Count(p => p.IsAvailable)</strong> còn hàng
+                </small>
+            </div>
+        }
+    </div>
+</div>
+<!-- Menu End -->
+
+@code {
+    public List<ProductModel> Products { get; set; } = new();
+    public List<CategoryModel> Categories { get; set; } = new();
+    public string? ApiError { get; set; }
+    private bool isLoading = true;
+
+    private int? SelectedCategoryId { get; set; }
+
+    private IEnumerable<ProductModel> FilteredProducts => 
+        SelectedCategoryId == null 
+            ? Products 
+            : Products.Where(p => p.CategoryId == SelectedCategoryId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        
+        try
+        {
+            var productResponse = await ApiService.GetAsync<ProductListResponse>("/api/Product");
+            if (productResponse != null && productResponse.Success && productResponse.List != null)
+            {
+                Products = productResponse.List;
+            }
+            else
+            {
+                ApiError = productResponse?.Message ?? "Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.";
+            }
+        }
+        catch (Exception)
+        {
+            ApiError = "Dịch vụ API hiện không khả dụng. Vui lòng quay lại sau.";
+        }
+
+        try
+        {
+            var catResponse = await ApiService.GetAsync<List<CategoryModel>>("/api/Category");
+            if (catResponse != null)
+            {
+                Categories = catResponse;
+            }
+        }
+        catch (Exception)
+        {
+            // Logging can be done here. For now, failing silently for categories.
+        }
+        
+        isLoading = false;
+    }
+
+    private void FilterByCategory(int? categoryId)
+    {
+        SelectedCategoryId = categoryId;
+    }
+}
+

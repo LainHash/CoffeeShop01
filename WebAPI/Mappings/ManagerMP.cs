@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using WebAPI.DTOs.Accounts;
 using WebAPI.DTOs.Accounts.Managers;
 using WebAPI.Models;
 
@@ -12,6 +13,7 @@ namespace WebAPI.Mappings
             CreateMap<CreateEmployeeDTO, User>();
 
             CreateMap<Employee, ManagerDTO>();
+            CreateMap<User, AccountDTO>();
         }
     }
 }

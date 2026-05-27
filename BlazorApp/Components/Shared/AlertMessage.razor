@@ -1,0 +1,42 @@
+@if (IsVisible)
+{
+    <div class="alert @AlertClass alert-dismissible fade show" role="alert">
+        @Message
+        <button type="button" class="btn-close" @onclick="Hide" aria-label="Close"></button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsError { get; set; } = false;
+
+    [Parameter]
+    public bool IsVisible { get; set; } = false;
+
+    private string AlertClass => IsError ? "alert-danger" : "alert-success";
+
+    public void ShowSuccess(string message)
+    {
+        Message = message;
+        IsError = false;
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void ShowError(string message)
+    {
+        Message = message;
+        IsError = true;
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

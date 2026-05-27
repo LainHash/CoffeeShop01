@@ -17,14 +17,14 @@ namespace RazorPage.DTOs.Auth
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
-        public CustomerProfileDTO? Customer { get; set; }
+        public CustomerProfileDTO? Data { get; set; }
     }
 
     public class ManagerInfoResponse
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
-        public ManagerProfileDTO? Manager { get; set; }
+        public ManagerProfileDTO? Data { get; set; }
     }
 
     public class CustomerProfileDTO
@@ -46,6 +46,7 @@ namespace RazorPage.DTOs.Auth
     {
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
     }
 }

@@ -6,6 +6,6 @@ namespace RazorPage.DTOs.Products
     {
         public bool Success { get; set; }
         public string? Message { get; set; }
-        public List<ProductDTO>? List { get; set; }
+        public List<ProductDTO>? Data { get; set; }
     }
 }

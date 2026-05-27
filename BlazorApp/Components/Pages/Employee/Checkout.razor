@@ -1,0 +1,264 @@
+@page "/employee/checkout/{Id:guid}"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IOrderApiService OrderApiService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Thanh toán hóa đơn - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Thanh toán</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Thanh toán hóa đơn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-fluid pt-5">
+    <div class="container">
+        <!-- Back Link -->
+        <div class="mb-4">
+            <a href="/order/details/@Id" class="btn btn-outline-secondary rounded-pill">
+                <i class="fa fa-arrow-left mr-1"></i> Quay lại chi tiết hóa đơn
+            </a>
+        </div>
+
+        <AlertMessage @ref="alert" />
+        <LoadingSpinner IsLoading="isLoading" />
+
+        @if (!isLoading && order != null)
+        {
+            <div class="row">
+                <!-- Left: Payment Form -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-dark text-white py-3">
+                            <h5 class="mb-0 text-white"><i class="fa fa-credit-card mr-2 text-primary"></i>Phương thức thanh toán</h5>
+                        </div>
+                        <div class="card-body bg-white p-4">
+                            <label class="text-muted mb-3 d-block">Vui lòng chọn hình thức thanh toán:</label>
+                            
+                            <div class="row mb-4">
+                                <!-- Cash Option -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="payment-method-card text-center p-3 border rounded cursor-pointer @(PaymentMethod == "Cash" ? "active-method" : "")" 
+                                         @onclick='() => SetPaymentMethod("Cash")'>
+                                        <i class="fa fa-money-bill-wave fa-2x text-success mb-2"></i>
+                                        <h6 class="font-weight-bold text-dark mb-0">Tiền mặt</h6>
+                                        <small class="text-muted">Cash</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Credit Card Option -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="payment-method-card text-center p-3 border rounded cursor-pointer @(PaymentMethod == "Credit Card" ? "active-method" : "")" 
+                                         @onclick='() => SetPaymentMethod("Credit Card")'>
+                                        <i class="fa fa-credit-card fa-2x text-primary mb-2"></i>
+                                        <h6 class="font-weight-bold text-dark mb-0">Thẻ tín dụng</h6>
+                                        <small class="text-muted">Credit Card</small>
+                                    </div>
+                                </div>
+
+                                <!-- Bank Transfer Option -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="payment-method-card text-center p-3 border rounded cursor-pointer @(PaymentMethod == "Bank Transfer" ? "active-method" : "")" 
+                                         @onclick='() => SetPaymentMethod("Bank Transfer")'>
+                                        <i class="fa fa-university fa-2x text-info mb-2"></i>
+                                        <h6 class="font-weight-bold text-dark mb-0">Chuyển khoản</h6>
+                                        <small class="text-muted">Bank Transfer</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Notes area -->
+                            <div class="form-group mb-3">
+                                <label for="noteInput" class="font-weight-bold text-dark">Ghi chú thanh toán</label>
+                                <textarea id="noteInput" @bind="Note" class="form-control" rows="3" placeholder="Nhập ghi chú giao dịch nếu có (ví dụ: số thẻ, mã giao dịch, khách đưa 500k thối 20k...)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Transfer details (visually shown when Bank Transfer selected) -->
+                    @if (PaymentMethod == "Bank Transfer")
+                    {
+                        <div id="bankTransferDetails" class="card border-0 shadow-sm mb-4 bg-light">
+                            <div class="card-body p-4 text-center">
+                                <h6 class="font-weight-bold text-dark mb-3"><i class="fa fa-qrcode mr-2 text-primary"></i>Thông tin chuyển khoản nhanh</h6>
+                                <p class="text-muted small mb-2">Quét mã QR bên dưới để thanh toán nhanh:</p>
+                                
+                                <div class="bg-white p-3 d-inline-block rounded border mb-3">
+                                    <!-- Generates VietQR standard link for bank transfer -->
+                                    <img src="https://img.vietqr.io/image/MB-123456789999-qr_only.png?amount=@((int)order.TotalAmount)&addInfo=KOPPEE%20HD%20@order.OrderId" 
+                                         alt="Mã QR chuyển khoản" 
+                                         style="max-width: 200px; height: auto;" />
+                                </div>
+                                <div class="text-left max-w-sm mx-auto small">
+                                    <div><strong>Ngân hàng:</strong> MB Bank (NHTMCP Quân Đội)</div>
+                                    <div><strong>Số tài khoản:</strong> 123456789999</div>
+                                    <div><strong>Chủ tài khoản:</strong> COFFEE SHOP KOPPEE</div>
+                                    <div><strong>Số tiền:</strong> <span class="text-primary font-weight-bold">@order.TotalAmount.ToString("N0") đ</span></div>
+                                    <div><strong>Nội dung:</strong> <span class="text-dark font-weight-bold">KOPPEE HD @order.OrderId</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right: Order Summary -->
+                <div class="col-lg-5 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-dark text-white py-3">
+                            <h5 class="mb-0 text-white"><i class="fa fa-receipt mr-2 text-primary"></i>Tóm tắt hóa đơn</h5>
+                        </div>
+                        <div class="card-body bg-white p-4">
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between text-muted small mb-1">
+                                    <span>Mã hóa đơn:</span>
+                                    <span class="font-weight-bold text-dark">#@order.OrderId</span>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted small mb-1">
+                                    <span>Bàn phục vụ:</span>
+                                    <span class="font-weight-bold text-dark">@(order.TableNumber > 0 ? $"Bàn {order.TableNumber} (Tầng {order.FloorNumber})" : "Mang đi")</span>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted small">
+                                    <span>Nhân viên:</span>
+                                    <span class="font-weight-bold text-dark">@order.EmployeeName</span>
+                                </div>
+                            </div>
+
+                            <h6 class="font-weight-bold text-dark mb-3">Sản phẩm đã chọn:</h6>
+                            <div class="order-items-list mb-3" style="max-height: 200px; overflow-y: auto;">
+                                @foreach (var item in order.OrderDetails)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="small">
+                                            <span class="font-weight-bold text-dark">@item.ProductName</span>
+                                            <span class="text-muted ml-1">x @item.Quantity</span>
+                                        </div>
+                                        <span class="small font-weight-bold text-dark">@item.LineTotal.ToString("N0") đ</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="pt-3 border-top">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Tạm tính:</span>
+                                    <span class="font-weight-bold">@order.SubTotal.ToString("N0") đ</span>
+                                </div>
+                                @if (order.DiscountId.HasValue && order.DiscountId.Value > 0)
+                                {
+                                    <div class="d-flex justify-content-between mb-2 text-success">
+                                        <span>Mã giảm giá (@order.DiscountCode):</span>
+                                        <span>- @((order.SubTotal - order.TotalAmount).ToString("N0")) đ</span>
+                                    </div>
+                                }
+                                <hr />
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0 text-dark font-weight-bold">Tổng thanh toán:</h5>
+                                    <h3 class="mb-0 text-primary font-weight-bold">@order.TotalAmount.ToString("N0") đ</h3>
+                                </div>
+
+                                <button type="button" @onclick="ConfirmCheckout" disabled="@isSubmitting" class="btn btn-primary btn-block btn-lg py-3 rounded-pill shadow-sm font-weight-bold">
+                                    @if (isSubmitting)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>Đang xử lý...</span>
+                                    }
+                                    else
+                                    {
+                                        <span><i class="fa fa-check-circle mr-2"></i>XÁC NHẬN & HOÀN TẤT</span>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .payment-method-card {
+        transition: all 0.3s ease;
+        border-width: 2px !important;
+        background-color: #fff;
+    }
+    .payment-method-card:hover {
+        border-color: #DA9F5B !important;
+        transform: translateY(-2px);
+    }
+    .active-method {
+        border-color: #DA9F5B !important;
+        background-color: rgba(218, 159, 91, 0.05) !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private OrderModel? order;
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+    private AlertMessage alert = default!;
+
+    public string PaymentMethod { get; set; } = "Cash";
+    public string? Note { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrderDetails();
+    }
+
+    private async Task LoadOrderDetails()
+    {
+        isLoading = true;
+        var result = await OrderApiService.GetByIdAsync(Id);
+        if (result != null && result.Success && result.GetOrder() != null)
+        {
+            order = result.GetOrder();
+            if (order!.Status != "Unpaid")
+            {
+                NavigationManager.NavigateTo($"/order/details/{Id}");
+            }
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Không thể tìm thấy hóa đơn cần thanh toán.");
+        }
+        isLoading = false;
+    }
+
+    private void SetPaymentMethod(string method)
+    {
+        PaymentMethod = method;
+    }
+
+    private async Task ConfirmCheckout()
+    {
+        isSubmitting = true;
+        alert.Hide();
+
+        var result = await OrderApiService.CheckoutAsync(Id, PaymentMethod, Note);
+        if (result != null && result.Success)
+        {
+            NavigationManager.NavigateTo($"/order/details/{Id}");
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Thanh toán thất bại. Vui lòng thử lại.");
+            isSubmitting = false;
+        }
+    }
+}
+

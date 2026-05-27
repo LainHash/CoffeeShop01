@@ -12,66 +12,6 @@
         .ToList();
 }
 
-<style>
-    .floor-tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
-    }
-    .floor-tab-btn {
-        padding: 8px 20px;
-        border: none;
-        background: #f8f9fa;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    .floor-tab-btn.active {
-        background: #DA9F5B;
-        color: white;
-    }
-    .table-floor-panel {
-        display: none;
-    }
-    .table-floor-panel.active {
-        display: block;
-    }
-    .table-map-card {
-        border: 2px solid #ddd;
-        border-radius: 12px;
-        padding: 15px;
-        text-align: center;
-        background: white;
-        transition: transform 0.2s;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    .table-map-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .table-map-card.status-Available { border-color: #28a745; border-top-width: 5px; }
-    .table-map-card.status-Occupied { border-color: #dc3545; border-top-width: 5px; }
-    .table-map-card.status-Reserved { border-color: #ffc107; border-top-width: 5px; }
-    .table-map-card.status-Unavailable { border-color: #6c757d; border-top-width: 5px; }
-    
-    .status-badge {
-        font-size: 0.8rem;
-        padding: 3px 8px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        display: inline-block;
-    }
-    .badge-Available { background-color: #d4edda; color: #155724; }
-    .badge-Occupied { background-color: #f8d7da; color: #721c24; }
-    .badge-Reserved { background-color: #fff3cd; color: #856404; }
-    .badge-Unavailable { background-color: #e2e3e5; color: #383d41; }
-</style>
 
 <vc:page-header title="Sơ Đồ Bàn"></vc:page-header>
 

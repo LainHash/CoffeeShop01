@@ -1,0 +1,237 @@
+@page "/employee/orders"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IOrderApiService OrderApiService
+
+<PageTitle>Danh sách Hóa đơn - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Quản lý Hóa đơn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Quản lý Hóa đơn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<AlertMessage @ref="alert" />
+
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && filteredOrders != null && allOrders != null)
+{
+    <div class="container-fluid pt-5">
+        <div class="container">
+            <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+                <h1 class="display-4">Quản Lý Hóa Đơn</h1>
+                <span class="text-primary font-weight-bold">Danh sách hóa đơn của quán</span>
+            </div>
+
+            <!-- Quick Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                        <div class="card-body">
+                            <i class="fa fa-receipt fa-2x text-primary mb-2"></i>
+                            <h5 class="text-muted font-weight-normal mb-1">Tổng Đơn Hàng</h5>
+                            <h3 class="font-weight-bold text-dark mb-0">@allOrders.Count</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                        <div class="card-body">
+                            <i class="fa fa-clock fa-2x text-warning mb-2"></i>
+                            <h5 class="text-muted font-weight-normal mb-1">Chưa Thanh Toán</h5>
+                            <h3 class="font-weight-bold text-warning mb-0">@allOrders.Count(o => o.Status == "Unpaid")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                        <div class="card-body">
+                            <i class="fa fa-check-circle fa-2x text-success mb-2"></i>
+                            <h5 class="text-muted font-weight-normal mb-1">Đã Thanh Toán</h5>
+                            <h3 class="font-weight-bold text-success mb-0">@allOrders.Count(o => o.Status == "Paid")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card border-0 shadow-sm text-center py-4 bg-light">
+                        <div class="card-body">
+                            <i class="fa fa-wallet fa-2x text-info mb-2"></i>
+                            <h5 class="text-muted font-weight-normal mb-1">Tổng Doanh Thu</h5>
+                            <h3 class="font-weight-bold text-info mb-0">@allOrders.Where(o => o.Status == "Paid").Sum(o => o.TotalAmount).ToString("N0") đ</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-white"><i class="fa fa-list mr-2 text-primary"></i>Danh Sách Hóa Đơn</h5>
+                    <a href="/employee/pos" class="btn btn-primary btn-sm rounded-pill"><i class="fa fa-plus mr-1"></i>Tạo Đơn (POS)</a>
+                </div>
+                <div class="card-body bg-light">
+                    <!-- Search and Filter Bar -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-2">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white border-right-0"><i class="fa fa-search text-muted"></i></span>
+                                </div>
+                                <input type="text" class="form-control border-left-0" placeholder="Tìm theo Mã đơn, Bàn, Nhân viên..." @bind="searchQuery" @bind:event="oninput" @onkeyup="FilterOrders" />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <select class="form-control" @bind="statusFilter" @bind:after="FilterOrders">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Unpaid">Chưa thanh toán</option>
+                                <option value="Paid">Đã thanh toán</option>
+                                <option value="Cancelled">Đã hủy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover bg-white mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col" class="py-3">Mã Đơn</th>
+                                    <th scope="col" class="py-3">Bàn</th>
+                                    <th scope="col" class="py-3">Nhân Viên</th>
+                                    <th scope="col" class="py-3">Trạng Thái</th>
+                                    <th scope="col" class="py-3 text-right">Tổng Tiền</th>
+                                    <th scope="col" class="py-3 text-center">Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (filteredOrders.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="fa fa-box-open fa-3x mb-3 text-light"></i>
+                                            <p class="mb-0">Không tìm thấy hóa đơn nào.</p>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var order in filteredOrders)
+                                    {
+                                        <tr>
+                                            <td class="font-weight-bold text-dark py-3">#@order.OrderId</td>
+                                            <td class="py-3">
+                                                @if (order.TableNumber > 0)
+                                                {
+                                                    <span class="badge badge-light border px-2 py-1">Bàn @order.TableNumber (Tầng @order.FloorNumber)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td class="py-3 text-secondary">@order.EmployeeName</td>
+                                            <td class="py-3">
+                                                @if (order.Status == "Unpaid")
+                                                {
+                                                    <span class="badge badge-warning text-dark px-3 py-1 font-weight-normal"><i class="fa fa-spinner fa-spin mr-1"></i>Chưa thanh toán</span>
+                                                }
+                                                else if (order.Status == "Paid")
+                                                {
+                                                    <span class="badge badge-success px-3 py-1 font-weight-normal"><i class="fa fa-check mr-1"></i>Đã thanh toán</span>
+                                                }
+                                                else if (order.Status == "Cancelled")
+                                                {
+                                                    <span class="badge badge-secondary px-3 py-1 font-weight-normal"><i class="fa fa-times mr-1"></i>Đã hủy</span>
+                                                }
+                                            </td>
+                                            <td class="font-weight-bold text-dark text-right py-3">@order.TotalAmount.ToString("N0") đ</td>
+                                            <td class="text-center py-3">
+                                                <div class="btn-group" role="group">
+                                                    <a href="/order/details/@order.PublicId" class="btn btn-outline-info btn-sm rounded-left" title="Xem chi tiết">
+                                                        <i class="fa fa-eye"></i> Xem chi tiết
+                                                    </a>
+                                                    @if (order.Status == "Unpaid")
+                                                    {
+                                                        <a href="/employee/checkout/@order.PublicId" class="btn btn-primary btn-sm rounded-right" title="Thanh toán">
+                                                            <i class="fa fa-credit-card mr-1"></i> Thanh toán
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<OrderModel>? allOrders;
+    private List<OrderModel>? filteredOrders;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+    private string statusFilter = "";
+    private string searchQuery = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        isLoading = true;
+        var result = await OrderApiService.GetAllAsync();
+        if (result != null && result.Success && result.Orders != null)
+        {
+            // Sort: Unpaid first, then by OrderId descending
+            allOrders = result.Orders
+                .OrderBy(o => o.Status != "Unpaid")
+                .ThenByDescending(o => o.OrderId)
+                .ToList();
+            FilterOrders();
+        }
+        else
+        {
+            alert.ShowError("Không thể tải danh sách hóa đơn.");
+        }
+        isLoading = false;
+    }
+
+    private void FilterOrders()
+    {
+        if (allOrders == null) return;
+        
+        var query = allOrders.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(statusFilter))
+        {
+            query = query.Where(o => o.Status == statusFilter);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            var lowerQuery = searchQuery.ToLowerInvariant();
+            query = query.Where(o => 
+                (o.PublicId.HasValue && o.PublicId.Value.ToString().ToLowerInvariant().Contains(lowerQuery)) ||
+                (o.OrderId.ToString().Contains(lowerQuery)) ||
+                (o.TableNumber.ToString().Contains(lowerQuery)) ||
+                (!string.IsNullOrEmpty(o.EmployeeName) && o.EmployeeName.ToLowerInvariant().Contains(lowerQuery))
+            );
+        }
+        
+        filteredOrders = query.ToList();
+    }
+}
+

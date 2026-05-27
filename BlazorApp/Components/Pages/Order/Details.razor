@@ -1,0 +1,334 @@
+@page "/order/details/{Id:guid}"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@inject IOrderApiService OrderApiService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<PageTitle>Chi tiết Đơn hàng - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Chi tiết Hóa đơn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Chi tiết Hóa đơn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-fluid pt-5">
+    <div class="container no-print">
+        <!-- Back navigation & Breadcrumb -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <a href="/employee/orders" class="btn btn-outline-secondary rounded-pill">
+                <i class="fa fa-arrow-left mr-1"></i> Quay lại danh sách
+            </a>
+            <span class="text-muted font-weight-normal">Hóa đơn / Chi tiết / #@(order?.OrderId)</span>
+        </div>
+
+        <AlertMessage @ref="alert" />
+        <LoadingSpinner IsLoading="isLoading" />
+
+        @if (!isLoading && order != null)
+        {
+            <div class="row">
+                <!-- Left Column: Order Items & Receipt Details -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="mb-0 text-white"><i class="fa fa-receipt mr-2 text-primary"></i>Hóa Đơn Chi Tiết</h5>
+                            <span class="font-weight-normal text-muted">ID: @order.PublicId</span>
+                        </div>
+                        <div class="card-body bg-white p-4">
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-striped align-middle">
+                                    <thead class="bg-light">
+                                        <tr class="text-uppercase text-muted" style="font-size: 0.85rem;">
+                                            <th scope="col" style="width: 80px;">Hình ảnh</th>
+                                            <th scope="col">Sản phẩm</th>
+                                            <th scope="col" class="text-center" style="width: 100px;">SL</th>
+                                            <th scope="col" class="text-right" style="width: 120px;">Đơn giá</th>
+                                            <th scope="col" class="text-right" style="width: 140px;">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in order.OrderDetails)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/img/default-coffee.png" : item.ImageUrl)" 
+                                                         alt="@item.ProductName" 
+                                                         class="img-fluid rounded" 
+                                                         style="width: 50px; height: 50px; object-fit: cover;" 
+                                                         onerror="this.src='/img/about.png';" />
+                                                </td>
+                                                <td class="font-weight-bold text-dark align-middle">
+                                                    @item.ProductName
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    @item.Quantity
+                                                </td>
+                                                <td class="text-right align-middle text-secondary">
+                                                    @item.UnitPrice.ToString("N0") đ
+                                                </td>
+                                                <td class="text-right align-middle font-weight-bold text-dark">
+                                                    @item.LineTotal.ToString("N0") đ
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <hr class="my-4" />
+
+                            <!-- Pricing Breakdown -->
+                            <div class="row justify-content-end">
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Tạm tính:</span>
+                                        <span class="font-weight-bold">@order.SubTotal.ToString("N0") đ</span>
+                                    </div>
+                                    @if (order.DiscountId.HasValue && order.DiscountId.Value > 0)
+                                    {
+                                        <div class="d-flex justify-content-between mb-2 text-success">
+                                            <span>Mã giảm giá (@order.DiscountCode):</span>
+                                            <span>- @((order.SubTotal - order.TotalAmount).ToString("N0")) đ</span>
+                                        </div>
+                                    }
+                                    <hr />
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0 text-dark font-weight-bold">Tổng thanh toán:</h5>
+                                        <h4 class="mb-0 text-primary font-weight-bold">@order.TotalAmount.ToString("N0") đ</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Meta Information & Actions -->
+                <div class="col-lg-4 mb-4">
+                    <!-- Order Info Card -->
+                    <div class="card border-0 shadow-sm mb-4 bg-light">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-dark font-weight-bold mb-4">Thông tin đơn hàng</h5>
+                            
+                            <div class="mb-3">
+                                <span class="text-muted d-block small">Trạng thái:</span>
+                                @if (order.Status == "Unpaid")
+                                {
+                                    <span class="badge badge-warning text-dark px-3 py-2 font-weight-bold d-inline-block mt-1">
+                                        <i class="fa fa-clock mr-1"></i>CHƯA THANH TOÁN
+                                    </span>
+                                }
+                                else if (order.Status == "Paid")
+                                {
+                                    <span class="badge badge-success px-3 py-2 font-weight-bold d-inline-block mt-1">
+                                        <i class="fa fa-check-circle mr-1"></i>ĐÃ THANH TOÁN
+                                    </span>
+                                }
+                                else if (order.Status == "Cancelled")
+                                {
+                                    <span class="badge badge-secondary px-3 py-2 font-weight-bold d-inline-block mt-1">
+                                        <i class="fa fa-times-circle mr-1"></i>ĐÃ HỦY
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted d-block small">Bàn phục vụ:</span>
+                                @if (order.TableNumber > 0)
+                                {
+                                    <span class="font-weight-bold text-dark">Bàn @order.TableNumber (Tầng @order.FloorNumber)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">Mang đi / Không có bàn</span>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted d-block small">Nhân viên lập đơn:</span>
+                                <span class="font-weight-bold text-dark">@order.EmployeeName</span>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(order.Note))
+                            {
+                                <div class="mb-3">
+                                    <span class="text-muted d-block small">Ghi chú:</span>
+                                    <p class="font-italic text-secondary mb-0 bg-white p-2 border rounded">@order.Note</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Actions Card -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 text-center">
+                            @if (order.Status == "Unpaid")
+                            {
+                                <a href="/employee/checkout/@order.PublicId" class="btn btn-primary btn-block btn-lg mb-3 py-3 rounded-pill shadow-sm">
+                                    <i class="fa fa-credit-card mr-2"></i>Thanh Toán Ngay
+                                </a>
+
+                                <button type="button" class="btn btn-outline-danger btn-block rounded-pill" onclick="alert('Chức năng hủy đơn hàng chưa được hỗ trợ trên Blazor App')">
+                                    <i class="fa fa-trash-alt mr-2"></i>Hủy Hóa Đơn
+                                </button>
+                            }
+                            else if (order.Status == "Paid")
+                            {
+                                <div class="alert alert-success border-0 py-3 mb-3">
+                                    <i class="fa fa-check-double fa-2x mb-2 d-block"></i>
+                                    Hóa đơn này đã được thanh toán đầy đủ.
+                                </div>
+                                <button type="button" @onclick="PrintInvoice" class="btn btn-dark btn-block btn-lg rounded-pill">
+                                    <i class="fa fa-print mr-2"></i>In Hóa Đơn
+                                </button>
+                            }
+                            else if (order.Status == "Cancelled")
+                            {
+                                <div class="alert alert-secondary border-0 py-3 mb-0">
+                                    <i class="fa fa-ban fa-2x mb-2 d-block"></i>
+                                    Hóa đơn này đã bị hủy.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+    <!-- PRINTABLE RECEIPT TEMPLATE -->
+    <div class="print-only receipt-print bg-white p-4 text-dark d-none">
+        <div class="text-center mb-4">
+            <h2 class="font-weight-bold mb-1">KOPPEE COFFEE</h2>
+            <p class="small mb-1">Đường Trần Duy Hưng, Cầu Giấy, Hà Nội</p>
+            <p class="small mb-0">ĐT: 0123.456.789</p>
+            <div style="border-top: 1px dashed #000;" class="my-3"></div>
+            <h4 class="font-weight-bold text-uppercase">Hóa Đơn Thanh Toán</h4>
+            <p class="small">Mã hóa đơn: #@order.OrderId</p>
+        </div>
+
+        <div class="small mb-3">
+            <div><strong>Bàn:</strong> @(order.TableNumber > 0 ? $"Bàn {order.TableNumber} (Tầng {order.FloorNumber})" : "Mang đi")</div>
+            <div><strong>Nhân viên:</strong> @order.EmployeeName</div>
+            <div><strong>Thời gian:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</div>
+        </div>
+
+        <div style="border-top: 1px dashed #000;" class="my-2"></div>
+
+        <table class="table table-sm table-borderless small mb-3">
+            <thead>
+                <tr>
+                    <th>Tên món</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-right">Đơn giá</th>
+                    <th class="text-right">T.Tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in order.OrderDetails)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-right">@item.UnitPrice.ToString("N0")</td>
+                        <td class="text-right">@item.LineTotal.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #000;" class="my-2"></div>
+
+        <div class="small">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Tạm tính:</span>
+                <span>@order.SubTotal.ToString("N0") đ</span>
+            </div>
+            @if (order.DiscountId.HasValue && order.DiscountId.Value > 0)
+            {
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Giảm giá (@order.DiscountCode):</span>
+                    <span>- @((order.SubTotal - order.TotalAmount).ToString("N0")) đ</span>
+                </div>
+            }
+            <div class="d-flex justify-content-between font-weight-bold" style="font-size: 1.1rem;">
+                <span>TỔNG TIỀN:</span>
+                <span>@order.TotalAmount.ToString("N0") đ</span>
+            </div>
+        </div>
+
+        <div style="border-top: 1px dashed #000;" class="my-3"></div>
+
+        <div class="text-center small mt-4">
+            <p class="font-italic mb-1">Cảm ơn Quý khách! Hẹn gặp lại!</p>
+            <p class="mb-0">Powered by KOPPEE POS System</p>
+        </div>
+    </div>
+}
+
+<style>
+    /* Print media CSS queries */
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        .print-only, .print-only * {
+            visibility: visible;
+        }
+        .print-only {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            display: block !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private OrderModel? order;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrderDetails();
+    }
+
+    private async Task LoadOrderDetails()
+    {
+        isLoading = true;
+        var result = await OrderApiService.GetByIdAsync(Id);
+        
+        if (result != null && result.Success && result.GetOrder() != null)
+        {
+            order = result.GetOrder();
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Không tìm thấy thông tin hóa đơn.");
+        }
+        isLoading = false;
+    }
+
+    private async Task PrintInvoice()
+    {
+        await JS.InvokeVoidAsync("window.print");
+    }
+}
+

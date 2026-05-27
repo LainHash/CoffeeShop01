@@ -1,0 +1,422 @@
+@page "/employee/pos"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IProductApiService ProductApiService
+@inject ITableApiService TableApiService
+@inject IOrderApiService OrderApiService
+@inject IDiscountApiService DiscountApiService
+@inject NavigationManager NavigationManager
+
+<PageTitle>POS - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Hệ thống POS</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Hệ thống POS</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Hệ thống POS</h4>
+            <h1 class="display-4">Tạo Hóa Đơn Mới</h1>
+        </div>
+
+        <AlertMessage @ref="alert" />
+
+        <div class="row">
+            <!-- Left: Products -->
+            <div class="col-lg-8 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">Danh sách sản phẩm</h4>
+                    <input type="text" class="form-control w-50" placeholder="Tìm kiếm món ăn, đồ uống..." @bind="searchTerm" @bind:event="oninput" />
+                </div>
+                
+                <LoadingSpinner IsLoading="isLoadingProducts" />
+                
+                @if (!isLoadingProducts && filteredProducts != null)
+                {
+                    <div class="row">
+                        @foreach (var prod in filteredProducts)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm @(!prod.IsAvailable ? "opacity-50" : "")">
+                                    <img src="@(string.IsNullOrEmpty(prod.ImageUrl) ? "images/no-image.png" : prod.ImageUrl)" 
+                                         class="card-img-top" alt="@prod.ProductName" style="height: 200px; object-fit: cover;">
+                                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                                        <div>
+                                            <h5 class="card-title">@prod.ProductName</h5>
+                                            <p class="card-text font-weight-bold text-primary">@prod.Price.ToString("N0") VNĐ</p>
+                                        </div>
+                                        <div class="mt-2">
+                                            @if (prod.IsAvailable)
+                                            {
+                                                <button type="button" class="btn btn-outline-primary btn-sm" @onclick="() => AddToCart(prod)">
+                                                    <i class="fa fa-plus"></i> Thêm món
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-danger">Hết hàng</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Right: Cart & Tables -->
+            <div class="col-lg-4">
+                <h4 class="mb-4">Chi tiết hóa đơn</h4>
+                <div class="card shadow-sm border-0 bg-light pb-2">
+                    <div class="card-body">
+                        <!-- Table Selection -->
+                        <div class="form-group mb-4 bg-white p-3 rounded shadow-sm">
+                            <label class="font-weight-bold mb-3 d-block">
+                                <i class="fa fa-table mr-1 text-primary"></i> Chọn bàn phục vụ
+                            </label>
+                            
+                            @if (tables != null && tables.Any())
+                            {
+                                var tablesByFloor = tables.GroupBy(t => t.FloorNumber).OrderBy(g => g.Key).ToList();
+                                var selectedTable = tables.FirstOrDefault(t => t.TableId == selectedTableId);
+                                
+                                <div class="floor-tabs mb-3">
+                                    @foreach (var floor in tablesByFloor)
+                                    {
+                                        <button type="button" 
+                                                class="floor-tab-btn @(currentFloor == floor.Key ? "active" : "")" 
+                                                @onclick="() => currentFloor = floor.Key">
+                                            Tầng @floor.Key
+                                        </button>
+                                    }
+                                </div>
+                                
+                                @foreach (var floor in tablesByFloor)
+                                {
+                                    <div class="table-floor-panel @(currentFloor == floor.Key ? "active" : "")">
+                                        <div class="row g-2">
+                                            @foreach (var t in floor.OrderBy(x => x.TableNumber))
+                                            {
+                                                <div class="col-4 mb-2">
+                                                    <div class="table-card @(selectedTableId == t.TableId ? "selected" : "")" 
+                                                         @onclick="() => selectedTableId = t.TableId">
+                                                        <span class="table-icon">🪑</span>
+                                                        <div class="table-num">Bàn @t.TableNumber</div>
+                                                        <div class="table-status text-muted small">
+                                                            @(t.Status == "Available" ? "Trống" : t.Status == "Occupied" ? "Đang phục vụ" : t.Status)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                
+                                @if (selectedTable != null)
+                                {
+                                    <div class="alert alert-info mt-3 py-2 px-3 mb-0 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fa fa-info-circle mr-1 text-info"></i>
+                                            Đang chọn: <strong>Bàn @selectedTable.TableNumber (Tầng @selectedTable.FloorNumber)</strong>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-info" @onclick="() => selectedTableId = 0">Bỏ chọn</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning py-2 mt-3 mb-0 text-center">
+                                        <i class="fa fa-exclamation-triangle mr-1"></i> Chưa chọn bàn
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning py-2 text-center">Chưa có bàn nào trong hệ thống.</div>
+                            }
+                        </div>
+
+                        <hr />
+                        <h5 class="mb-3 font-weight-bold">
+                            Các món đã chọn 
+                            <span class="badge badge-primary float-right">@cart.Sum(x => x.Quantity)</span>
+                        </h5>
+                        
+                        <div class="bg-white p-2 rounded shadow-sm mb-4" style="min-height: 150px; max-height: 350px; overflow-y: auto;">
+                            @if (cart.Count == 0)
+                            {
+                                <div class="text-center text-muted py-5">
+                                    <i class="fa fa-shopping-basket fa-3x mb-3 text-light"></i>
+                                    <p>Chưa có món nào.</p>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var item in cart)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom px-2">
+                                        <div style="width: 55%;">
+                                            <h6 class="my-0 font-weight-bold text-dark">@item.ProductName</h6>
+                                            <div class="d-flex align-items-center mt-2">
+                                                <small class="text-muted mr-2">@item.UnitPrice.ToString("N0") x</small>
+                                                <div class="input-group input-group-sm" style="width: 90px;">
+                                                    <div class="input-group-prepend">
+                                                        <button class="btn btn-outline-secondary px-2" @onclick="() => DecreaseQuantity(item)">-</button>
+                                                    </div>
+                                                    <input type="text" class="form-control text-center px-1 font-weight-bold" value="@item.Quantity" readonly>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary px-2" @onclick="() => IncreaseQuantity(item)">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end" style="width: 45%;">
+                                            <span class="font-weight-bold text-dark mb-2">@item.LineTotal.ToString("N0") đ</span>
+                                            <button type="button" class="btn btn-sm btn-outline-danger px-2 py-1" @onclick="() => RemoveFromCart(item)">
+                                                <i class="fa fa-trash"></i> Bỏ
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <div class="bg-white p-3 rounded shadow-sm">
+                            <div class="d-flex justify-content-between font-weight-bold mb-3">
+                                <span>Tạm tính:</span>
+                                <span class="text-muted">@SubTotal.ToString("N0") VNĐ</span>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="small text-muted font-weight-bold">Mã giảm giá (nếu có)</label>
+                                <select class="form-control form-control-sm" @bind="selectedDiscountId">
+                                    <option value="0">-- Không có --</option>
+                                    @if (discounts != null)
+                                    {
+                                        @foreach (var d in discounts)
+                                        {
+                                            <option value="@d.DiscountId">@d.DisplayLabel</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            
+                            @if (DiscountAmount > 0)
+                            {
+                                <div class="d-flex justify-content-between font-weight-bold mb-2 text-success">
+                                    <span>Giảm giá:</span>
+                                    <span>- @DiscountAmount.ToString("N0") VNĐ</span>
+                                </div>
+                            }
+
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="font-weight-bold">Thành tiền:</span>
+                                <span class="text-danger font-weight-bold" style="font-size: 1.5rem;">@TotalAmount.ToString("N0") VNĐ</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-block font-weight-bold py-3 mt-4 shadow-sm" 
+                                disabled="@(cart.Count == 0 || selectedTableId == 0 || isSubmitting)"
+                                @onclick="SubmitOrder">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                                <span>Đang xử lý...</span>
+                            }
+                            else
+                            {
+                                <span><i class="fa fa-check-circle mr-2"></i>XÁC NHẬN TẠO HÓA ĐƠN</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ProductModel>? products;
+    private List<TableModel>? tables;
+    private List<DiscountModel>? discounts;
+    private List<CartItem> cart = new();
+    
+    private string _searchTerm = "";
+    private string searchTerm 
+    { 
+        get => _searchTerm; 
+        set { _searchTerm = value; FilterProducts(); } 
+    }
+    
+    private List<ProductModel>? filteredProducts;
+
+    private int selectedTableId = 0;
+    private int selectedDiscountId = 0;
+    private int currentFloor = 1;
+    
+    private bool isLoadingProducts = true;
+    private bool isSubmitting = false;
+    private AlertMessage alert = default!;
+    private Guid currentEmployeeId;
+
+    private decimal SubTotal => cart.Sum(x => x.LineTotal);
+    
+    private decimal DiscountAmount 
+    {
+        get
+        {
+            if (selectedDiscountId == 0 || discounts == null) return 0;
+            var d = discounts.FirstOrDefault(x => x.DiscountId == selectedDiscountId);
+            if (d == null) return 0;
+            
+            if (d.Type == "Percentage")
+                return SubTotal * (decimal)(d.Value / 100.0);
+            return (decimal)d.Value;
+        }
+    }
+    
+    private decimal TotalAmount => Math.Max(0, SubTotal - DiscountAmount);
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState != null)
+        {
+            var authState = await AuthState;
+            var user = authState.User;
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var idClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (idClaim != null && Guid.TryParse(idClaim.Value, out var guid))
+                {
+                    currentEmployeeId = guid;
+                }
+            }
+        }
+
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoadingProducts = true;
+        
+        var prodResult = await ProductApiService.GetAllAsync();
+        if (prodResult != null && prodResult.Success)
+        {
+            products = prodResult.List.Where(p => p.IsAvailable).ToList();
+            FilterProducts();
+        }
+
+        var tableResult = await TableApiService.GetAllAsync();
+        if (tableResult != null && tableResult.Success)
+        {
+            tables = tableResult.List;
+            if (tables.Any())
+            {
+                currentFloor = tables.Min(t => t.FloorNumber);
+            }
+        }
+
+        var discResult = await DiscountApiService.GetAllAsync();
+        if (discResult != null && discResult.Success)
+        {
+            discounts = discResult.List;
+        }
+
+        isLoadingProducts = false;
+    }
+
+    private void FilterProducts()
+    {
+        if (products == null) return;
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            filteredProducts = products.ToList();
+        else
+            filteredProducts = products.Where(p => p.ProductName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void AddToCart(ProductModel prod)
+    {
+        if (!prod.IsAvailable) return;
+        
+        var existing = cart.FirstOrDefault(x => x.ProductId == prod.ProductId);
+        if (existing != null)
+        {
+            existing.Quantity++;
+        }
+        else
+        {
+            cart.Add(new CartItem 
+            {
+                ProductId = prod.ProductId,
+                ProductName = prod.ProductName,
+                ImageUrl = prod.ImageUrl,
+                UnitPrice = prod.Price,
+                Quantity = 1
+            });
+        }
+    }
+
+    private void IncreaseQuantity(CartItem item) => item.Quantity++;
+    
+    private void DecreaseQuantity(CartItem item)
+    {
+        if (item.Quantity > 1) item.Quantity--;
+        else cart.Remove(item);
+    }
+    
+    private void RemoveFromCart(CartItem item) => cart.Remove(item);
+
+    private async Task SubmitOrder()
+    {
+        if (cart.Count == 0 || selectedTableId == 0) return;
+        
+        isSubmitting = true;
+        alert.Hide();
+
+        var input = new CreateOrderInput
+        {
+            TableId = selectedTableId,
+            EmployeePublicId = currentEmployeeId,
+            Status = "Unpaid",
+            SubTotal = SubTotal,
+            TotalAmount = TotalAmount,
+            DiscountId = selectedDiscountId == 0 ? null : selectedDiscountId,
+            OrderDetails = cart.Select(c => new CreateOrderDetailInput
+            {
+                ProductId = c.ProductId,
+                Quantity = c.Quantity,
+                UnitPrice = c.UnitPrice,
+                LineTotal = c.LineTotal
+            }).ToList()
+        };
+
+        var result = await OrderApiService.CreateAsync(input);
+        
+        if (result != null && result.Success && result.GetOrder() != null)
+        {
+            var orderId = result.GetOrder()!.PublicId;
+            NavigationManager.NavigateTo($"/order/details/{orderId}");
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Lỗi khi tạo hóa đơn.");
+            isSubmitting = false;
+        }
+    }
+}
+

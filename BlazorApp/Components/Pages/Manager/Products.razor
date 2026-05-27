@@ -1,0 +1,100 @@
+@page "/manager/products"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager")]
+@inject IProductApiService ProductApiService
+
+<PageTitle>Quản lý Sản phẩm - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Quản lý Sản phẩm</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Quản lý Sản phẩm</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<AlertMessage @ref="alert" />
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && products != null)
+{
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 80px">Hình ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Trạng thái</th>
+                    <th>Mô tả</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (products.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">Không có sản phẩm nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var p in products)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "images/no-image.png" : p.ImageUrl)" 
+                                     class="rounded object-fit-cover" width="50" height="50" />
+                            </td>
+                            <td class="fw-bold">@p.ProductName</td>
+                            <td>@p.Price.ToString("N0")đ</td>
+                            <td>
+                                @if (p.IsAvailable)
+                                {
+                                    <span class="badge bg-success">Đang bán</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Ngừng bán</span>
+                                }
+                            </td>
+                            <td class="text-muted small">@(string.IsNullOrEmpty(p.Description) ? "-" : p.Description)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<ProductModel>? products;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        isLoading = true;
+        var result = await ProductApiService.GetAllAsync();
+        
+        if (result != null && result.Success)
+        {
+            products = result.List;
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Không thể tải danh sách sản phẩm.");
+        }
+        isLoading = false;
+    }
+}
+

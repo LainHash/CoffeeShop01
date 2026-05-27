@@ -4,6 +4,6 @@
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
-        public List<TableApiItem> List { get; set; } = new();
+        public List<TableApiItem> Data { get; set; } = new();
     }
 }

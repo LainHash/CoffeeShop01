@@ -7,8 +7,7 @@ namespace RazorPage.DTOs.Auth
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         public int RoleId { get; set; }
-        public AuthCustomerData? Customer { get; set; }
-        public AuthManagerData? Manager { get; set; }
+        public AuthManagerData? Data { get; set; }
     }
 
     public class AuthCustomerData
