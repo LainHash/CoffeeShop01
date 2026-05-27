@@ -1,4 +1,5 @@
 @page "/employee/pos"
+@rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject IProductApiService ProductApiService
 @inject ITableApiService TableApiService
@@ -21,148 +22,226 @@
 </div>
 <!-- Page Header End -->
 
-<div class="row h-100 pos-container">
-    <!-- Left: Products -->
-    <div class="col-lg-8 h-100 d-flex flex-col">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="m-0">Thực đơn</h3>
-            <input type="text" class="form-control w-25" placeholder="Tìm kiếm..." @bind="searchTerm" @bind:event="oninput" />
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Hệ thống POS</h4>
+            <h1 class="display-4">Tạo Hóa Đơn Mới</h1>
         </div>
-        
-        <LoadingSpinner IsLoading="isLoadingProducts" />
-        
-        @if (!isLoadingProducts && filteredProducts != null)
-        {
-            <div class="row g-3 overflow-auto flex-grow-1 custom-scrollbar pb-3">
-                @foreach (var prod in filteredProducts)
+
+        <AlertMessage @ref="alert" />
+
+        <div class="row">
+            <!-- Left: Products -->
+            <div class="col-lg-8 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">Danh sách sản phẩm</h4>
+                    <input type="text" class="form-control w-50" placeholder="Tìm kiếm món ăn, đồ uống..." @bind="searchTerm" @bind:event="oninput" />
+                </div>
+                
+                <LoadingSpinner IsLoading="isLoadingProducts" />
+                
+                @if (!isLoadingProducts && filteredProducts != null)
                 {
-                    <div class="col-sm-6 col-md-4 col-xl-3">
-                        <div class="card h-100 pos-product-card shadow-sm cursor-pointer @(prod.IsAvailable ? "" : "opacity-50")" 
-                             @onclick="() => AddToCart(prod)">
-                            <img src="@(string.IsNullOrEmpty(prod.ImageUrl) ? "images/no-image.png" : prod.ImageUrl)" 
-                                 class="card-img-top object-fit-cover" height="140" alt="@prod.ProductName">
-                            <div class="card-body p-2 d-flex flex-column justify-content-between">
-                                <h6 class="card-title text-truncate mb-1" title="@prod.ProductName">@prod.ProductName</h6>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-primary fw-bold">@prod.Price.ToString("N0")đ</span>
-                                    @if (!prod.IsAvailable)
-                                    {
-                                        <span class="badge bg-danger small">Hết hàng</span>
-                                    }
+                    <div class="row">
+                        @foreach (var prod in filteredProducts)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm @(!prod.IsAvailable ? "opacity-50" : "")">
+                                    <img src="@(string.IsNullOrEmpty(prod.ImageUrl) ? "images/no-image.png" : prod.ImageUrl)" 
+                                         class="card-img-top" alt="@prod.ProductName" style="height: 200px; object-fit: cover;">
+                                    <div class="card-body text-center d-flex flex-column justify-content-between">
+                                        <div>
+                                            <h5 class="card-title">@prod.ProductName</h5>
+                                            <p class="card-text font-weight-bold text-primary">@prod.Price.ToString("N0") VNĐ</p>
+                                        </div>
+                                        <div class="mt-2">
+                                            @if (prod.IsAvailable)
+                                            {
+                                                <button type="button" class="btn btn-outline-primary btn-sm" @onclick="() => AddToCart(prod)">
+                                                    <i class="fa fa-plus"></i> Thêm món
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-danger">Hết hàng</span>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 }
             </div>
-        }
-    </div>
 
-    <!-- Right: Cart & Checkout -->
-    <div class="col-lg-4 h-100 bg-white border-start shadow-sm d-flex flex-column rounded-3 p-3">
-        <AlertMessage @ref="alert" />
-
-        <div class="mb-3">
-            <label class="form-label fw-bold">Chọn Bàn</label>
-            <select class="form-select bg-light" @bind="selectedTableId">
-                <option value="0">-- Chọn bàn --</option>
-                @if (tables != null)
-                {
-                    @foreach (var t in tables.Where(x => x.Status == "Available" || x.Status == "Occupied"))
-                    {
-                        <option value="@t.TableId">@t.DisplayName (@t.StatusLabel)</option>
-                    }
-                }
-            </select>
-        </div>
-
-        <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
-            <h5 class="m-0 fw-bold">Giỏ hàng</h5>
-            <span class="badge bg-primary rounded-pill">@cart.Sum(x => x.Quantity) món</span>
-        </div>
-
-        <!-- Cart Items -->
-        <div class="flex-grow-1 overflow-auto custom-scrollbar mb-3 pe-1">
-            @if (cart.Count == 0)
-            {
-                <div class="text-center text-muted mt-5">
-                    <i class="bi bi-cart-x display-1 opacity-25"></i>
-                    <p class="mt-2">Giỏ hàng trống</p>
-                </div>
-            }
-            else
-            {
-                <ul class="list-group list-group-flush">
-                    @foreach (var item in cart)
-                    {
-                        <li class="list-group-item px-0 py-2 border-bottom">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="w-50">
-                                    <div class="fw-bold text-truncate" title="@item.ProductName">@item.ProductName</div>
-                                    <small class="text-muted">@item.UnitPrice.ToString("N0")đ</small>
+            <!-- Right: Cart & Tables -->
+            <div class="col-lg-4">
+                <h4 class="mb-4">Chi tiết hóa đơn</h4>
+                <div class="card shadow-sm border-0 bg-light pb-2">
+                    <div class="card-body">
+                        <!-- Table Selection -->
+                        <div class="form-group mb-4 bg-white p-3 rounded shadow-sm">
+                            <label class="font-weight-bold mb-3 d-block">
+                                <i class="fa fa-table mr-1 text-primary"></i> Chọn bàn phục vụ
+                            </label>
+                            
+                            @if (tables != null && tables.Any())
+                            {
+                                var tablesByFloor = tables.GroupBy(t => t.FloorNumber).OrderBy(g => g.Key).ToList();
+                                var selectedTable = tables.FirstOrDefault(t => t.TableId == selectedTableId);
+                                
+                                <div class="floor-tabs mb-3">
+                                    @foreach (var floor in tablesByFloor)
+                                    {
+                                        <button type="button" 
+                                                class="floor-tab-btn @(currentFloor == floor.Key ? "active" : "")" 
+                                                @onclick="() => currentFloor = floor.Key">
+                                            Tầng @floor.Key
+                                        </button>
+                                    }
                                 </div>
-                                <div class="w-50 d-flex justify-content-end align-items-center gap-2">
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-secondary" @onclick="() => DecreaseQuantity(item)">-</button>
-                                        <span class="btn btn-light disabled px-2">@item.Quantity</span>
-                                        <button class="btn btn-outline-secondary" @onclick="() => IncreaseQuantity(item)">+</button>
+                                
+                                @foreach (var floor in tablesByFloor)
+                                {
+                                    <div class="table-floor-panel @(currentFloor == floor.Key ? "active" : "")">
+                                        <div class="row g-2">
+                                            @foreach (var t in floor.OrderBy(x => x.TableNumber))
+                                            {
+                                                <div class="col-4 mb-2">
+                                                    <div class="table-card @(selectedTableId == t.TableId ? "selected" : "")" 
+                                                         @onclick="() => selectedTableId = t.TableId">
+                                                        <span class="table-icon">🪑</span>
+                                                        <div class="table-num">Bàn @t.TableNumber</div>
+                                                        <div class="table-status text-muted small">
+                                                            @(t.Status == "Available" ? "Trống" : t.Status == "Occupied" ? "Đang phục vụ" : t.Status)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-danger border-0" @onclick="() => RemoveFromCart(item)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                }
+                                
+                                @if (selectedTable != null)
+                                {
+                                    <div class="alert alert-info mt-3 py-2 px-3 mb-0 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fa fa-info-circle mr-1 text-info"></i>
+                                            Đang chọn: <strong>Bàn @selectedTable.TableNumber (Tầng @selectedTable.FloorNumber)</strong>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-info" @onclick="() => selectedTableId = 0">Bỏ chọn</button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning py-2 mt-3 mb-0 text-center">
+                                        <i class="fa fa-exclamation-triangle mr-1"></i> Chưa chọn bàn
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning py-2 text-center">Chưa có bàn nào trong hệ thống.</div>
+                            }
+                        </div>
+
+                        <hr />
+                        <h5 class="mb-3 font-weight-bold">
+                            Các món đã chọn 
+                            <span class="badge badge-primary float-right">@cart.Sum(x => x.Quantity)</span>
+                        </h5>
+                        
+                        <div class="bg-white p-2 rounded shadow-sm mb-4" style="min-height: 150px; max-height: 350px; overflow-y: auto;">
+                            @if (cart.Count == 0)
+                            {
+                                <div class="text-center text-muted py-5">
+                                    <i class="fa fa-shopping-basket fa-3x mb-3 text-light"></i>
+                                    <p>Chưa có món nào.</p>
                                 </div>
+                            }
+                            else
+                            {
+                                @foreach (var item in cart)
+                                {
+                                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom px-2">
+                                        <div style="width: 55%;">
+                                            <h6 class="my-0 font-weight-bold text-dark">@item.ProductName</h6>
+                                            <div class="d-flex align-items-center mt-2">
+                                                <small class="text-muted mr-2">@item.UnitPrice.ToString("N0") x</small>
+                                                <div class="input-group input-group-sm" style="width: 90px;">
+                                                    <div class="input-group-prepend">
+                                                        <button class="btn btn-outline-secondary px-2" @onclick="() => DecreaseQuantity(item)">-</button>
+                                                    </div>
+                                                    <input type="text" class="form-control text-center px-1 font-weight-bold" value="@item.Quantity" readonly>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary px-2" @onclick="() => IncreaseQuantity(item)">+</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-end" style="width: 45%;">
+                                            <span class="font-weight-bold text-dark mb-2">@item.LineTotal.ToString("N0") đ</span>
+                                            <button type="button" class="btn btn-sm btn-outline-danger px-2 py-1" @onclick="() => RemoveFromCart(item)">
+                                                <i class="fa fa-trash"></i> Bỏ
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <div class="bg-white p-3 rounded shadow-sm">
+                            <div class="d-flex justify-content-between font-weight-bold mb-3">
+                                <span>Tạm tính:</span>
+                                <span class="text-muted">@SubTotal.ToString("N0") VNĐ</span>
                             </div>
-                        </li>
-                    }
-                </ul>
-            }
-        </div>
 
-        <!-- Summary -->
-        <div class="bg-light p-3 rounded-3 mt-auto">
-            <div class="mb-2">
-                <label class="form-label small text-muted mb-1">Mã giảm giá (nếu có)</label>
-                <select class="form-select form-select-sm" @bind="selectedDiscountId">
-                    <option value="0">Không áp dụng</option>
-                    @if (discounts != null)
-                    {
-                        @foreach (var d in discounts)
-                        {
-                            <option value="@d.DiscountId">@d.DisplayLabel</option>
-                        }
-                    }
-                </select>
-            </div>
-            
-            <div class="d-flex justify-content-between mb-1">
-                <span class="text-muted">Tạm tính:</span>
-                <span>@SubTotal.ToString("N0")đ</span>
-            </div>
-            @if (DiscountAmount > 0)
-            {
-                <div class="d-flex justify-content-between mb-1 text-success">
-                    <span>Giảm giá:</span>
-                    <span>-@DiscountAmount.ToString("N0")đ</span>
+                            <div class="form-group mb-3">
+                                <label class="small text-muted font-weight-bold">Mã giảm giá (nếu có)</label>
+                                <select class="form-control form-control-sm" @bind="selectedDiscountId">
+                                    <option value="0">-- Không có --</option>
+                                    @if (discounts != null)
+                                    {
+                                        @foreach (var d in discounts)
+                                        {
+                                            <option value="@d.DiscountId">@d.DisplayLabel</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            
+                            @if (DiscountAmount > 0)
+                            {
+                                <div class="d-flex justify-content-between font-weight-bold mb-2 text-success">
+                                    <span>Giảm giá:</span>
+                                    <span>- @DiscountAmount.ToString("N0") VNĐ</span>
+                                </div>
+                            }
+
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="font-weight-bold">Thành tiền:</span>
+                                <span class="text-danger font-weight-bold" style="font-size: 1.5rem;">@TotalAmount.ToString("N0") VNĐ</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-block font-weight-bold py-3 mt-4 shadow-sm" 
+                                disabled="@(cart.Count == 0 || selectedTableId == 0 || isSubmitting)"
+                                @onclick="SubmitOrder">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                                <span>Đang xử lý...</span>
+                            }
+                            else
+                            {
+                                <span><i class="fa fa-check-circle mr-2"></i>XÁC NHẬN TẠO HÓA ĐƠN</span>
+                            }
+                        </button>
+                    </div>
                 </div>
-            }
-            <div class="d-flex justify-content-between mt-2 pt-2 border-top">
-                <span class="fw-bold fs-5">Tổng tiền:</span>
-                <span class="fw-bold fs-5 text-primary">@TotalAmount.ToString("N0")đ</span>
             </div>
-
-            <button class="btn btn-success w-100 py-3 mt-3 fw-bold fs-5" 
-                    disabled="@(cart.Count == 0 || selectedTableId == 0 || isSubmitting)"
-                    @onclick="SubmitOrder">
-                @if (isSubmitting)
-                {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <span>Đang xử lý...</span>
-                }
-                else
-                {
-                    <span>THANH TOÁN</span>
-                }
-            </button>
         </div>
     </div>
 </div>
@@ -184,6 +263,7 @@
 
     private int selectedTableId = 0;
     private int selectedDiscountId = 0;
+    private int currentFloor = 1;
     
     private bool isLoadingProducts = true;
     private bool isSubmitting = false;
@@ -245,6 +325,10 @@
         if (tableResult != null && tableResult.Success)
         {
             tables = tableResult.List;
+            if (tables.Any())
+            {
+                currentFloor = tables.Min(t => t.FloorNumber);
+            }
         }
 
         var discResult = await DiscountApiService.GetAllAsync();
@@ -335,3 +419,4 @@
         }
     }
 }
+

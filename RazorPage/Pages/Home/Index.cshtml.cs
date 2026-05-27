@@ -35,9 +35,9 @@ namespace RazorPage.Pages.Home
                         PropertyNameCaseInsensitive = true
                     });
 
-                    if (result?.Success == true && result.List != null)
+                    if (result?.Success == true && result.Data != null)
                     {
-                        Products = result.List.Where(p => p.IsAvailable).ToList();
+                        Products = result.Data.Where(p => p.IsAvailable).ToList();
                     }
                 }
                 else

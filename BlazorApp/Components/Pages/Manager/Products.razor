@@ -1,4 +1,5 @@
 @page "/manager/products"
+@rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager")]
 @inject IProductApiService ProductApiService
 
@@ -96,3 +97,4 @@
         isLoading = false;
     }
 }
+

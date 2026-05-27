@@ -1,4 +1,5 @@
 @page "/employee/tablemap"
+@rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject ITableApiService TableApiService
 
@@ -17,51 +18,71 @@
 </div>
 <!-- Page Header End -->
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Sơ đồ bàn</h2>
-    <div class="d-flex gap-2">
-        <span class="badge bg-success p-2">Trống</span>
-        <span class="badge bg-danger p-2">Đang dùng</span>
-        <span class="badge bg-warning text-dark p-2">Đặt trước</span>
-        <span class="badge bg-secondary p-2">Bảo trì</span>
-    </div>
-</div>
 
-<AlertMessage @ref="alert" />
-<LoadingSpinner IsLoading="isLoading" />
-
-@if (!isLoading && tables != null)
-{
-    var floors = tables.Select(t => t.FloorNumber).Distinct().OrderBy(f => f);
-
-    @foreach (var floor in floors)
-    {
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Tầng @floor</h5>
-            </div>
-            <div class="card-body">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-                    @foreach (var table in tables.Where(t => t.FloorNumber == floor).OrderBy(t => t.TableNumber))
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Quản Lý Bàn</h4>
+            <h1 class="display-4">Sơ Đồ Từng Tầng</h1>
+        </div>
+        
+        <AlertMessage @ref="alert" />
+        <LoadingSpinner IsLoading="isLoading" />
+        
+        @if (!isLoading && tables != null)
+        {
+            if (!tables.Any())
+            {
+                <div class="alert alert-warning text-center">Chưa có dữ liệu bàn nào trong hệ thống.</div>
+            }
+            else
+            {
+                var tablesByFloor = tables.GroupBy(t => t.FloorNumber).OrderBy(g => g.Key).ToList();
+                
+                <div class="floor-tabs mb-4 justify-content-center">
+                    @foreach (var floor in tablesByFloor)
                     {
-                        <div class="col">
-                            <div class="card h-100 table-card text-center cursor-pointer border-2 @GetBorderClass(table.Status)">
-                                <div class="card-body" @onclick="() => ShowUpdateModal(table)">
-                                    <h4 class="card-title">Bàn @table.TableNumber</h4>
-                                    <div class="mb-2">
-                                        <i class="bi bi-people-fill text-muted"></i> 
-                                        <span class="small text-muted">@table.RecommendedCapacity người</span>
-                                    </div>
-                                    <span class="badge @table.StatusBadgeClass w-100 py-2">@table.StatusLabel</span>
-                                </div>
-                            </div>
-                        </div>
+                        <button type="button" 
+                                class="floor-tab-btn @(currentFloor == floor.Key ? "active" : "")" 
+                                @onclick="() => currentFloor = floor.Key">
+                            Tầng @floor.Key
+                        </button>
                     }
                 </div>
-            </div>
-        </div>
-    }
-}
+
+                @foreach (var floor in tablesByFloor)
+                {
+                    <div class="table-floor-panel @(currentFloor == floor.Key ? "active" : "")">
+                        <div class="row">
+                            @foreach (var t in floor.OrderBy(x => x.TableNumber))
+                            {
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                    <div class="table-map-card status-@t.Status">
+                                        <div>
+                                            <div class="status-badge badge-@t.Status">@t.StatusLabel</div>
+                                            <h4>Bàn @t.TableNumber</h4>
+                                            <p class="text-muted mb-3"><i class="fa fa-users text-primary mr-1"></i> Sức chứa: @t.RecommendedCapacity</p>
+                                        </div>
+                                        
+                                        <div class="d-flex flex-column gap-2" style="gap: 10px;">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @onclick="() => ShowUpdateModal(t)">
+                                                <i class="fa fa-edit mr-1"></i> Đổi Trạng Thái
+                                            </button>
+                                            
+                                            <a href="/employee/pos" class="btn btn-outline-primary btn-sm btn-block">
+                                                <i class="fa fa-file-invoice mr-1"></i> Tạo Hóa Đơn
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
 
 @if (selectedTable != null)
 {
@@ -111,6 +132,7 @@
     private TableModel? selectedTable;
     private string newStatus = "";
     private bool isUpdating = false;
+    private int currentFloor = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -124,6 +146,10 @@
         if (result != null && result.Success)
         {
             tables = result.List;
+            if (tables.Any())
+            {
+                currentFloor = tables.Min(t => t.FloorNumber);
+            }
         }
         else
         {
@@ -171,3 +197,4 @@
         isUpdating = false;
     }
 }
+

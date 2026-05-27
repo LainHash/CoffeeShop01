@@ -1,4 +1,5 @@
 @page "/manager/employees/create"
+@rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager")]
 @inject IAuthApiService AuthApiService
 
@@ -128,3 +129,4 @@
         isSubmitting = false;
     }
 }
+
