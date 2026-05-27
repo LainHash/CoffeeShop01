@@ -104,6 +104,7 @@
                                     <th scope="col" class="py-3">Mã Đơn</th>
                                     <th scope="col" class="py-3">Bàn</th>
                                     <th scope="col" class="py-3">Nhân Viên</th>
+                                    <th scope="col" class="py-3">Ngày Tạo</th>
                                     <th scope="col" class="py-3">Trạng Thái</th>
                                     <th scope="col" class="py-3 text-right">Tổng Tiền</th>
                                     <th scope="col" class="py-3 text-center">Hành Động</th>
@@ -136,6 +137,7 @@
                                                 }
                                             </td>
                                             <td class="py-3 text-secondary">@order.EmployeeName</td>
+                                            <td class="py-3 text-secondary">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                                             <td class="py-3">
                                                 @if (order.Status == "Unpaid")
                                                 {

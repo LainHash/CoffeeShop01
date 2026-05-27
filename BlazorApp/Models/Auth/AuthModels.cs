@@ -12,7 +12,7 @@ namespace BlazorApp.Models.Auth
         public string Message { get; set; } = string.Empty;
         public int RoleId { get; set; }
         public AuthCustomerData? Customer { get; set; }
-        public AuthManagerData? Manager { get; set; }
+        public AuthManagerData? Data { get; set; }
     }
 
     public class AuthCustomerData

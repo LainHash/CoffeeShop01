@@ -1,11 +1,12 @@
 using FluentValidation;
 using WebAPI.DTOs.Orders.Create;
+using WebAPI.Helpers.Constants.Orders;
 
 namespace WebAPI.Middlewares.Orders.Create
 {
     public class CreateOrderValidator : AbstractValidator<CreateOrderDTO>
     {
-        private static readonly string[] AllowedStatuses = ["Pending", "InProgress", "Completed", "Cancelled"];
+        private static readonly string[] AllowedStatuses = [InvoiceStatuses.Unpaid, InvoiceStatuses.Paid, InvoiceStatuses.Cancelled];
 
         public CreateOrderValidator()
         {

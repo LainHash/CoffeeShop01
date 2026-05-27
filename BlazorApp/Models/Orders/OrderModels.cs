@@ -18,6 +18,7 @@ namespace BlazorApp.Models.Orders
         public int FloorNumber { get; set; }
         public string? EmployeeName { get; set; }
         public string? DiscountCode { get; set; }
+        public DateTime CreatedAt { get; set; }
         public List<OrderDetailModel> OrderDetails { get; set; } = new();
 
         public string StatusLabel => Status switch
