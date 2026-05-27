@@ -19,7 +19,7 @@ namespace BlazorApp.Services.Implementations
 
         public async Task<AuthApiResponse?> RegisterEmployeeAsync(RegisterEmployeeInput input)
         {
-            return await _apiService.PostAsync<RegisterEmployeeInput, AuthApiResponse>("/api/Auth/register/employee", input);
+            return await _apiService.PostAsync<RegisterEmployeeInput, AuthApiResponse>("/api/Manager/Create/Employee", input);
         }
     }
 }

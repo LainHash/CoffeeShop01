@@ -33,7 +33,7 @@ namespace WebAPI.Services.Implementations
         public async Task<DiscountResult<DiscountDTO>> GetOneAsync(string code)
         {
             var discount = await _context.Discounts
-                .FirstOrDefaultAsync(d => string.Equals(d.DiscountCode, code, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(d => d.DiscountCode == code);
             if (discount == null)
             {
                 return new DiscountResult<DiscountDTO>
