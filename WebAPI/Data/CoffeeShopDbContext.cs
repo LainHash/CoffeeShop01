@@ -200,6 +200,7 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Note).HasMaxLength(255);
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.ReservationTime).HasColumnType("datetime");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
@@ -231,6 +232,7 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.MaxCapacity).HasDefaultValue(2);
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RecommendedCapacity).HasDefaultValue(2);
             entity.Property(e => e.Shape).HasMaxLength(50);
             entity.Property(e => e.Status)

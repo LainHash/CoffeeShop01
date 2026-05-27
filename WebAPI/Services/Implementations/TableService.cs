@@ -63,9 +63,10 @@ namespace WebAPI.Services.Implementations
             };
         }
 
-        public async Task<TableResult<TableEntityDTO>> UpdateStatusAsync(int tableId, string status)
+        public async Task<TableResult<TableEntityDTO>> UpdateStatusAsync(int floorNumber, int tableNumber, string status)
         {
-            var table = await _context.TableEntities.FindAsync(tableId);
+            var table = await _context.TableEntities
+                .FirstOrDefaultAsync(t => t.FloorNumber == floorNumber && t.TableNumber == tableNumber);
             if (table == null)
             {
                 return new TableResult<TableEntityDTO>

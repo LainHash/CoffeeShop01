@@ -8,6 +8,6 @@ namespace WebAPI.Services.Interfaces
         Task<TableResult<List<TableEntityDTO>>> GetAllAsync();
         Task<TableResult<TableEntityDTO>> GetOneAsync(int floorNumber, int tableNumber);
         Task<TableResult<List<TableEntityDTO>>> GetAllByFloorAsync(int floorNumber);
-        Task<TableResult<TableEntityDTO>> UpdateStatusAsync(int tableId, string status);
+        Task<TableResult<TableEntityDTO>> UpdateStatusAsync(int floorNumber, int tableNumber, string status);
     }
 }

@@ -4,7 +4,7 @@ namespace BlazorApp.Models.Reservations
 {
     public class ReservationModel
     {
-        public int ReservationId { get; set; }
+        public Guid ReservationId { get; set; }
         public string CustomerFullName { get; set; } = string.Empty;
         public string CustomerPhone { get; set; } = string.Empty;
         public string? TableName { get; set; }

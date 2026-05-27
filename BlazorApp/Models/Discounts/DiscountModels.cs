@@ -22,4 +22,11 @@ namespace BlazorApp.Models.Discounts
         [JsonPropertyName("data")]
         public List<DiscountModel> List { get; set; } = new();
     }
+
+    public class DiscountResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public DiscountModel? Data { get; set; }
+    }
 }

@@ -30,10 +30,10 @@ namespace WebAPI.Services.Implementations
             };
         }
 
-        public async Task<DiscountResult<DiscountDTO>> GetOneAsync(int id)
+        public async Task<DiscountResult<DiscountDTO>> GetOneAsync(string code)
         {
             var discount = await _context.Discounts
-                .FirstOrDefaultAsync(d => d.DiscountId == id);
+                .FirstOrDefaultAsync(d => d.DiscountCode == code);
             if (discount == null)
             {
                 return new DiscountResult<DiscountDTO>

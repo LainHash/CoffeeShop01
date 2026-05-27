@@ -22,10 +22,10 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetOne(int id)
+        [HttpGet("{code}")]
+        public async Task<IActionResult> GetOne(string code)
         {
-            var result = await _discountService.GetOneAsync(id);
+            var result = await _discountService.GetOneAsync(code);
             if(!result.Success)
             {
                 return BadRequest(result);

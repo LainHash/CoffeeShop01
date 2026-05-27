@@ -1,11 +1,12 @@
 using FluentValidation;
 using WebAPI.DTOs.Orders.Update;
+using WebAPI.Helpers.Constants.Orders;
 
 namespace WebAPI.Middlewares.Orders.Update
 {
     public class UpdateOrderValidator : AbstractValidator<UpdateOrderDTO>
     {
-        private static readonly string[] AllowedStatuses = ["Pending", "InProgress", "Completed", "Cancelled"];
+        private static readonly string[] AllowedStatuses = [InvoiceStatuses.Unpaid, InvoiceStatuses.Paid, InvoiceStatuses.Cancelled];
 
         public UpdateOrderValidator()
         {

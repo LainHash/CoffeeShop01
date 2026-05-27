@@ -19,8 +19,7 @@
     </div>
 </div>
 <!-- Page Header End -->
-
-<div class="row justify-content-center">
+@* <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
         <div class="card shadow-sm mt-4">
             <div class="card-header bg-primary text-white">
@@ -88,6 +87,139 @@
                         </button>
                     </div>
                 </EditForm>
+            </div>
+        </div>
+    </div>
+</div> *@
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="reservation position-relative overlay-top overlay-bottom">
+            <div class="row align-items-center">
+                <div class="col-lg-6 my-5 my-lg-0">
+                    <div class="p-5">
+                        <div class="mb-4">
+                            <span class="badge badge-warning text-dark px-3 py-2 mb-3 font-weight-bold" style="font-size:0.85rem; border-radius:20px;">
+                                <i class="fa fa-user-tie mr-1"></i> Chế độ Nhân Viên
+                            </span>
+                            <h1 class="display-3 text-primary">ĐẶT BÀN</h1>
+                            <h1 class="text-white">Cho Khách Hàng</h1>
+                        </div>
+                        <p class="text-white">Điền đầy đủ thông tin để đặt bàn cho khách. Hệ thống sẽ ghi nhận ngay lập tức và gửi xác nhận.</p>
+                        <ul class="list-inline text-white m-0">
+                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Xác nhận đặt bàn ngay lập tức</li>
+                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Không phí hủy bàn</li>
+                            <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Ưu đãi độc quyền cho thành viên</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="text-center p-5" style="background: rgba(51, 33, 29, .85); border-radius: 12px;">
+                        <h2 class="text-white mb-4">
+                            <i class="fa fa-calendar-alt text-primary mr-2"></i>Thông Tin Đặt Bàn
+                        </h2>
+
+                        <AlertMessage @ref="alert" />
+                        <EditForm Model="input"
+                                  OnValidSubmit="HandleSubmit"
+                                  class="mb-3 text-left">
+                            <DataAnnotationsValidator />
+                            <div class="form-group">
+                                <label class="text-white small font-weight-bold mb-1">
+                                    <i class="fa fa-user text-primary mr-1"></i>Họ và Tên Khách Hàng <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="input.FullName"
+                                           class="form-control bg-transparent border-primary p-4 text-white"
+                                           placeholder="Nhập tên khách hàng" />
+                                <span asp-validation-for="Input.FullName" class="text-warning small"></span>
+                            </div>
+
+
+
+                            <!-- Phone -->
+                            <div class="form-group">
+                                <label class="text-white small font-weight-bold mb-1">
+                                    <i class="fa fa-phone text-primary mr-1"></i>Số Điện Thoại <span class="text-danger">*</span>
+                                </label>
+                                <InputText @bind-Value="input.Phone"
+                                           class="form-control bg-transparent border-primary p-4 text-white"
+                                           placeholder="Nhập SĐT" />
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="text-white small font-weight-bold mb-1">
+                                            <i class="fa fa-calendar text-primary mr-1"></i>Ngày <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="date" id="date" data-target-input="nearest">
+                                            <InputDate Type="InputDateType.DateTimeLocal"
+                                                       @bind-Value="input.ReservationTime"
+                                                       class="form-control bg-transparent border-primary p-4 datetimepicker-input text-white" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="text-white small font-weight-bold mb-1">
+                                    <i class="fa fa-users text-primary mr-1"></i>Số Lượng Khách <span class="text-danger">*</span>
+                                </label>
+                                <InputNumber @bind-Value="input.NumberOfGuests"
+                                             class="custom-select bg-transparent border-primary px-4 text-white"
+                                             style="height: 56px;"
+                                             min="1"
+                                             max="50" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="text-white small font-weight-bold mb-1">
+                                    <i class="fa fa-chair text-primary mr-1"></i>Chọn Bàn
+                                </label>
+                                <InputSelect @bind-Value="input.TableId"
+                                             class="custom-select bg-transparent border-primary px-4 text-white"
+                                             style="height: 56px;">
+                                    <option value="">-- Chọn bàn --</option>
+                                    @if (tables != null)
+                                    {
+                                        @foreach (var t in tables)
+                                        {
+                                            <option value="@t.TableId"
+                                                    style="color: black;">
+                                                Bàn @t.TableNumber (Tầng @t.FloorNumber) - Sức chứa: @t.RecommendedCapacity
+                                            </option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="text-white small font-weight-bold mb-1">
+                                    <i class="fa fa-sticky-note text-primary mr-1"></i>Ghi Chú
+                                </label>
+                                <InputTextArea @bind-Value="input.Note"
+                                               class="form-control bg-transparent border-primary p-4 text-white"
+                                               rows="3"
+                                               placeholder="Yêu cầu đặc biệt..." />
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-block font-weight-bold py-3"
+                                    style="border-radius:8px; font-size:1.05rem;"
+                                    disabled="@isSubmitting">
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Đang lưu...</span>
+                                }
+                                else
+                                {
+                                    <span>Lưu đặt bàn</span>
+                                }
+                            </button>
+                        </EditForm>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

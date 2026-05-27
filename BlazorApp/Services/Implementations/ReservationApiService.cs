@@ -17,7 +17,7 @@ namespace BlazorApp.Services.Implementations
             return await _apiService.GetAsync<ReservationListResponse>("/api/Reservation");
         }
 
-        public async Task<ReservationResponse?> GetByIdAsync(int id)
+        public async Task<ReservationResponse?> GetByIdAsync(Guid id)
         {
             return await _apiService.GetAsync<ReservationResponse>($"/api/Reservation/{id}");
         }
@@ -27,7 +27,7 @@ namespace BlazorApp.Services.Implementations
             return await _apiService.PostAsync<CreateReservationInput, ReservationResponse>("/api/Reservation", input);
         }
 
-        public async Task<ReservationResponse?> UpdateAsync(int id, UpdateReservationInput input)
+        public async Task<ReservationResponse?> UpdateAsync(Guid id, UpdateReservationInput input)
         {
             return await _apiService.PutAsync<UpdateReservationInput, ReservationResponse>($"/api/Reservation/{id}", input);
         }

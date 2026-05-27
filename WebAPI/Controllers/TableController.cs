@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{floorNumber}/{tableNumber}")]
+        [HttpGet("floor/{floorNumber}/{tableNumber}")]
         public async Task<IActionResult> GetOne(int floorNumber, int tableNumber)
         {
             var result = await _tableService.GetOneAsync(floorNumber, tableNumber);
@@ -45,10 +45,10 @@ namespace WebAPI.Controllers
             public string Status { get; set; } = string.Empty;
         }
 
-        [HttpPut("{tableId}/status")]
-        public async Task<IActionResult> UpdateStatus(int tableId, [FromBody] UpdateStatusRequest req)
+        [HttpPut("floor/{floorNumber}/{tableNumber}/status")]
+        public async Task<IActionResult> UpdateStatus(int floorNumber, int tableNumber, [FromBody] UpdateStatusRequest req)
         {
-            var result = await _tableService.UpdateStatusAsync(tableId, req.Status);
+            var result = await _tableService.UpdateStatusAsync(floorNumber, tableNumber, req.Status);
             if (!result.Success)
             {
                 return BadRequest(result);

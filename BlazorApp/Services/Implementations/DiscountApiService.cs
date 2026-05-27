@@ -16,5 +16,10 @@ namespace BlazorApp.Services.Implementations
         {
             return await _apiService.GetAsync<DiscountListResponse>("/api/Discount");
         }
+
+        public async Task<DiscountResponse?> GetOneAsync(string code)
+        {
+            return await _apiService.GetAsync<DiscountResponse>($"/api/Discount/{code}");
+        }
     }
 }

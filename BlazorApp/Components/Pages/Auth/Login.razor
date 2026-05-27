@@ -139,29 +139,28 @@
 
         if (result != null && result.Success)
         {
+            if (result.RoleId == 1)
+            {
+                alert.ShowError("Chỉ nhân viên hoặc quản lý mới được phép đăng nhập vào hệ thống.");
+                isLoading = false;
+                return;
+            }
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Role, result.RoleId == 1 ? "Customer" : result.RoleId == 2 ? "Manager" : "Employee")
+                new Claim(ClaimTypes.Role, result.RoleId == 2 ? "Manager" : "Employee")
             };
 
-            if (result.RoleId == 1 && result.Customer != null)
+            if (result.Data != null)
             {
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Customer.PublicId.ToString()));
-                claims.Add(new Claim(ClaimTypes.Email, result.Customer.Email));
-                claims.Add(new Claim(ClaimTypes.Name, result.Customer.FullName));
-                claims.Add(new Claim("Username", result.Customer.Username));
-                claims.Add(new Claim("Phone", result.Customer.Phone));
-            }
-            else if (result.RoleId != 1 && result.Manager != null)
-            {
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Manager.PublicId.ToString()));
-                claims.Add(new Claim(ClaimTypes.Email, result.Manager.Email));
-                claims.Add(new Claim(ClaimTypes.Name, result.Manager.FullName));
-                claims.Add(new Claim("Username", result.Manager.Username));
-                claims.Add(new Claim("Phone", result.Manager.Phone));
-                if (!string.IsNullOrEmpty(result.Manager.Position))
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Data.PublicId.ToString()));
+                claims.Add(new Claim(ClaimTypes.Email, result.Data.Email));
+                claims.Add(new Claim(ClaimTypes.Name, result.Data.FullName));
+                claims.Add(new Claim("Username", result.Data.Username));
+                claims.Add(new Claim("Phone", result.Data.Phone));
+                if (!string.IsNullOrEmpty(result.Data.Position))
                 {
-                    claims.Add(new Claim("Position", result.Manager.Position));
+                    claims.Add(new Claim("Position", result.Data.Position));
                 }
             }
 
@@ -173,14 +172,7 @@
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
 
-            if (result.RoleId == 1)
-            {
-                NavigationManager.NavigateTo("/", forceLoad: true);
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/employee/pos", forceLoad: true);
-            }
+            NavigationManager.NavigateTo("/employee/pos", forceLoad: true);
         }
         else
         {

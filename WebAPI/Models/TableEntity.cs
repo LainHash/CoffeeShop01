@@ -21,6 +21,8 @@ public partial class TableEntity
 
     public int MaxCapacity { get; set; }
 
+    public Guid PublicId { get; set; }
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
