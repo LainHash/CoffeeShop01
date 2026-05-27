@@ -1,0 +1,113 @@
+@page "/Home/Contact"
+
+<PageTitle>Contact - KOPPEE Coffee Shop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Liên Hệ</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Liên Hệ</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Contact Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="section-title">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Liên Hệ Với Chúng Tôi</h4>
+            <h1 class="display-4">Kết Nối Với Chúng Tôi</h1>
+        </div>
+        <div class="row">
+            <!-- Contact Info -->
+            <div class="col-lg-4 mb-5 mb-lg-0">
+                <div class="d-flex flex-column mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Địa Chỉ</h6>
+                            <p class="m-0">123 Đường Cà Phê, Quận 1, TP. Hồ Chí Minh, Việt Nam</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-phone-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Điện Thoại</h6>
+                            <p class="m-0">+84 028 123 4567</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Email</h6>
+                            <p class="m-0">hello@koppee.vn</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="btn btn-primary btn-lg-square mr-3 flex-shrink-0">
+                            <i class="fa fa-clock"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-uppercase mb-1">Giờ Mở Cửa</h6>
+                            <p class="m-0">Thứ 2 - Thứ 6: 7:00 Sáng – 10:00 Tối</p>
+                            <p class="m-0">Thứ 7 - CN: 8:00 Sáng – 11:00 Tối</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow" style="border-radius: 16px;">
+                    <div class="card-body p-5">
+                        <h4 class="font-weight-bold mb-4">Gửi tin nhắn cho chúng tôi</h4>
+                        <form @onsubmit:preventDefault>
+                            <div class="form-row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Tên của bạn</label>
+                                        <input type="text" class="form-control p-3" placeholder="Nguyễn Văn A" required />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Email của bạn</label>
+                                        <input type="email" class="form-control p-3" placeholder="ten@vidu.com" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="font-weight-bold">Tiêu đề</label>
+                                <input type="text" class="form-control p-3" placeholder="Chúng tôi có thể giúp gì cho bạn?" />
+                            </div>
+                            <div class="form-group">
+                                <label class="font-weight-bold">Tin nhắn</label>
+                                <textarea class="form-control p-3" rows="5" placeholder="Viết tin nhắn của bạn tại đây..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary font-weight-bold py-3 px-5">
+                                <i class="fa fa-paper-plane mr-2"></i>Gửi Tin Nhắn
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Contact End -->

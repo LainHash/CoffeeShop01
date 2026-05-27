@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BlazorApp.Models.Products
 {
     public class ProductModel
@@ -47,6 +49,7 @@ namespace BlazorApp.Models.Products
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        [JsonPropertyName("data")]
         public List<ProductModel> List { get; set; } = new();
     }
 
@@ -61,6 +64,7 @@ namespace BlazorApp.Models.Products
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        [JsonPropertyName("data")]
         public List<CategoryModel> List { get; set; } = new();
     }
 }

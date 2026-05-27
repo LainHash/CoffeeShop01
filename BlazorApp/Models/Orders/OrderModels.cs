@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BlazorApp.Models.Orders
 {
     public class OrderModel
@@ -83,6 +85,7 @@ namespace BlazorApp.Models.Orders
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        [JsonPropertyName("data")]
         public List<OrderModel>? Orders { get; set; }
     }
 

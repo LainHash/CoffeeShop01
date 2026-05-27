@@ -3,7 +3,7 @@ using BlazorApp.Components;
 using BlazorApp.Services.Implementations;
 using BlazorApp.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -27,10 +27,17 @@ builder.Services.AddScoped<ITableApiService, TableApiService>();
 builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 builder.Services.AddScoped<IDiscountApiService, DiscountApiService>();
 
-// Register Custom Authentication
-builder.Services.AddScoped<SessionService>();
-builder.Services.AddScoped<AppAuthStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<AppAuthStateProvider>());
+// Register Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.AccessDeniedPath = "/access-denied";
+        options.Cookie.Name = "CoffeeShopAuth";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    });
+
+builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();

@@ -1,59 +1,124 @@
 @page "/login"
 @layout BlazorApp.Components.Layout.MainLayout
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
 @inject IAuthApiService AuthApiService
-@inject SessionService SessionService
-@inject AppAuthStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-header bg-dark text-white text-center py-3">
-                <h4 class="mb-0">Đăng nhập</h4>
-            </div>
-            <div class="card-body p-4">
-                <AlertMessage @ref="alert" />
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Đăng Nhập</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Đăng Nhập</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
 
-                <EditForm Model="input" OnValidSubmit="HandleLogin">
-                    <DataAnnotationsValidator />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header text-center py-4" style="background: #33211d;">
+                    <h1 class="text-white m-0 display-4 text-uppercase">KOPPEE</h1>
+                    <p class="text-primary m-0 font-weight-bold">Chào mừng quay trở lại</p>
+                </div>
+                <div class="card-body p-5">
+                    <AlertMessage @ref="alert" />
 
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <InputText @bind-Value="input.Email" class="form-control" placeholder="Nhập email" />
-                        <ValidationMessage For="@(() => input.Email)" class="text-danger small" />
-                    </div>
+                    <EditForm Model="input" OnValidSubmit="HandleLogin" FormName="loginForm" id="login-form">
+                        <div class="form-group">
+                            <label asp-for="Input.Email" class="font-weight-bold">Email</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-envelope text-primary"></i>
+                                    </span>
+                                </div>
+                                <InputText @bind-Value="input.Email"
+                                           class="form-control p-3"
+                                           style="border-color: #d4a054;"
+                                           placeholder="Nhập email" />
 
-                    <div class="mb-4">
-                        <label class="form-label">Mật khẩu</label>
-                        <InputText @bind-Value="input.Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
-                        <ValidationMessage For="@(() => input.Password)" class="text-danger small" />
-                    </div>
+                            </div>
+                            <ValidationMessage For="@(() => input.Email)"
+                                               class="text-danger small" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Password" class="font-weight-bold">Mật khẩu</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-lock text-primary"></i>
+                                    </span>
+                                </div>
+                                <InputText @bind-Value="input.Password"
+                                           type="password"
+                                           class="form-control p-3"
+                                           placeholder="Nhập mật khẩu"
+                                           style="border-color: #d4a054;"
+                                           id="password-field" />
 
-                    <button type="submit" class="btn btn-primary w-100 py-2" disabled="@isLoading">
-                        @if (isLoading)
-                        {
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <span>Đang xử lý...</span>
-                        }
-                        else
-                        {
-                            <span>Đăng nhập</span>
-                        }
-                    </button>
-                </EditForm>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="toggle-pwd" tabindex="-1">
+                                        <i class="fa fa-eye" id="eye-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <ValidationMessage For="@(() => input.Password)"
+                                               class="text-danger small" />
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-block font-weight-bold py-3 mt-4"
+                                style="border-radius: 8px; font-size: 1.1rem;"
+                                disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>Đang xử lý...</span>
+                            }
+                            else
+                            {
+                                <span>
+                                    <i class="fa fa-sign-in-alt mr-2"></i>Đăng Nhập
+                                </span>
+                            }
+                        </button>
+                    </EditForm>
+
+                        
+                    <hr class="my-4">
+
+                    @* <div class="text-center">
+                        <p class="mb-1">Chưa có tài khoản?</p>
+                        <a asp-page="/Auth/Register" class="btn btn-outline-primary font-weight-bold py-2 px-4"
+                           style="border-radius: 8px;">
+                            <i class="fa fa-user-plus mr-2"></i>Đăng Ký Ngay
+                        </a>
+                    </div> *@
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    private LoginInput input = new();
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm]
+    private LoginInput input { get; set; } = new();
     private bool isLoading = false;
     private AlertMessage alert = default!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        if (await SessionService.IsLoggedInAsync())
+        if (HttpContext?.User?.Identity?.IsAuthenticated == true)
         {
             NavigationManager.NavigateTo("/");
         }
@@ -74,39 +139,47 @@
 
         if (result != null && result.Success)
         {
-            UserSession session = new()
+            var claims = new List<Claim>
             {
-                RoleId = result.RoleId
+                new Claim(ClaimTypes.Role, result.RoleId == 1 ? "Customer" : result.RoleId == 2 ? "Manager" : "Employee")
             };
 
             if (result.RoleId == 1 && result.Customer != null)
             {
-                session.PublicId = result.Customer.PublicId;
-                session.Email = result.Customer.Email;
-                session.FullName = result.Customer.FullName;
-                session.Username = result.Customer.Username;
-                session.Phone = result.Customer.Phone;
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Customer.PublicId.ToString()));
+                claims.Add(new Claim(ClaimTypes.Email, result.Customer.Email));
+                claims.Add(new Claim(ClaimTypes.Name, result.Customer.FullName));
+                claims.Add(new Claim("Username", result.Customer.Username));
+                claims.Add(new Claim("Phone", result.Customer.Phone));
             }
             else if (result.RoleId != 1 && result.Manager != null)
             {
-                session.PublicId = result.Manager.PublicId;
-                session.Email = result.Manager.Email;
-                session.FullName = result.Manager.FullName;
-                session.Username = result.Manager.Username;
-                session.Phone = result.Manager.Phone;
-                session.Position = result.Manager.Position;
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Manager.PublicId.ToString()));
+                claims.Add(new Claim(ClaimTypes.Email, result.Manager.Email));
+                claims.Add(new Claim(ClaimTypes.Name, result.Manager.FullName));
+                claims.Add(new Claim("Username", result.Manager.Username));
+                claims.Add(new Claim("Phone", result.Manager.Phone));
+                if (!string.IsNullOrEmpty(result.Manager.Position))
+                {
+                    claims.Add(new Claim("Position", result.Manager.Position));
+                }
             }
 
-            await SessionService.SetUserAsync(session);
-            AuthStateProvider.NotifyUserAuthentication(session);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
 
-            if (session.IsCustomer)
+            if (HttpContext != null)
             {
-                NavigationManager.NavigateTo("/");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            }
+
+            if (result.RoleId == 1)
+            {
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
             {
-                NavigationManager.NavigateTo("/employee/pos");
+                NavigationManager.NavigateTo("/employee/pos", forceLoad: true);
             }
         }
         else

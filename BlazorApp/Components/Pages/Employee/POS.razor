@@ -4,10 +4,22 @@
 @inject ITableApiService TableApiService
 @inject IOrderApiService OrderApiService
 @inject IDiscountApiService DiscountApiService
-@inject SessionService SessionService
 @inject NavigationManager NavigationManager
 
 <PageTitle>POS - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Hệ thống POS</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Hệ thống POS</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
 
 <div class="row h-100 pos-container">
     <!-- Left: Products -->
@@ -196,12 +208,23 @@
     
     private decimal TotalAmount => Math.Max(0, SubTotal - DiscountAmount);
 
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        var user = await SessionService.GetUserAsync();
-        if (user != null)
+        if (AuthState != null)
         {
-            currentEmployeeId = user.PublicId;
+            var authState = await AuthState;
+            var user = authState.User;
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                var idClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (idClaim != null && Guid.TryParse(idClaim.Value, out var guid))
+                {
+                    currentEmployeeId = guid;
+                }
+            }
         }
 
         await LoadData();

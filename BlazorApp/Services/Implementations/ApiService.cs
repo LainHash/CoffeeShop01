@@ -16,7 +16,12 @@ namespace BlazorApp.Services.Implementations
         {
             try
             {
-                return await _httpClient.GetFromJsonAsync<T>(endpoint);
+                var response = await _httpClient.GetAsync(endpoint);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<T>();
+                }
+                return default;
             }
             catch
             {

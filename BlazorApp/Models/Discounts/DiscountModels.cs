@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BlazorApp.Models.Discounts
 {
     public class DiscountModel
@@ -17,6 +19,7 @@ namespace BlazorApp.Models.Discounts
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        [JsonPropertyName("data")]
         public List<DiscountModel> List { get; set; } = new();
     }
 }

@@ -1,0 +1,67 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using BlazorApp.Auth
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
+
+<!-- Navbar Start -->
+<div class="container-fluid p-0 nav-bar">
+    <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
+        <a href="/" class="navbar-brand px-lg-4 m-0">
+            <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
+        </a>
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+            <div class="navbar-nav ml-auto p-4">
+                <a class="nav-item nav-link" href="/">Trang Chủ</a>
+                <a class="nav-item nav-link" href="/Home/About">Về Chúng Tôi</a>
+                <a class="nav-item nav-link" href="/Home/Service">Dịch Vụ</a>
+                <a class="nav-item nav-link" href="/Product">Thực Đơn</a>
+                <a class="nav-item nav-link" href="/Home/Testimonial">Phản Hồi</a>
+                <a href="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
+
+                <AuthorizeView Roles="Manager, Employee">
+                    <Authorized>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-warning font-weight-bold"
+                               data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                <i class="fa fa-cog mr-1"></i>Quản lý
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/Employee/POS"><i class="fa fa-cash-register mr-2"></i>Hệ thống POS</a>
+                                <a class="dropdown-item" href="/Employee/Orders"><i class="fa fa-list mr-2"></i>Quản lý hóa đơn</a>
+                                <a class="dropdown-item" href="/Employee/TableMap"><i class="fa fa-list mr-2"></i>Sơ đồ bàn</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/Order/ReservationSchedule"><i class="fa fa-calendar-week mr-2"></i>Lịch đặt bàn</a>
+                                <a class="dropdown-item" href="/Order/Reservation"><i class="fa fa-calendar-plus mr-2"></i>Tạo đặt bàn</a>
+                            </div>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="nav-item dropdown ml-3">
+                            <a class="nav-link dropdown-toggle text-primary font-weight-bold"
+                               data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                <i class="fa fa-user mr-1"></i>@context.User.Identity?.Name
+                            </a>
+                            <div class="dropdown-menu">
+                                <a href="/logout" class="dropdown-item text-danger">
+                                    <i class="fa fa-sign-out-alt mr-2"></i>Đăng xuất
+                                </a>
+                            </div>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="btn btn-primary font-weight-bold ml-3">
+                            <i class="fa fa-sign-in-alt mr-1"></i>Đăng Nhập
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- Navbar End -->

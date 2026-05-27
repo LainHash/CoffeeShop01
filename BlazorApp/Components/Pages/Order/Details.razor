@@ -2,8 +2,22 @@
 @attribute [Authorize]
 @inject IOrderApiService OrderApiService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>Chi tiết Đơn hàng - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Chi tiết Hóa đơn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Chi tiết Hóa đơn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Chi tiết Hóa đơn</h2>
@@ -50,6 +64,38 @@
                             </li>
                         }
                     </ul>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card shadow-sm mt-4 no-print">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Thao tác</h5>
+                </div>
+                <div class="card-body text-center">
+                    @if (order.Status == "Unpaid")
+                    {
+                        <a href="/employee/checkout/@order.PublicId" class="btn btn-primary w-100 py-3 rounded-pill shadow-sm font-weight-bold">
+                            <i class="bi bi-credit-card mr-2"></i>Thanh Toán Ngay
+                        </a>
+                    }
+                    else if (order.Status == "Paid")
+                    {
+                        <div class="alert alert-success border-0 py-3 mb-3">
+                            <i class="bi bi-check-circle-fill fa-2x mb-2 d-block text-success"></i>
+                            Hóa đơn này đã được thanh toán đầy đủ.
+                        </div>
+                        <button type="button" class="btn btn-dark w-100 py-3 rounded-pill" @onclick="PrintInvoice">
+                            <i class="bi bi-printer mr-2"></i>In Hóa Đơn
+                        </button>
+                    }
+                    else if (order.Status == "Cancelled")
+                    {
+                        <div class="alert alert-secondary border-0 py-3 mb-0">
+                            <i class="bi bi-x-circle-fill fa-2x mb-2 d-block text-secondary"></i>
+                            Hóa đơn này đã bị hủy.
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -117,7 +163,98 @@
             </div>
         </div>
     </div>
+
+    <!-- PRINTABLE RECEIPT TEMPLATE -->
+    <div class="print-only receipt-print bg-white p-4 text-dark d-none">
+        <div class="text-center mb-4">
+            <h2 class="font-weight-bold mb-1">KOPPEE COFFEE</h2>
+            <p class="small mb-1">Đường Trần Duy Hưng, Cầu Giấy, Hà Nội</p>
+            <p class="small mb-0">ĐT: 0123.456.789</p>
+            <div style="border-top: 1px dashed #000;" class="my-3"></div>
+            <h4 class="font-weight-bold text-uppercase">Hóa Đơn Thanh Toán</h4>
+            <p class="small">Mã hóa đơn: #@order.OrderId</p>
+        </div>
+
+        <div class="small mb-3">
+            <div><strong>Bàn:</strong> @(order.TableNumber > 0 ? $"Bàn {order.TableNumber} (Tầng {order.FloorNumber})" : "Mang đi")</div>
+            <div><strong>Nhân viên:</strong> @order.EmployeeName</div>
+            <div><strong>Thời gian:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</div>
+        </div>
+
+        <div style="border-top: 1px dashed #000;" class="my-2"></div>
+
+        <table class="table table-sm table-borderless small mb-3">
+            <thead>
+                <tr>
+                    <th>Tên món</th>
+                    <th class="text-center">SL</th>
+                    <th class="text-right">Đơn giá</th>
+                    <th class="text-right">T.Tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in order.OrderDetails)
+                {
+                    <tr>
+                        <td>@item.ProductName</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-right">@item.UnitPrice.ToString("N0")</td>
+                        <td class="text-right">@item.LineTotal.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed #000;" class="my-2"></div>
+
+        <div class="small">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Tạm tính:</span>
+                <span>@order.SubTotal.ToString("N0") đ</span>
+            </div>
+            @if (order.DiscountId.HasValue && order.DiscountId.Value > 0)
+            {
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Giảm giá (@order.DiscountCode):</span>
+                    <span>- @((order.SubTotal - order.TotalAmount).ToString("N0")) đ</span>
+                </div>
+            }
+            <div class="d-flex justify-content-between font-weight-bold" style="font-size: 1.1rem;">
+                <span>TỔNG TIỀN:</span>
+                <span>@order.TotalAmount.ToString("N0") đ</span>
+            </div>
+        </div>
+
+        <div style="border-top: 1px dashed #000;" class="my-3"></div>
+
+        <div class="text-center small mt-4">
+            <p class="font-italic mb-1">Cảm ơn Quý khách! Hẹn gặp lại!</p>
+            <p class="mb-0">Powered by KOPPEE POS System</p>
+        </div>
+    </div>
 }
+
+<style>
+    /* Print media CSS queries */
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        .print-only, .print-only * {
+            visibility: visible;
+        }
+        .print-only {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            display: block !important;
+        }
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
 
 @code {
     [Parameter]
@@ -146,5 +283,10 @@
             alert.ShowError(result?.Message ?? "Không tìm thấy thông tin hóa đơn.");
         }
         isLoading = false;
+    }
+
+    private async Task PrintInvoice()
+    {
+        await JS.InvokeVoidAsync("window.print");
     }
 }
