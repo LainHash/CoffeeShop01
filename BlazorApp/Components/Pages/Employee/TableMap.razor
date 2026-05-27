@@ -182,7 +182,7 @@
         if (selectedTable == null) return;
 
         isUpdating = true;
-        var result = await TableApiService.UpdateStatusAsync(selectedTable.TableId, newStatus);
+        var result = await TableApiService.UpdateStatusAsync(selectedTable.FloorNumber, selectedTable.TableNumber, newStatus);
         
         if (result != null && result.Success)
         {

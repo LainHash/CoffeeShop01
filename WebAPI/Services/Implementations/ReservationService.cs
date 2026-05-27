@@ -183,12 +183,12 @@ namespace WebAPI.Services.Implementations
             };
         }
 
-        public async Task<ReservationResult<ReservationDTO>> GetByIdAsync(int reservationId)
+        public async Task<ReservationResult<ReservationDTO>> GetByIdAsync(Guid id)
         {
             var reservation = await _context.Reservations
                 .Include(r => r.Customer)
                 .Include(r => r.Table)
-                .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
+                .FirstOrDefaultAsync(r => r.PublicId == id);
 
             if (reservation == null)
                 return new ReservationResult<ReservationDTO>
@@ -205,7 +205,7 @@ namespace WebAPI.Services.Implementations
             };
         }
 
-        public async Task<ReservationResult<ReservationDTO>> UpdateAsync(int reservationId, UpdateReservationDTO dto)
+        public async Task<ReservationResult<ReservationDTO>> UpdateAsync(Guid id, UpdateReservationDTO dto)
         {
             var allowedStatuses = new[] { "Pending", "Confirmed", "Cancelled", "Completed" };
             if (!allowedStatuses.Contains(dto.Status))
@@ -218,7 +218,7 @@ namespace WebAPI.Services.Implementations
             var reservation = await _context.Reservations
                 .Include(r => r.Customer)
                 .Include(r => r.Table)
-                .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
+                .FirstOrDefaultAsync(r => r.PublicId == id);
 
             if (reservation == null)
                 return new ReservationResult<ReservationDTO>

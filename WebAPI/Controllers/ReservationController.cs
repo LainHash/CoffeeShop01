@@ -40,8 +40,8 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _reservationService.GetByIdAsync(id);
             if (!result.Success)
@@ -71,8 +71,8 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateReservationDTO dto,
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateReservationDTO dto,
             [FromServices] IValidator<UpdateReservationDTO> validator)
         {
             var error = await validator.ValidateAndReturnError(dto);

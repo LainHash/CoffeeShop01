@@ -17,10 +17,10 @@ namespace BlazorApp.Services.Implementations
             return await _apiService.GetAsync<TableListResponse>("/api/Table");
         }
 
-        public async Task<TableResponse?> UpdateStatusAsync(int id, string status)
+        public async Task<TableResponse?> UpdateStatusAsync(int floorNumber, int tableNumber, string status)
         {
             var payload = new { Status = status };
-            return await _apiService.PutAsync<object, TableResponse>($"/api/Table/{id}/status", payload);
+            return await _apiService.PutAsync<object, TableResponse>($"/api/Table/{floorNumber}/{tableNumber}/status", payload);
         }
     }
 }

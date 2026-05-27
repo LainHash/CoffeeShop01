@@ -11,9 +11,9 @@ namespace WebAPI.Services.Interfaces
 
         Task<ReservationResult<List<ReservationDTO>>> GetAllAsync();
 
-        Task<ReservationResult<ReservationDTO>> GetByIdAsync(int reservationId);
+        Task<ReservationResult<ReservationDTO>> GetByIdAsync(Guid id);
 
-        Task<ReservationResult<ReservationDTO>> UpdateAsync(int reservationId, UpdateReservationDTO dto);
+        Task<ReservationResult<ReservationDTO>> UpdateAsync(Guid id, UpdateReservationDTO dto);
 
         Task<ReservationResult<List<ReservationDTO>>> GetByWeekAsync(DateTime weekStart);
     }
