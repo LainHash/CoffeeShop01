@@ -142,10 +142,13 @@
         if (productResult != null && productResult.Success && productResult.Data != null)
         {
             product = productResult.Data;
+            var cat = categories.FirstOrDefault(c => c.CategoryName == product.CategoryName);
+            int catId = cat?.CategoryId ?? 0;
+
             input = new UpdateProductInput
             {
                 ProductName = product.ProductName,
-                CategoryId = product.CategoryId,
+                CategoryId = catId,
                 Price = product.Price,
                 ImageUrl = product.ImageUrl,
                 Description = product.Description,

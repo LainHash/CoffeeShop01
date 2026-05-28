@@ -38,14 +38,14 @@
         @if (Categories.Any())
         {
             <div class="d-flex flex-wrap justify-content-center mb-5">
-                <button class="btn @(SelectedCategoryId == null ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
+                <button class="btn @(SelectedCategoryName == null ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
                         @onclick="() => FilterByCategory(null)">
                     Tất Cả
                 </button>
                 @foreach (var cat in Categories)
                 {
-                    <button class="btn @(SelectedCategoryId == cat.CategoryId ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
-                            @onclick="() => FilterByCategory(cat.CategoryId)">
+                    <button class="btn @(SelectedCategoryName == cat.CategoryName ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
+                            @onclick="() => FilterByCategory(cat.CategoryName)">
                         @cat.CategoryName
                     </button>
                 }
@@ -129,12 +129,12 @@
     public string? ApiError { get; set; }
     private bool isLoading = true;
 
-    private int? SelectedCategoryId { get; set; }
+    private string? SelectedCategoryName { get; set; }
 
     private IEnumerable<ProductModel> FilteredProducts => 
-        SelectedCategoryId == null 
+        SelectedCategoryName == null 
             ? Products 
-            : Products.Where(p => p.CategoryId == SelectedCategoryId);
+            : Products.Where(p => p.CategoryName == SelectedCategoryName);
 
     protected override async Task OnInitializedAsync()
     {
@@ -159,10 +159,10 @@
 
         try
         {
-            var catResponse = await ApiService.GetAsync<List<CategoryModel>>("/api/Category");
-            if (catResponse != null)
+            var catResponse = await ApiService.GetAsync<CategoryListResponse>("/api/Category");
+            if (catResponse != null && catResponse.Success && catResponse.List != null)
             {
-                Categories = catResponse;
+                Categories = catResponse.List;
             }
         }
         catch (Exception)
@@ -173,9 +173,9 @@
         isLoading = false;
     }
 
-    private void FilterByCategory(int? categoryId)
+    private void FilterByCategory(string? categoryName)
     {
-        SelectedCategoryId = categoryId;
+        SelectedCategoryName = categoryName;
     }
 }
 
