@@ -3,6 +3,7 @@
 @using BlazorApp.Models.Products
 @using BlazorApp.Services.Interfaces
 @inject IApiService ApiService
+@using Helpers.Constants
 
 <PageTitle>Menu - KOPPEE Coffee Shop</PageTitle>
 
@@ -18,7 +19,6 @@
     </div>
 </div>
 <!-- Page Header End -->
-
 <!-- Menu Start -->
 <div class="container-fluid pt-5 pb-5">
     <div class="container">
@@ -38,15 +38,15 @@
         @if (Categories.Any())
         {
             <div class="d-flex flex-wrap justify-content-center mb-5">
-                <button class="btn @(SelectedCategoryName == null ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
+                <button class="btn @(SelectedCategoryName == null ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4"
                         @onclick="() => FilterByCategory(null)">
                     Tất Cả
                 </button>
                 @foreach (var cat in Categories)
                 {
-                    <button class="btn @(SelectedCategoryName == cat.CategoryName ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4" 
+                    <button class="btn @(SelectedCategoryName == cat.CategoryName ? "btn-primary active" : "btn-outline-primary") font-weight-bold mx-2 mb-2 px-4"
                             @onclick="() => FilterByCategory(cat.CategoryName)">
-                        @cat.CategoryName
+                        @CategoryConstants.ViTrans(@cat.CategoryName)
                     </button>
                 }
             </div>
@@ -122,7 +122,6 @@
     </div>
 </div>
 <!-- Menu End -->
-
 @code {
     public List<ProductModel> Products { get; set; } = new();
     public List<CategoryModel> Categories { get; set; } = new();
@@ -131,15 +130,15 @@
 
     private string? SelectedCategoryName { get; set; }
 
-    private IEnumerable<ProductModel> FilteredProducts => 
-        SelectedCategoryName == null 
-            ? Products 
+    private IEnumerable<ProductModel> FilteredProducts =>
+        SelectedCategoryName == null
+            ? Products
             : Products.Where(p => p.CategoryName == SelectedCategoryName);
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        
+
         try
         {
             var productResponse = await ApiService.GetAsync<ProductListResponse>("/api/Product");
@@ -169,7 +168,7 @@
         {
             // Logging can be done here. For now, failing silently for categories.
         }
-        
+
         isLoading = false;
     }
 
