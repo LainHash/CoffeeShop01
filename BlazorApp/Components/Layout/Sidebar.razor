@@ -4,15 +4,12 @@
 <!-- Sidebar Start -->
 <AuthorizeView Roles="Manager, Employee">
     <Authorized>
-        <!-- Sidebar Toggle Button -->
         <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Mở/Đóng Menu">
             <i class="bi bi-layout-sidebar"></i>
         </button>
 
-        <!-- Overlay -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-        <!-- Sidebar -->
         <div class="staff-sidebar" id="staffSidebar">
             <!-- Sidebar Header -->
             <div class="sidebar-header">
@@ -25,7 +22,6 @@
                 </button>
             </div>
 
-            <!-- User Info -->
             <div class="sidebar-user">
                 <div class="sidebar-avatar">
                     <i class="bi bi-person-circle"></i>
@@ -38,10 +34,8 @@
 
             <div class="sidebar-divider"></div>
 
-            <!-- Nav Items -->
             <nav class="sidebar-nav">
 
-                <!-- Hóa đơn Group -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-label">Hóa Đơn</div>
                     <a class="sidebar-link" href="/Order/POS">
@@ -56,7 +50,6 @@
 
                 <div class="sidebar-divider"></div>
 
-                <!-- Quản Lý Bàn Group -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-label">Quản Lý Bàn</div>
                     <a class="sidebar-link" href="/Table/Map">
@@ -67,7 +60,6 @@
 
                 <div class="sidebar-divider"></div>
 
-                <!-- Đặt Bàn Group -->
                 <div class="sidebar-group">
                     <div class="sidebar-group-label">Đặt Bàn</div>
                     <a class="sidebar-link" href="/Reservation/Schedule">
@@ -79,32 +71,26 @@
                         <span>Tạo đặt bàn</span>
                     </a>
                 </div>
-
-                <!-- Manager-only Group -->
-                <AuthorizeView Roles="Manager">
-                    <Authorized>
-                        <div class="sidebar-divider"></div>
-                        <div class="sidebar-group">
-                            <div class="sidebar-group-label">Quản Lý</div>
-                            <a class="sidebar-link" href="/Manager/Customers">
-                                <i class="bi bi-people-fill"></i>
-                                <span>Khách hàng</span>
-                            </a>
-                            <a class="sidebar-link" href="/Manager/Employees">
-                                <i class="bi bi-person-badge"></i>
-                                <span>Nhân viên</span>
-                            </a>
-                            <a class="sidebar-link" href="/Manager/Employees/Create">
-                                <i class="bi bi-person-plus-fill"></i>
-                                <span>Thêm nhân viên</span>
-                            </a>
-                            <a class="sidebar-link" href="/Product/Index">
-                                <i class="bi bi-cup-hot-fill"></i>
-                                <span>Sản phẩm</span>
-                            </a>
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-group">
+                    <div class="sidebar-group-label">Quản Lý</div>
+                    <a class="sidebar-link" href="/Manager/Customers">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Khách hàng</span>
+                    </a>
+                    <a class="sidebar-link" href="/Manager/Employees">
+                        <i class="bi bi-person-badge"></i>
+                        <span>Nhân viên</span>
+                    </a>
+                    <a class="sidebar-link" href="/Manager/Employees/Create">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span>Thêm nhân viên</span>
+                    </a>
+                    <a class="sidebar-link" href="/Product/Index">
+                        <i class="bi bi-cup-hot-fill"></i>
+                        <span>Sản phẩm</span>
+                    </a>
+                </div>
 
             </nav>
 
