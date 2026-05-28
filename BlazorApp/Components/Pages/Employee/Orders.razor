@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject IOrderApiService OrderApiService
+@using Helpers.Constants
 
 <PageTitle>Danh sách Hóa đơn - CoffeeShop</PageTitle>
 
@@ -139,17 +140,26 @@
                                             <td class="py-3 text-secondary">@order.EmployeeName</td>
                                             <td class="py-3 text-secondary">@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                                             <td class="py-3">
-                                                @if (order.Status == "Unpaid")
+                                                @if (order.Status == OrderStatuses.Unpaid)
                                                 {
-                                                    <span class="badge badge-warning text-dark px-3 py-1 font-weight-normal"><i class="fa fa-spinner fa-spin mr-1"></i>Chưa thanh toán</span>
+                                                    <span class="badge badge-warning text-dark px-3 py-1 font-weight-normal">
+                                                        <i class="fa fa-spinner fa-spin mr-1"></i>
+                                                        @OrderStatuses.ViTranslate(order.Status)
+                                                    </span>
                                                 }
-                                                else if (order.Status == "Paid")
+                                                else if (order.Status == OrderStatuses.Paid)
                                                 {
-                                                    <span class="badge badge-success px-3 py-1 font-weight-normal"><i class="fa fa-check mr-1"></i>Đã thanh toán</span>
+                                                    <span class="badge badge-success px-3 py-1 font-weight-normal">
+                                                        <i class="fa fa-check mr-1"></i>
+                                                        @OrderStatuses.ViTranslate(order.Status)
+                                                    </span>
                                                 }
-                                                else if (order.Status == "Cancelled")
+                                                else if (order.Status == OrderStatuses.Cancelled)
                                                 {
-                                                    <span class="badge badge-secondary px-3 py-1 font-weight-normal"><i class="fa fa-times mr-1"></i>Đã hủy</span>
+                                                    <span class="badge badge-secondary px-3 py-1 font-weight-normal">
+                                                        <i class="fa fa-times mr-1"></i>
+                                                        @OrderStatuses.ViTranslate(order.Status)
+                                                    </span>
                                                 }
                                             </td>
                                             <td class="font-weight-bold text-dark text-right py-3">@order.TotalAmount.ToString("N0") đ</td>
@@ -214,7 +224,7 @@
     private void FilterOrders()
     {
         if (allOrders == null) return;
-        
+
         var query = allOrders.AsEnumerable();
 
         if (!string.IsNullOrEmpty(statusFilter))
@@ -225,14 +235,14 @@
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             var lowerQuery = searchQuery.ToLowerInvariant();
-            query = query.Where(o => 
+            query = query.Where(o =>
                 (o.PublicId.HasValue && o.PublicId.Value.ToString().ToLowerInvariant().Contains(lowerQuery)) ||
                 (o.OrderId.ToString().Contains(lowerQuery)) ||
                 (o.TableNumber.ToString().Contains(lowerQuery)) ||
                 (!string.IsNullOrEmpty(o.EmployeeName) && o.EmployeeName.ToLowerInvariant().Contains(lowerQuery))
             );
         }
-        
+
         filteredOrders = query.ToList();
     }
 }

@@ -6,6 +6,7 @@
 @inject IOrderApiService OrderApiService
 @inject IDiscountApiService DiscountApiService
 @inject NavigationManager NavigationManager
+@using Helpers.Constants
 
 <PageTitle>POS - CoffeeShop</PageTitle>
 
@@ -38,9 +39,9 @@
                     <h4 class="mb-0">Danh sách sản phẩm</h4>
                     <input type="text" class="form-control w-50" placeholder="Tìm kiếm món ăn, đồ uống..." @bind="searchTerm" @bind:event="oninput" />
                 </div>
-                
+
                 <LoadingSpinner IsLoading="isLoadingProducts" />
-                
+
                 @if (!isLoadingProducts && filteredProducts != null)
                 {
                     <div class="row">
@@ -48,7 +49,7 @@
                         {
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100 shadow-sm @(!prod.IsAvailable ? "opacity-50" : "")">
-                                    <img src="@(string.IsNullOrEmpty(prod.ImageUrl) ? "images/no-image.png" : prod.ImageUrl)" 
+                                    <img src="@(string.IsNullOrEmpty(prod.ImageUrl) ? "images/no-image.png" : prod.ImageUrl)"
                                          class="card-img-top" alt="@prod.ProductName" style="height: 200px; object-fit: cover;">
                                     <div class="card-body text-center d-flex flex-column justify-content-between">
                                         <div>
@@ -85,23 +86,23 @@
                             <label class="font-weight-bold mb-3 d-block">
                                 <i class="fa fa-table mr-1 text-primary"></i> Chọn bàn phục vụ
                             </label>
-                            
+
                             @if (tables != null && tables.Any())
                             {
                                 var tablesByFloor = tables.GroupBy(t => t.FloorNumber).OrderBy(g => g.Key).ToList();
                                 var selectedTable = tables.FirstOrDefault(t => t.TableId == selectedTableId);
-                                
+
                                 <div class="floor-tabs mb-3">
                                     @foreach (var floor in tablesByFloor)
                                     {
-                                        <button type="button" 
-                                                class="floor-tab-btn @(currentFloor == floor.Key ? "active" : "")" 
+                                        <button type="button"
+                                                class="floor-tab-btn @(currentFloor == floor.Key ? "active" : "")"
                                                 @onclick="() => currentFloor = floor.Key">
                                             Tầng @floor.Key
                                         </button>
                                     }
                                 </div>
-                                
+
                                 @foreach (var floor in tablesByFloor)
                                 {
                                     <div class="table-floor-panel @(currentFloor == floor.Key ? "active" : "")">
@@ -109,7 +110,7 @@
                                             @foreach (var t in floor.OrderBy(x => x.TableNumber))
                                             {
                                                 <div class="col-4 mb-2">
-                                                    <div class="table-card @(selectedTableId == t.TableId ? "selected" : "")" 
+                                                    <div class="table-card @(selectedTableId == t.TableId ? "selected" : "")"
                                                          @onclick="() => selectedTableId = t.TableId">
                                                         <span class="table-icon">🪑</span>
                                                         <div class="table-num">Bàn @t.TableNumber</div>
@@ -122,7 +123,7 @@
                                         </div>
                                     </div>
                                 }
-                                
+
                                 @if (selectedTable != null)
                                 {
                                     <div class="alert alert-info mt-3 py-2 px-3 mb-0 d-flex justify-content-between align-items-center">
@@ -148,10 +149,10 @@
 
                         <hr />
                         <h5 class="mb-3 font-weight-bold">
-                            Các món đã chọn 
+                            Các món đã chọn
                             <span class="badge badge-primary float-right">@cart.Sum(x => x.Quantity)</span>
                         </h5>
-                        
+
                         <div class="bg-white p-2 rounded shadow-sm mb-4" style="min-height: 150px; max-height: 350px; overflow-y: auto;">
                             @if (cart.Count == 0)
                             {
@@ -210,7 +211,7 @@
                                     }
                                 </select>
                             </div>
-                            
+
                             @if (DiscountAmount > 0)
                             {
                                 <div class="d-flex justify-content-between font-weight-bold mb-2 text-success">
@@ -226,7 +227,7 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-primary btn-block font-weight-bold py-3 mt-4 shadow-sm" 
+                        <button type="button" class="btn btn-primary btn-block font-weight-bold py-3 mt-4 shadow-sm"
                                 disabled="@(cart.Count == 0 || selectedTableId == 0 || isSubmitting)"
                                 @onclick="SubmitOrder">
                             @if (isSubmitting)
@@ -251,41 +252,53 @@
     private List<TableModel>? tables;
     private List<DiscountModel>? discounts;
     private List<CartItem> cart = new();
-    
+
     private string _searchTerm = "";
-    private string searchTerm 
-    { 
-        get => _searchTerm; 
-        set { _searchTerm = value; FilterProducts(); } 
+    private string searchTerm
+    {
+        get => _searchTerm;
+        set { _searchTerm = value; FilterProducts(); }
     }
-    
+
     private List<ProductModel>? filteredProducts;
 
     private int selectedTableId = 0;
     private int selectedDiscountId = 0;
     private int currentFloor = 1;
-    
+
     private bool isLoadingProducts = true;
     private bool isSubmitting = false;
     private AlertMessage alert = default!;
     private Guid currentEmployeeId;
 
     private decimal SubTotal => cart.Sum(x => x.LineTotal);
-    
-    private decimal DiscountAmount 
+
+    private decimal DiscountAmount
     {
         get
         {
             if (selectedDiscountId == 0 || discounts == null) return 0;
             var d = discounts.FirstOrDefault(x => x.DiscountId == selectedDiscountId);
             if (d == null) return 0;
-            
-            if (d.Type == "Percentage")
+
+            if (d.Type == DiscountConstants.Percent)
                 return SubTotal * (decimal)(d.Value / 100.0);
             return (decimal)d.Value;
         }
     }
-    
+
+    private string DiscountType
+    {
+        get
+        {
+            if (selectedDiscountId == 0 || discounts == null) return "";
+            var d = discounts.FirstOrDefault(x => x.DiscountId == selectedDiscountId);
+            if (d == null) return "";
+
+            return d.Type;
+        }
+    }
+
     private decimal TotalAmount => Math.Max(0, SubTotal - DiscountAmount);
 
     [CascadingParameter]
@@ -313,7 +326,7 @@
     private async Task LoadData()
     {
         isLoadingProducts = true;
-        
+
         var prodResult = await ProductApiService.GetAllAsync();
         if (prodResult != null && prodResult.Success)
         {
@@ -352,7 +365,7 @@
     private void AddToCart(ProductModel prod)
     {
         if (!prod.IsAvailable) return;
-        
+
         var existing = cart.FirstOrDefault(x => x.ProductId == prod.ProductId);
         if (existing != null)
         {
@@ -360,7 +373,7 @@
         }
         else
         {
-            cart.Add(new CartItem 
+            cart.Add(new CartItem
             {
                 ProductId = prod.ProductId,
                 ProductName = prod.ProductName,
@@ -372,19 +385,19 @@
     }
 
     private void IncreaseQuantity(CartItem item) => item.Quantity++;
-    
+
     private void DecreaseQuantity(CartItem item)
     {
         if (item.Quantity > 1) item.Quantity--;
         else cart.Remove(item);
     }
-    
+
     private void RemoveFromCart(CartItem item) => cart.Remove(item);
 
     private async Task SubmitOrder()
     {
         if (cart.Count == 0 || selectedTableId == 0) return;
-        
+
         isSubmitting = true;
         alert.Hide();
 
@@ -392,7 +405,7 @@
         {
             TableId = selectedTableId,
             EmployeePublicId = currentEmployeeId,
-            Status = "Unpaid",
+            Status = OrderStatuses.Unpaid,
             SubTotal = SubTotal,
             TotalAmount = TotalAmount,
             DiscountId = selectedDiscountId == 0 ? null : selectedDiscountId,
@@ -406,7 +419,7 @@
         };
 
         var result = await OrderApiService.CreateAsync(input);
-        
+
         if (result != null && result.Success && result.GetOrder() != null)
         {
             var orderId = result.GetOrder()!.PublicId;
