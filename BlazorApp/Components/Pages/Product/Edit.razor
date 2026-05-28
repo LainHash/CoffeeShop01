@@ -1,5 +1,190 @@
-﻿<h3>Edit</h3>
+@page "/Product/Edit/{id:guid}"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager")]
+@inject IProductApiService ProductApiService
+@inject ICategoryApiService CategoryApiService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Cập nhật Sản phẩm - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Cập nhật Sản phẩm</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white"><a class="text-white" href="/Product/Index">Quản lý Sản phẩm</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Cập nhật</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<AlertMessage @ref="alert" />
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && product != null)
+{
+    <div class="container-fluid py-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <EditForm Model="input" OnValidSubmit="HandleSubmit">
+                            <DataAnnotationsValidator />
+
+                            <div class="row g-3">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
+                                    <InputText @bind-Value="input.ProductName" class="form-control" required />
+                                    <ValidationMessage For="@(() => input.ProductName)" class="text-danger" />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+                                    <InputSelect @bind-Value="input.CategoryId" class="form-select" required>
+                                        <option value="0">-- Chọn danh mục --</option>
+                                        @foreach (var cat in categories)
+                                        {
+                                            <option value="@cat.CategoryId">@cat.CategoryName</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Giá (VNĐ) <span class="text-danger">*</span></label>
+                                    <InputNumber @bind-Value="input.Price" class="form-control" required min="0" />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Loại sản phẩm</label>
+                                    <div class="form-check mt-2">
+                                        <InputCheckbox @bind-Value="input.IsMadeToOrder" class="form-check-input" id="isMadeToOrder" />
+                                        <label class="form-check-label" for="isMadeToOrder">
+                                            Pha chế khi đặt (Made to order)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Số lượng tồn kho</label>
+                                    <InputNumber @bind-Value="input.UnitsInstock" class="form-control" min="0" disabled="@input.IsMadeToOrder" />
+                                    @if (input.IsMadeToOrder)
+                                    {
+                                        <small class="text-muted">Sản phẩm pha chế không cần quản lý tồn kho.</small>
+                                    }
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Đường dẫn hình ảnh</label>
+                                    <InputText @bind-Value="input.ImageUrl" class="form-control" />
+                                    @if (!string.IsNullOrEmpty(input.ImageUrl))
+                                    {
+                                        <div class="mt-2">
+                                            <img src="@input.ImageUrl" alt="Preview" class="img-thumbnail" style="max-height: 150px;" />
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="col-12 mb-4">
+                                    <label class="form-label fw-bold">Mô tả</label>
+                                    <InputTextArea @bind-Value="input.Description" class="form-control" rows="4" />
+                                </div>
+
+                                <div class="col-12 d-flex justify-content-between mt-3">
+                                    <a href="/Product/Index" class="btn btn-secondary px-4 py-2">Quay lại</a>
+                                    <button type="submit" class="btn btn-primary px-4 py-2" disabled="@isLoading">
+                                        <i class="bi bi-save me-1"></i> Lưu thay đổi
+                                    </button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    [Parameter]
+    public Guid Id { get; set; }
 
+    private UpdateProductInput input = new();
+    private ProductModel? product;
+    private List<CategoryModel> categories = new();
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        
+        var categoryTask = CategoryApiService.GetAllAsync();
+        var productTask = ProductApiService.GetByIdAsync(Id);
+
+        await Task.WhenAll(categoryTask, productTask);
+
+        var categoryResult = await categoryTask;
+        if (categoryResult != null && categoryResult.Success)
+        {
+            categories = categoryResult.List;
+        }
+
+        var productResult = await productTask;
+        if (productResult != null && productResult.Success && productResult.Data != null)
+        {
+            product = productResult.Data;
+            input = new UpdateProductInput
+            {
+                ProductName = product.ProductName,
+                CategoryId = product.CategoryId,
+                Price = product.Price,
+                ImageUrl = product.ImageUrl,
+                Description = product.Description,
+                UnitsInstock = product.UnitsInstock,
+                IsMadeToOrder = product.IsMadeToOrder
+            };
+        }
+        else
+        {
+            alert.ShowError(productResult?.Message ?? "Không tìm thấy sản phẩm.");
+        }
+
+        isLoading = false;
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (input.CategoryId == 0)
+        {
+            alert.ShowError("Vui lòng chọn danh mục.");
+            return;
+        }
+
+        if (input.IsMadeToOrder)
+        {
+            input.UnitsInstock = null;
+        }
+
+        isLoading = true;
+        var result = await ProductApiService.UpdateAsync(Id, input);
+        
+        if (result != null && result.Success)
+        {
+            NavigationManager.NavigateTo("/Product/Index");
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Đã xảy ra lỗi khi cập nhật sản phẩm.");
+            isLoading = false;
+        }
+    }
 }

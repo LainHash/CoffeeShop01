@@ -17,6 +17,8 @@ namespace WebAPI.DTOs.Products
 
         public bool IsAvailable { get; set; }
 
+        public bool IsMadeToOrder { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public int UnitsInstock { get; set; }

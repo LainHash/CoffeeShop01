@@ -13,10 +13,6 @@
 
 /* ===== TOGGLE BUTTON ===== */
 .sidebar-toggle-btn {
-    position: fixed;
-    top: 18px;
-    left: 18px;
-    z-index: 1060;
     width: var(--toggle-size);
     height: var(--toggle-size);
     border: none;

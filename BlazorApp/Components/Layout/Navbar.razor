@@ -4,8 +4,15 @@
 @inject NavigationManager NavigationManager
 
 <!-- Navbar Start -->
-<div class="container-fluid p-0 nav-bar">
+<div class="container-fluid p-0 nav-bar" style="position: sticky; top: 0; z-index: 1040; background: #33211D;">
     <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
+        <AuthorizeView Roles="Manager, Employee">
+            <Authorized>
+                <button class="sidebar-toggle-btn ml-3" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Mở/Đóng Menu">
+                    <i class="bi bi-layout-sidebar"></i>
+                </button>
+            </Authorized>
+        </AuthorizeView>
         <a href="/" class="navbar-brand px-lg-4 m-0">
             <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
         </a>

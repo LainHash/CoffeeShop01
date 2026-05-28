@@ -14,7 +14,8 @@ namespace BlazorApp.Models.Products
         public string? Description { get; set; }
         public bool IsAvailable { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int UnitsInstock { get; set; }
+        public int? UnitsInstock { get; set; }
+        public bool IsMadeToOrder { get; set; }
     }
 
     public class CreateProductInput
@@ -24,7 +25,8 @@ namespace BlazorApp.Models.Products
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public int UnitsInstock { get; set; }
+        public int? UnitsInstock { get; set; }
+        public bool IsMadeToOrder { get; set; }
     }
 
     public class UpdateProductInput
@@ -34,7 +36,8 @@ namespace BlazorApp.Models.Products
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public int UnitsInstock { get; set; }
+        public int? UnitsInstock { get; set; }
+        public bool IsMadeToOrder { get; set; }
     }
 
     public class CategoryModel
@@ -44,7 +47,6 @@ namespace BlazorApp.Models.Products
         public string? Description { get; set; }
     }
 
-    // API Response wrappers
     public class ProductListResponse
     {
         public bool Success { get; set; }
