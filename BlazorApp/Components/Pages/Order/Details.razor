@@ -176,8 +176,16 @@
                                     <i class="fa fa-credit-card mr-2"></i>Thanh Toán Ngay
                                 </a>
 
-                                <button type="button" class="btn btn-outline-danger btn-block rounded-pill" onclick="alert('Chức năng hủy đơn hàng chưa được hỗ trợ trên Blazor App')">
-                                    <i class="fa fa-trash-alt mr-2"></i>Hủy Hóa Đơn
+                                <button type="button" class="btn btn-outline-danger btn-block rounded-pill" @onclick="CancelOrder" disabled="@isCancelling">
+                                    @if (isCancelling)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span>Đang hủy...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-trash-alt mr-2"></i><span>Hủy Hóa Đơn</span>
+                                    }
                                 </button>
                             }
                             else if (order.Status == "Paid")
@@ -308,6 +316,7 @@
 
     private OrderModel? order;
     private bool isLoading = true;
+    private bool isCancelling = false;
     private AlertMessage alert = default!;
 
     protected override async Task OnInitializedAsync()
@@ -334,6 +343,30 @@
     private async Task PrintInvoice()
     {
         await JS.InvokeVoidAsync("window.print");
+    }
+
+    private async Task CancelOrder()
+    {
+        if (order == null) return;
+        
+        bool confirm = await JS.InvokeAsync<bool>("confirm", "Bạn có chắc chắn muốn hủy hóa đơn này không?");
+        if (!confirm) return;
+
+        isCancelling = true;
+        alert.Hide();
+
+        var result = await OrderApiService.CheckoutAsync(order.PublicId, "None", "Hủy hóa đơn", confirm: false);
+        if (result != null && result.Success)
+        {
+            alert.ShowSuccess("Hóa đơn đã được hủy thành công.");
+            await LoadOrderDetails(); // Tải lại thông tin mới nhất
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Có lỗi xảy ra khi hủy hóa đơn.");
+        }
+
+        isCancelling = false;
     }
 }
 

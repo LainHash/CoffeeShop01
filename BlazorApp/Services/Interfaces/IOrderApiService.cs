@@ -7,6 +7,6 @@ namespace BlazorApp.Services.Interfaces
         Task<OrderListResponse?> GetAllAsync();
         Task<OrderSingleResponse?> GetByIdAsync(Guid id);
         Task<OrderSingleResponse?> CreateAsync(CreateOrderInput input);
-        Task<OrderSingleResponse?> CheckoutAsync(Guid id, string paymentMethod, string? note);
+        Task<OrderSingleResponse?> CheckoutAsync(Guid id, string paymentMethod, string? note, bool confirm = true);
     }
 }

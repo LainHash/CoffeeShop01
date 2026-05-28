@@ -38,7 +38,8 @@ namespace WebAPI.Controllers
                 success = true,
                 message = result.Message,
                 roleId = result.Data!.User.RoleId,
-                data = result.Data
+                data = result.Data,
+                token = result.Token
             });
         }
     }

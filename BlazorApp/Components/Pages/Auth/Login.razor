@@ -164,6 +164,11 @@
                 }
             }
 
+            if (!string.IsNullOrEmpty(result.Token))
+            {
+                claims.Add(new Claim("jwt_token", result.Token));
+            }
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 

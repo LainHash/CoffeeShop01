@@ -236,7 +236,7 @@
         {
             var lowerQuery = searchQuery.ToLowerInvariant();
             query = query.Where(o =>
-                (o.PublicId.HasValue && o.PublicId.Value.ToString().ToLowerInvariant().Contains(lowerQuery)) ||
+                (o.PublicId.ToString().ToLowerInvariant().Contains(lowerQuery)) ||
                 (o.OrderId.ToString().Contains(lowerQuery)) ||
                 (o.TableNumber.ToString().Contains(lowerQuery)) ||
                 (!string.IsNullOrEmpty(o.EmployeeName) && o.EmployeeName.ToLowerInvariant().Contains(lowerQuery))

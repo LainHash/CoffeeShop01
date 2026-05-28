@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Products.Create;
@@ -38,6 +39,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager,Employee")]
         public async Task<IActionResult> Create(CreateProductDTO dto, [FromServices] IValidator<CreateProductDTO> validator)
         {
             var error = await validator.ValidateAndReturnError(dto);
@@ -55,6 +57,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Manager,Employee")]
         public async Task<IActionResult> Update(Guid id, UpdateProductDTO dto, [FromServices] IValidator<UpdateProductDTO> validator)
         {
             var error = await validator.ValidateAndReturnError(dto);
@@ -72,6 +75,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _productsService.DeleteAsync(id);
