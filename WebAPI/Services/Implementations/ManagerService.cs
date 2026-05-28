@@ -47,6 +47,7 @@ namespace WebAPI.Services.Implementations
             employee.User = _mapper.Map<User>(dto);
             employee.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             employee.User.IsActive = true;
+            employee.User.RoleId = 2;
             
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();

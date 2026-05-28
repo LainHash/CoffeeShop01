@@ -1,4 +1,4 @@
-@page "/order/details/{Id:guid}"
+@page "/Order/Details/{Id:guid}"
 @rendermode InteractiveServer
 @attribute [Authorize]
 @inject IOrderApiService OrderApiService
@@ -24,7 +24,7 @@
     <div class="container no-print">
         <!-- Back navigation & Breadcrumb -->
         <div class="mb-4 d-flex justify-content-between align-items-center">
-            <a href="/employee/orders" class="btn btn-outline-secondary rounded-pill">
+            <a href="/Order/Index" class="btn btn-outline-secondary rounded-pill">
                 <i class="fa fa-arrow-left mr-1"></i> Quay lại danh sách
             </a>
             <span class="text-muted font-weight-normal">Hóa đơn / Chi tiết / #@(order?.OrderId)</span>
@@ -172,7 +172,7 @@
                         <div class="card-body p-4 text-center">
                             @if (order.Status == "Unpaid")
                             {
-                                <a href="/employee/checkout/@order.PublicId" class="btn btn-primary btn-block btn-lg mb-3 py-3 rounded-pill shadow-sm">
+                                <a href="/Order/Checkout/@order.PublicId" class="btn btn-primary btn-block btn-lg mb-3 py-3 rounded-pill shadow-sm">
                                     <i class="fa fa-credit-card mr-2"></i>Thanh Toán Ngay
                                 </a>
 

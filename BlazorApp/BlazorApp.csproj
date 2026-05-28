@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\Pages\Employee\" />
     <Folder Include="Models\Managers\" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-@page "/employee/tablemap"
+@page "/Table/Map"
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject ITableApiService TableApiService
@@ -69,7 +69,7 @@
                                                 <i class="fa fa-edit mr-1"></i> Đổi Trạng Thái
                                             </button>
                                             
-                                            <a href="/employee/pos" class="btn btn-outline-primary btn-sm btn-block">
+                                            <a href="/Order/POS?floor=@t.FloorNumber&tableNum=@t.TableNumber" class="btn btn-outline-primary btn-sm btn-block">
                                                 <i class="fa fa-file-invoice mr-1"></i> Tạo Hóa Đơn
                                             </a>
                                         </div>

@@ -1,4 +1,4 @@
-@page "/order/reservation"
+@page "/Reservation/Create"
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject IReservationApiService ReservationApiService
@@ -183,7 +183,7 @@
 
         if (result != null && result.Success)
         {
-            NavigationManager.NavigateTo("/order/reservationschedule");
+            NavigationManager.NavigateTo("/Reservation/Schedule");
         }
         else
         {

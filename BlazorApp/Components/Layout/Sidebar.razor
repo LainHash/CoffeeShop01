@@ -1,0 +1,121 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+<!-- Sidebar Start -->
+<AuthorizeView Roles="Manager, Employee">
+    <Authorized>
+        <!-- Sidebar Toggle Button -->
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Mở/Đóng Menu">
+            <i class="bi bi-layout-sidebar"></i>
+        </button>
+
+        <!-- Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Sidebar -->
+        <div class="staff-sidebar" id="staffSidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>KOPPEE</span>
+                </div>
+                <button class="sidebar-close-btn" onclick="closeSidebar()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- User Info -->
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="sidebar-user-info">
+                    <span class="sidebar-username">@context.User.Identity?.Name</span>
+                    <span class="sidebar-role">@(context.User.IsInRole("Manager") ? "Quản lý" : "Nhân viên")</span>
+                </div>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <!-- Nav Items -->
+            <nav class="sidebar-nav">
+
+                <!-- Hóa đơn Group -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-label">Hóa Đơn</div>
+                    <a class="sidebar-link" href="/Order/POS">
+                        <i class="bi bi-terminal-fill"></i>
+                        <span>Hệ thống POS</span>
+                    </a>
+                    <a class="sidebar-link" href="/Order/Index">
+                        <i class="bi bi-receipt"></i>
+                        <span>Danh sách hóa đơn</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <!-- Quản Lý Bàn Group -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-label">Quản Lý Bàn</div>
+                    <a class="sidebar-link" href="/Table/Map">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                        <span>Sơ đồ bàn</span>
+                    </a>
+                </div>
+
+                <div class="sidebar-divider"></div>
+
+                <!-- Đặt Bàn Group -->
+                <div class="sidebar-group">
+                    <div class="sidebar-group-label">Đặt Bàn</div>
+                    <a class="sidebar-link" href="/Reservation/Schedule">
+                        <i class="bi bi-calendar-week"></i>
+                        <span>Lịch đặt bàn</span>
+                    </a>
+                    <a class="sidebar-link" href="/Reservation/Create">
+                        <i class="bi bi-calendar-plus"></i>
+                        <span>Tạo đặt bàn</span>
+                    </a>
+                </div>
+
+                <!-- Manager-only Group -->
+                <AuthorizeView Roles="Manager">
+                    <Authorized>
+                        <div class="sidebar-divider"></div>
+                        <div class="sidebar-group">
+                            <div class="sidebar-group-label">Quản Lý</div>
+                            <a class="sidebar-link" href="/Manager/Customers">
+                                <i class="bi bi-people-fill"></i>
+                                <span>Khách hàng</span>
+                            </a>
+                            <a class="sidebar-link" href="/Manager/Employees">
+                                <i class="bi bi-person-badge"></i>
+                                <span>Nhân viên</span>
+                            </a>
+                            <a class="sidebar-link" href="/Manager/Employees/Create">
+                                <i class="bi bi-person-plus-fill"></i>
+                                <span>Thêm nhân viên</span>
+                            </a>
+                            <a class="sidebar-link" href="/Product/Index">
+                                <i class="bi bi-cup-hot-fill"></i>
+                                <span>Sản phẩm</span>
+                            </a>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <a href="/logout" class="sidebar-logout">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+<!-- Sidebar End -->

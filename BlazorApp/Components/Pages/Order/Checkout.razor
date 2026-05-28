@@ -1,4 +1,4 @@
-@page "/employee/checkout/{Id:guid}"
+@page "/Order/Checkout/{Id:guid}"
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject IOrderApiService OrderApiService
@@ -23,7 +23,7 @@
     <div class="container">
         <!-- Back Link -->
         <div class="mb-4">
-            <a href="/order/details/@Id" class="btn btn-outline-secondary rounded-pill">
+            <a href="/Order/Details/@Id" class="btn btn-outline-secondary rounded-pill">
                 <i class="fa fa-arrow-left mr-1"></i> Quay lại chi tiết hóa đơn
             </a>
         </div>
@@ -229,7 +229,7 @@
             order = result.GetOrder();
             if (order!.Status != "Unpaid")
             {
-                NavigationManager.NavigateTo($"/order/details/{Id}");
+                NavigationManager.NavigateTo($"/Order/Details/{Id}");
             }
         }
         else
@@ -252,7 +252,7 @@
         var result = await OrderApiService.CheckoutAsync(Id, PaymentMethod, Note);
         if (result != null && result.Success)
         {
-            NavigationManager.NavigateTo($"/order/details/{Id}");
+            NavigationManager.NavigateTo($"/Order/Details/{Id}");
         }
         else
         {

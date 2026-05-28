@@ -172,7 +172,7 @@
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
 
-            NavigationManager.NavigateTo("/employee/pos", forceLoad: true);
+            NavigationManager.NavigateTo("/Order/POS", forceLoad: true);
         }
         else
         {
