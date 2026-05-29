@@ -1,0 +1,139 @@
+@page "/Product/Delete/{id:guid}"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager")]
+@inject IProductApiService ProductApiService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Xóa Sản phẩm - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Xóa Sản phẩm</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white"><a class="text-white" href="/Product/Index">Quản lý Sản phẩm</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Xóa</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<AlertMessage @ref="alert" />
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && product != null)
+{
+    <div class="container-fluid py-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-danger shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0 text-white"><i class="bi bi-exclamation-triangle-fill me-2"></i> Xác nhận xóa</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="fs-5 text-danger fw-bold">Bạn có chắc chắn muốn xóa sản phẩm này?</p>
+                        <p class="text-muted">Hành động này không thể hoàn tác.</p>
+                        
+                        <div class="mt-4 p-3 bg-light rounded border">
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold">Tên sản phẩm:</div>
+                                <div class="col-sm-8">@product.ProductName</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold">Danh mục:</div>
+                                <div class="col-sm-8">@product.CategoryName</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold">Giá:</div>
+                                <div class="col-sm-8">@product.Price.ToString("N0") VNĐ</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold">Loại / Tồn kho:</div>
+                                <div class="col-sm-8">
+                                    @if (product.IsMadeToOrder)
+                                    {
+                                        <span class="text-muted fst-italic">Pha chế khi đặt</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@product.UnitsInstock (có sẵn)</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 fw-bold">Trạng thái:</div>
+                                <div class="col-sm-8">
+                                    @if (product.IsAvailable)
+                                    {
+                                        <span class="badge bg-success">Đang bán</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Ngừng bán</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="/Product/Index" class="btn btn-secondary px-4 py-2">Hủy bỏ</a>
+                            <button class="btn btn-danger px-4 py-2" @onclick="HandleDelete" disabled="@isLoading">
+                                <i class="bi bi-trash me-1"></i> Xác nhận xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private ProductModel? product;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        
+        var result = await ProductApiService.GetByIdAsync(Id);
+        if (result != null && result.Success && result.Data != null)
+        {
+            product = result.Data;
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Không tìm thấy sản phẩm.");
+        }
+
+        isLoading = false;
+    }
+
+    private async Task HandleDelete()
+    {
+        isLoading = true;
+        var result = await ProductApiService.DeleteAsync(Id);
+        
+        if (result != null && result.Success)
+        {
+            NavigationManager.NavigateTo("/Product/Index");
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Đã xảy ra lỗi khi xóa sản phẩm.");
+            isLoading = false;
+        }
+    }
+}

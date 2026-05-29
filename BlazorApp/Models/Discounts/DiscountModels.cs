@@ -1,3 +1,4 @@
+using BlazorApp.Helpers.Constants;
 using System.Text.Json.Serialization;
 
 namespace BlazorApp.Models.Discounts
@@ -11,8 +12,8 @@ namespace BlazorApp.Models.Discounts
         public DateTime? ExpiredDate { get; set; }
 
         public string DisplayLabel => string.IsNullOrEmpty(DiscountCode)
-            ? $"{(Type == "Percentage" ? $"{Value}%" : $"{Value:N0}đ")} giảm"
-            : $"{DiscountCode} - {(Type == "Percentage" ? $"{Value}%" : $"{Value:N0}đ")}";
+            ? $"{(Type == DiscountConstants.Percent ? $"{Value}%" : $"{Value:N0}đ")} giảm"
+            : $"{DiscountCode} - {(Type == DiscountConstants.Percent ? $"{Value}%" : $"{Value:N0}đ")}";
     }
 
     public class DiscountListResponse

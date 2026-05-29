@@ -9,7 +9,7 @@ public partial class Employee
 
     public int UserId { get; set; }
 
-    public Guid? PublicId { get; set; }
+    public Guid PublicId { get; set; }
 
     public string FullName { get; set; } = null!;
 

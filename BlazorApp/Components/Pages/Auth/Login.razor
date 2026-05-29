@@ -164,6 +164,11 @@
                 }
             }
 
+            if (!string.IsNullOrEmpty(result.Token))
+            {
+                claims.Add(new Claim("jwt_token", result.Token));
+            }
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
@@ -172,7 +177,7 @@
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
 
-            NavigationManager.NavigateTo("/employee/pos", forceLoad: true);
+            NavigationManager.NavigateTo("/Order/POS", forceLoad: true);
         }
         else
         {

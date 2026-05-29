@@ -1,4 +1,4 @@
-@page "/order/reservationschedule"
+@page "/Reservation/Schedule"
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Manager,Employee")]
 @inject IReservationApiService ReservationApiService
@@ -53,7 +53,7 @@
                     <button class="btn btn-secondary btn-sm px-3" @onclick="TodayWeek" id="today-btn">
                         <i class="fa fa-home mr-1"></i> Tuần này
                     </button>
-                    <a href="/order/reservation" class="btn btn-primary btn-sm px-3" id="create-reservation-btn">
+                    <a href="/Reservation/Create" class="btn btn-primary btn-sm px-3" id="create-reservation-btn">
                         <i class="fa fa-plus mr-1"></i> Tạo đặt bàn
                     </a>
                 </div>
@@ -70,7 +70,6 @@
                 </span>
             </div>
 
-            <!-- Weekly Calendar Grid -->
             <div class="weekly-calendar">
                 <div class="calendar-grid">
                     @for (int i = 0; i < 7; i++)

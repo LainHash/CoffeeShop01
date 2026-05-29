@@ -4,6 +4,7 @@ namespace BlazorApp.Models.Reservations
 {
     public class ReservationModel
     {
+        [JsonPropertyName("publicId")]
         public Guid ReservationId { get; set; }
         public string CustomerFullName { get; set; } = string.Empty;
         public string CustomerPhone { get; set; } = string.Empty;

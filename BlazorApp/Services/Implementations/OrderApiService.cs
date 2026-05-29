@@ -27,9 +27,9 @@ namespace BlazorApp.Services.Implementations
             return await _apiService.PostAsync<CreateOrderInput, OrderSingleResponse>("/api/Order", input);
         }
 
-        public async Task<OrderSingleResponse?> CheckoutAsync(Guid id, string paymentMethod, string? note)
+        public async Task<OrderSingleResponse?> CheckoutAsync(Guid id, string paymentMethod, string? note, bool confirm = true)
         {
-            var endpoint = $"/api/Order/{id}/Checkout?confirm=true&paymentMethod={Uri.EscapeDataString(paymentMethod)}&note={Uri.EscapeDataString(note ?? "")}";
+            var endpoint = $"/api/Order/{id}/Checkout?confirm={confirm.ToString().ToLower()}&paymentMethod={Uri.EscapeDataString(paymentMethod)}&note={Uri.EscapeDataString(note ?? "")}";
             return await _apiService.PostAsync<object, OrderSingleResponse>(endpoint, new { });
         }
     }

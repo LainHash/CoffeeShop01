@@ -13,5 +13,7 @@
         public string? Description { get; set; }
 
         public int UnitsInstock { get; set; }
+
+        public bool IsMadeToOrder { get; set; }
     }
 }

@@ -4,8 +4,15 @@
 @inject NavigationManager NavigationManager
 
 <!-- Navbar Start -->
-<div class="container-fluid p-0 nav-bar">
+<div class="container-fluid p-0 nav-bar" style="position: sticky; top: 0; z-index: 1040; background: #33211D;">
     <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
+        <AuthorizeView Roles="Manager, Employee">
+            <Authorized>
+                <button class="sidebar-toggle-btn ml-3" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Mở/Đóng Menu">
+                    <i class="bi bi-layout-sidebar"></i>
+                </button>
+            </Authorized>
+        </AuthorizeView>
         <a href="/" class="navbar-brand px-lg-4 m-0">
             <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
         </a>
@@ -20,29 +27,6 @@
                 <a class="nav-item nav-link" href="/Product">Thực Đơn</a>
                 <a class="nav-item nav-link" href="/Home/Testimonial">Phản Hồi</a>
                 <a href="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
-
-                <AuthorizeView Roles="Manager, Employee">
-                    <Authorized>
-                        <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-warning font-weight-bold"
-                               data-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                                <i class="fa fa-cog mr-1"></i>Quản lý
-                            </a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/Employee/POS"><i class="fa fa-cash-register mr-2"></i>Hệ thống POS</a>
-                                <a class="dropdown-item" href="/Employee/Orders"><i class="fa fa-list mr-2"></i>Quản lý hóa đơn</a>
-                                <a class="dropdown-item" href="/Employee/TableMap"><i class="bi bi-table mr-2"></i>Sơ đồ bàn</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/Order/ReservationSchedule"><i class="fa fa-calendar-week mr-2"></i>Lịch đặt bàn</a>
-                                <a class="dropdown-item" href="/Order/Reservation"><i class="fa fa-calendar-plus mr-2"></i>Tạo đặt bàn</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/Manager/Employees/Create"><i class="bi bi-person-add mr-2"></i>Thêm nhân viên</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/Manager/Products"><i class="bi bi-cup-hot-fill mr-2"></i>Quản lý sản phẩm</a>
-                            </div>
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
 
                 <AuthorizeView>
                     <Authorized>
@@ -69,3 +53,5 @@
     </nav>
 </div>
 <!-- Navbar End -->
+
+<Sidebar />

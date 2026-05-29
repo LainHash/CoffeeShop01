@@ -24,6 +24,7 @@ namespace WebAPI.Services.Implementations
         public async Task<ProductResult<List<ProductDTO>>> GetAllAsync()
         {
             var products = await _context.Products
+                .Include(p => p.Category)
                 .Where(p => p.IsAvailable == true)
                 .ToListAsync();
             return new ProductResult<List<ProductDTO>>
@@ -37,6 +38,7 @@ namespace WebAPI.Services.Implementations
         public async Task<ProductResult<ProductDTO>> GetOneAsync(Guid id)
         {
             var product = await _context.Products
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.PublicId == id);
             if (product == null)
             {
@@ -78,6 +80,7 @@ namespace WebAPI.Services.Implementations
         public async Task<ProductResult<ProductDTO>> UpdateAsync(Guid id, UpdateProductDTO dto)
         {
             var product = await _context.Products
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.PublicId == id);
             if (product == null)
             {
@@ -108,6 +111,7 @@ namespace WebAPI.Services.Implementations
         public async Task<ProductResult> DeleteAsync(Guid id)
         {
             var product = await _context.Products
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.PublicId == id);
             if (product == null)
             {

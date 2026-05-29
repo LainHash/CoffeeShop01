@@ -138,16 +138,17 @@ namespace WebAPI.Services.Implementations
                 decimal discountAmount = 0;
                 if (order.DiscountId.HasValue)
                 {
-                    var discount = await _context.Discounts.FindAsync(order.DiscountId.Value);
+                    var discount = await _context.Discounts
+                        .FindAsync(order.DiscountId.Value);
                     if (discount != null)
                     {
-                        if (discount.Type.Equals(DiscountType.Flat, StringComparison.OrdinalIgnoreCase))
+                        if (discount.Type.Equals(DiscountType.Fixed, StringComparison.OrdinalIgnoreCase))
                         {
                             discountAmount = (decimal)discount.Value;
                         }
                         else if (discount.Type.Equals(DiscountType.Percent, StringComparison.OrdinalIgnoreCase))
                         {
-                            discountAmount = subTotal * (decimal)(discount.Value);
+                            discountAmount = subTotal * (decimal)(discount.Value/100);
                         }
                     }
                     else
