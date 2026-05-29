@@ -2,7 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs.Reservations;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
@@ -19,19 +19,26 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ReservationResult> CreateAsync(CreateReservationDTO dto)
+        public async Task<ReservationResult<ReservationDTO>> CreateAsync(CreateReservationDTO dto)
         {
             if (dto.ReservationTime <= DateTime.Now.AddMinutes(30))
             {
-                return new ReservationResult(false, "Thời gian đặt bàn phải ít nhất 30 phút trong tương lai.");
+                return new ReservationResult<ReservationDTO>
+                {
+                    Success = false,
+                    Message = "Thời gian đặt bàn phải ít nhất 30 phút trong tương lai."
+                };
             }
 
             if (dto.NumberOfGuests <= 0)
             {
-                return new ReservationResult(false, "Số lượng khách phải lớn hơn 0.");
+                return new ReservationResult<ReservationDTO>
+                {
+                    Success = false,
+                    Message = "Số lượng khách phải lớn hơn 0."
+                };
             }
 
-            // Tìm hoặc tạo khách hàng (Upsert)
             var customer = await _context.Customers
                 .FirstOrDefaultAsync(c => c.Phone == dto.Phone);
 
@@ -43,11 +50,10 @@ namespace WebAPI.Services.Implementations
                     Phone = dto.Phone
                 };
                 _context.Customers.Add(customer);
-                await _context.SaveChangesAsync(); // Lưu để có CustomerId
+                await _context.SaveChangesAsync();
             }
             else if (customer.FullName != dto.FullName)
             {
-                // Cập nhật tên nếu khác
                 customer.FullName = dto.FullName;
                 _context.Customers.Update(customer);
             }
@@ -62,7 +68,6 @@ namespace WebAPI.Services.Implementations
                 Status = "Pending",
             };
 
-            // Tìm bàn phù hợp và KHÔNG bị trùng lịch trong khoảng ±2 giờ
             var conflictWindowStart = dto.ReservationTime.AddHours(-2);
             var conflictWindowEnd = dto.ReservationTime.AddHours(2);
 
@@ -82,10 +87,18 @@ namespace WebAPI.Services.Implementations
                     .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value && t.IsActive == true && t.Status == "Available");
 
                 if (table == null)
-                    return new ReservationResult(false, "Bàn được chọn không tồn tại hoặc không ở trạng thái sẵn sàng.");
+                    return new ReservationResult<ReservationDTO>
+                    {
+                        Success = false,
+                        Message = "Bàn được chọn không tồn tại hoặc không ở trạng thái sẵn sàng."
+                    };
 
                 if (busyTableIds.Contains(table.TableId))
-                    return new ReservationResult(false, "Bàn được chọn đã có người đặt trong khung giờ này.");
+                    return new ReservationResult<ReservationDTO>
+                    {
+                        Success = false,
+                        Message = "Bàn được chọn đã có người đặt trong khung giờ này."
+                    };
 
                 availableTableId = table.TableId;
             }
@@ -100,7 +113,11 @@ namespace WebAPI.Services.Implementations
                     .FirstOrDefaultAsync();
 
                 if (availableTable == null)
-                    return new ReservationResult(false, "Hiện không có bàn trống phù hợp với số lượng khách trong khung giờ này. Vui lòng chọn giờ khác.");
+                    return new ReservationResult<ReservationDTO>
+                    {
+                        Success = false,
+                        Message = "Hiện không có bàn trống phù hợp với số lượng khách trong khung giờ này. Vui lòng chọn giờ khác."
+                    };
 
                 availableTableId = availableTable.TableId;
             }
@@ -115,16 +132,25 @@ namespace WebAPI.Services.Implementations
             await _context.Entry(reservation).Reference(r => r.Customer).LoadAsync();
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
 
-            return new ReservationResult(true, "Đặt bàn thành công! Chúng tôi sẽ xác nhận sớm.", _mapper.Map<ReservationDTO>(reservation));
+            return new ReservationResult<ReservationDTO>
+            {
+                Success = true,
+                Message = "Đặt bàn thành công! Chúng tôi sẽ xác nhận sớm.",
+                Data = _mapper.Map<ReservationDTO>(reservation)
+            };
         }
 
-        public async Task<ReservationResult> GetByCustomerAsync(Guid customerPublicId)
+        public async Task<ReservationResult<List<ReservationDTO>>> GetByCustomerAsync(Guid customerPublicId)
         {
             var customer = await _context.Customers
                 .FirstOrDefaultAsync(c => c.PublicId == customerPublicId);
 
             if (customer == null)
-                return new ReservationResult(false, "Khách hàng không tồn tại.");
+                return new ReservationResult<List<ReservationDTO>>
+                {
+                    Success = false,
+                    Message = "Khách hàng không tồn tại."
+                };
 
             var reservations = await _context.Reservations
                 .Include(r => r.Customer)
@@ -133,11 +159,15 @@ namespace WebAPI.Services.Implementations
                 .OrderByDescending(r => r.ReservationTime)
                 .ToListAsync();
 
-            return new ReservationResult(true, "Lấy danh sách đặt bàn thành công.",
-                reservations: _mapper.Map<List<ReservationDTO>>(reservations));
+            return new ReservationResult<List<ReservationDTO>>
+            {
+                Success = true,
+                Message = "Lấy danh sách đặt bàn thành công.",
+                Data = _mapper.Map<List<ReservationDTO>>(reservations)
+            };
         }
 
-        public async Task<ReservationResult> GetAllAsync()
+        public async Task<ReservationResult<List<ReservationDTO>>> GetAllAsync()
         {
             var reservations = await _context.Reservations
                 .Include(r => r.Customer)
@@ -145,36 +175,57 @@ namespace WebAPI.Services.Implementations
                 .OrderByDescending(r => r.ReservationTime)
                 .ToListAsync();
 
-            return new ReservationResult(true, "Lấy tất cả đặt bàn thành công.",
-                reservations: _mapper.Map<List<ReservationDTO>>(reservations));
+            return new ReservationResult<List<ReservationDTO>>
+            {
+                Success = true,
+                Message = "Lấy tất cả đặt bàn thành công.",
+                Data = _mapper.Map<List<ReservationDTO>>(reservations)
+            };
         }
 
-        public async Task<ReservationResult> GetByIdAsync(int reservationId)
+        public async Task<ReservationResult<ReservationDTO>> GetByIdAsync(Guid id)
         {
             var reservation = await _context.Reservations
                 .Include(r => r.Customer)
                 .Include(r => r.Table)
-                .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
+                .FirstOrDefaultAsync(r => r.PublicId == id);
 
             if (reservation == null)
-                return new ReservationResult(false, "Đặt bàn không tồn tại.");
+                return new ReservationResult<ReservationDTO>
+                {
+                    Success = false,
+                    Message = "Đặt bàn không tồn tại."
+                };
 
-            return new ReservationResult(true, "Lấy thông tin đặt bàn thành công.", _mapper.Map<ReservationDTO>(reservation));
+            return new ReservationResult<ReservationDTO>
+            {
+                Success = true,
+                Message = "Lấy thông tin đặt bàn thành công.",
+                Data = _mapper.Map<ReservationDTO>(reservation)
+            };
         }
 
-        public async Task<ReservationResult> UpdateAsync(int reservationId, UpdateReservationDTO dto)
+        public async Task<ReservationResult<ReservationDTO>> UpdateAsync(Guid id, UpdateReservationDTO dto)
         {
             var allowedStatuses = new[] { "Pending", "Confirmed", "Cancelled", "Completed" };
             if (!allowedStatuses.Contains(dto.Status))
-                return new ReservationResult(false, $"Trạng thái không hợp lệ. Giá trị hợp lệ: {string.Join(", ", allowedStatuses)}.");
+                return new ReservationResult<ReservationDTO>
+                {
+                    Success = false,
+                    Message = $"Trạng thái không hợp lệ. Giá trị hợp lệ: {string.Join(", ", allowedStatuses)}."
+                };
 
             var reservation = await _context.Reservations
                 .Include(r => r.Customer)
                 .Include(r => r.Table)
-                .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
+                .FirstOrDefaultAsync(r => r.PublicId == id);
 
             if (reservation == null)
-                return new ReservationResult(false, "Đặt bàn không tồn tại.");
+                return new ReservationResult<ReservationDTO>
+                {
+                    Success = false,
+                    Message = "Đặt bàn không tồn tại."
+                };
 
             if (dto.TableId.HasValue)
             {
@@ -182,7 +233,11 @@ namespace WebAPI.Services.Implementations
                     .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value && t.IsActive == true);
 
                 if (table == null)
-                    return new ReservationResult(false, "Bàn không tồn tại hoặc không hoạt động.");
+                    return new ReservationResult<ReservationDTO>
+                    {
+                        Success = false,
+                        Message = "Bàn không tồn tại hoặc không hoạt động."
+                    };
 
                 reservation.TableId = dto.TableId.Value;
             }
@@ -195,12 +250,16 @@ namespace WebAPI.Services.Implementations
 
             await _context.Entry(reservation).Reference(r => r.Table).LoadAsync();
 
-            return new ReservationResult(true, "Cập nhật đặt bàn thành công.", _mapper.Map<ReservationDTO>(reservation));
+            return new ReservationResult<ReservationDTO>
+            {
+                Success = true,
+                Message = "Cập nhật đặt bàn thành công.",
+                Data = _mapper.Map<ReservationDTO>(reservation)
+            };
         }
 
-        public async Task<ReservationResult> GetByWeekAsync(DateTime weekStart)
+        public async Task<ReservationResult<List<ReservationDTO>>> GetByWeekAsync(DateTime weekStart)
         {
-            // Đảm bảo weekStart là đầu ngày thứ Hai
             var startOfWeek = weekStart.Date;
             var endOfWeek = startOfWeek.AddDays(7);
 
@@ -211,8 +270,12 @@ namespace WebAPI.Services.Implementations
                 .OrderBy(r => r.ReservationTime)
                 .ToListAsync();
 
-            return new ReservationResult(true, "Lấy lịch đặt bàn theo tuần thành công.",
-                reservations: _mapper.Map<List<ReservationDTO>>(reservations));
+            return new ReservationResult<List<ReservationDTO>>
+            {
+                Success = true,
+                Message = "Lấy lịch đặt bàn theo tuần thành công.",
+                Data = _mapper.Map<List<ReservationDTO>>(reservations)
+            };
         }
     }
 }

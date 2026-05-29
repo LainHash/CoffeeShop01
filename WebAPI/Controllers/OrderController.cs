@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Http;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.Orders.Create;
 using WebAPI.DTOs.Orders.Update;
+using WebAPI.Helpers.Extensions;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -21,12 +22,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _orderService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                orders = result.Orders
-            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -35,49 +31,26 @@ namespace WebAPI.Controllers
             var result = await _orderService.GetOneAsync(id);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                order = result.Order
-            });
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderDTO request)
+        public async Task<IActionResult> Create([FromBody] CreateOrderDTO request,
+            [FromServices] IValidator<CreateOrderDTO> validator)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "Dữ liệu không hợp lệ."
-                });
-            }
+            var error = await validator.ValidateAndReturnError(request);
+            if (error != null) return error;
 
             var result = await _orderService.CreateAsync(request);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                order = result.Order
-            });
+            return Ok(result);
         }
 
         [HttpPost("{id}/Checkout")]
@@ -86,19 +59,10 @@ namespace WebAPI.Controllers
             var result = await _orderService.Checkout(id, confirm, paymentMethod, note);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
 
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                order = result.Order
-            });
+            return Ok(result);
         }
     }
 }

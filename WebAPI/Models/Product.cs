@@ -7,7 +7,7 @@ public partial class Product
 {
     public int ProductId { get; set; }
 
-    public Guid? PublicId { get; set; }
+    public Guid PublicId { get; set; }
 
     public string ProductName { get; set; } = null!;
 
@@ -24,6 +24,8 @@ public partial class Product
     public DateTime? CreatedAt { get; set; }
 
     public int? UnitsInStock { get; set; }
+
+    public bool IsMadeToOrder { get; set; }
 
     public virtual Category Category { get; set; } = null!;
 

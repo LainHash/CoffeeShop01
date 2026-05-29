@@ -1,0 +1,200 @@
+@page "/Table/Map"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject ITableApiService TableApiService
+
+<PageTitle>Sơ đồ bàn - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Sơ đồ bàn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Sơ đồ bàn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+            <h4 class="text-primary text-uppercase" style="letter-spacing: 5px;">Quản Lý Bàn</h4>
+            <h1 class="display-4">Sơ Đồ Từng Tầng</h1>
+        </div>
+        
+        <AlertMessage @ref="alert" />
+        <LoadingSpinner IsLoading="isLoading" />
+        
+        @if (!isLoading && tables != null)
+        {
+            if (!tables.Any())
+            {
+                <div class="alert alert-warning text-center">Chưa có dữ liệu bàn nào trong hệ thống.</div>
+            }
+            else
+            {
+                var tablesByFloor = tables.GroupBy(t => t.FloorNumber).OrderBy(g => g.Key).ToList();
+                
+                <div class="floor-tabs mb-4 justify-content-center">
+                    @foreach (var floor in tablesByFloor)
+                    {
+                        <button type="button" 
+                                class="floor-tab-btn @(currentFloor == floor.Key ? "active" : "")" 
+                                @onclick="() => currentFloor = floor.Key">
+                            Tầng @floor.Key
+                        </button>
+                    }
+                </div>
+
+                @foreach (var floor in tablesByFloor)
+                {
+                    <div class="table-floor-panel @(currentFloor == floor.Key ? "active" : "")">
+                        <div class="row">
+                            @foreach (var t in floor.OrderBy(x => x.TableNumber))
+                            {
+                                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                                    <div class="table-map-card status-@t.Status">
+                                        <div>
+                                            <div class="status-badge badge-@t.Status">@t.StatusLabel</div>
+                                            <h4>Bàn @t.TableNumber</h4>
+                                            <p class="text-muted mb-3"><i class="fa fa-users text-primary mr-1"></i> Sức chứa: @t.RecommendedCapacity</p>
+                                        </div>
+                                        
+                                        <div class="d-flex flex-column gap-2" style="gap: 10px;">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm btn-block" @onclick="() => ShowUpdateModal(t)">
+                                                <i class="fa fa-edit mr-1"></i> Đổi Trạng Thái
+                                            </button>
+                                            
+                                            <a href="/Order/POS?floor=@t.FloorNumber&tableNum=@t.TableNumber" class="btn btn-outline-primary btn-sm btn-block">
+                                                <i class="fa fa-file-invoice mr-1"></i> Tạo Hóa Đơn
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+
+@if (selectedTable != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cập nhật bàn @selectedTable.TableNumber - Tầng @selectedTable.FloorNumber</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Trạng thái hiện tại: <span class="badge @selectedTable.StatusBadgeClass">@selectedTable.StatusLabel</span></p>
+                    <div class="mb-3">
+                        <label class="form-label">Chọn trạng thái mới:</label>
+                        <select class="form-select" @bind="newStatus">
+                            <option value="Available">Trống</option>
+                            <option value="Occupied">Đang dùng</option>
+                            <option value="Reserved">Đặt trước</option>
+                            <option value="Maintenance">Bảo trì</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Hủy</button>
+                    <button type="button" class="btn btn-primary" @onclick="UpdateStatus" disabled="@isUpdating">
+                        @if (isUpdating)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span>Đang lưu...</span>
+                        }
+                        else
+                        {
+                            <span>Lưu thay đổi</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<TableModel>? tables;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    private TableModel? selectedTable;
+    private string newStatus = "";
+    private bool isUpdating = false;
+    private int currentFloor = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTables();
+    }
+
+    private async Task LoadTables()
+    {
+        isLoading = true;
+        var result = await TableApiService.GetAllAsync();
+        if (result != null && result.Success)
+        {
+            tables = result.List;
+            if (tables.Any())
+            {
+                currentFloor = tables.Min(t => t.FloorNumber);
+            }
+        }
+        else
+        {
+            alert.ShowError("Không thể tải danh sách bàn.");
+        }
+        isLoading = false;
+    }
+
+    private string GetBorderClass(string status) => status switch
+    {
+        "Available" => "border-success",
+        "Occupied" => "border-danger",
+        "Reserved" => "border-warning",
+        _ => "border-secondary"
+    };
+
+    private void ShowUpdateModal(TableModel table)
+    {
+        selectedTable = table;
+        newStatus = table.Status;
+    }
+
+    private void CloseModal()
+    {
+        selectedTable = null;
+    }
+
+    private async Task UpdateStatus()
+    {
+        if (selectedTable == null) return;
+
+        isUpdating = true;
+        var result = await TableApiService.UpdateStatusAsync(selectedTable.FloorNumber, selectedTable.TableNumber, newStatus);
+        
+        if (result != null && result.Success)
+        {
+            alert.ShowSuccess($"Cập nhật bàn {selectedTable.TableNumber} thành công.");
+            await LoadTables();
+            CloseModal();
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Lỗi khi cập nhật trạng thái bàn.");
+        }
+        isUpdating = false;
+    }
+}
+

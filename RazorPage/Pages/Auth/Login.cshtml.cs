@@ -61,29 +61,15 @@ namespace RazorPage.Pages.Auth
                 {
                     HttpContext.Session.SetInt32(AccountConstants.RoleId, result.RoleId);
 
-                    if (result.RoleId == 1 && result.Customer != null)
-                    {
-                        var customer = result.Customer;
-                        HttpContext.Session.SetString(AccountConstants.CustomerId, customer.PublicId.ToString());
-                        HttpContext.Session.SetString(AccountConstants.Email, customer.Email);
-                        HttpContext.Session.SetString(AccountConstants.Username, customer.Username);
-                        HttpContext.Session.SetString(AccountConstants.FullName, customer.FullName);
-                        HttpContext.Session.SetString(AccountConstants.Phone, customer.Phone);
+                    var manager = result.Data;
+                    HttpContext.Session.SetString(AccountConstants.ManagerId, manager!.PublicId.ToString());
+                    HttpContext.Session.SetString(AccountConstants.Email, manager.Email);
+                    HttpContext.Session.SetString(AccountConstants.Username, manager.Username);
+                    HttpContext.Session.SetString(AccountConstants.FullName, manager.FullName);
+                    HttpContext.Session.SetString(AccountConstants.Phone, manager.Phone);
+                    HttpContext.Session.SetString("Position", manager.Position ?? "");
 
-                        return RedirectToPage("/Home/Index");
-                    }
-                    else if (result.RoleId != 1 && result.Manager != null)
-                    {
-                        var manager = result.Manager;
-                        HttpContext.Session.SetString("ManagerId", manager.PublicId.ToString());
-                        HttpContext.Session.SetString(AccountConstants.Email, manager.Email);
-                        HttpContext.Session.SetString(AccountConstants.Username, manager.Username);
-                        HttpContext.Session.SetString(AccountConstants.FullName, manager.FullName);
-                        HttpContext.Session.SetString(AccountConstants.Phone, manager.Phone);
-                        HttpContext.Session.SetString("Position", manager.Position ?? "");
-
-                        return RedirectToPage("/Employee/POS");
-                    }
+                    return RedirectToPage("/Employee/POS");
                 }
 
                 ErrorMessage = result?.Message ?? "Đăng nhập thất bại. Vui lòng thử lại.";

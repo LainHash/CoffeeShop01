@@ -1,7 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
-using WebAPI.DTOs.Results;
+using WebAPI.ResultModels;
 using WebAPI.DTOs.TableEntities;
 using WebAPI.Services.Interfaces;
 
@@ -18,47 +18,74 @@ namespace WebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<TableResult> GetAllAsync()
+        public async Task<TableResult<List<TableEntityDTO>>> GetAllAsync()
         {
             var tables = await _context.TableEntities
                 .ToListAsync();
-            return new TableResult(true, "Lấy danh sách bàn thành công", _mapper.Map<List<TableEntityDTO>>(tables));
+            return new TableResult<List<TableEntityDTO>>
+            {
+                Success = true,
+                Message = "Lấy danh sách bàn thành công",
+                Data = _mapper.Map<List<TableEntityDTO>>(tables)
+            };
         }
 
-        public async Task<TableResult> GetOneAsync(int floorNumber, int tableNumber)
+        public async Task<TableResult<TableEntityDTO>> GetOneAsync(int floorNumber, int tableNumber)
         {
             var table = await _context.TableEntities
                 .FirstOrDefaultAsync(t => t.TableNumber == tableNumber && t.FloorNumber == floorNumber);
-            if(table == null)
+            if (table == null)
             {
-                return new TableResult(false, "Bàn không tồn tại!");
+                return new TableResult<TableEntityDTO>
+                {
+                    Success = false,
+                    Message = "Bàn không tồn tại!"
+                };
             }
-            return new TableResult(true, "Lấy bàn thành công.", _mapper.Map<TableEntityDTO>(table));
+            return new TableResult<TableEntityDTO>
+            {
+                Success = true,
+                Message = "Lấy bàn thành công.",
+                Data = _mapper.Map<TableEntityDTO>(table)
+            };
         }
 
-        public async Task<TableResult> GetAllByFloorAsync(int floorNumber)
+        public async Task<TableResult<List<TableEntityDTO>>> GetAllByFloorAsync(int floorNumber)
         {
             var tables = await _context.TableEntities
                 .Where(t => t.FloorNumber == floorNumber)
                 .ToListAsync();
-            return new TableResult(true, "Lấy danh sách bàn theo tầng thành công", _mapper.Map<List<TableEntityDTO>>(tables));
+            return new TableResult<List<TableEntityDTO>>
+            {
+                Success = true,
+                Message = "Lấy danh sách bàn theo tầng thành công",
+                Data = _mapper.Map<List<TableEntityDTO>>(tables)
+            };
         }
 
-        public async Task<TableResult> UpdateStatusAsync(int tableId, string status)
+        public async Task<TableResult<TableEntityDTO>> UpdateStatusAsync(int floorNumber, int tableNumber, string status)
         {
-            var table = await _context.TableEntities.FindAsync(tableId);
+            var table = await _context.TableEntities
+                .FirstOrDefaultAsync(t => t.FloorNumber == floorNumber && t.TableNumber == tableNumber);
             if (table == null)
             {
-                return new TableResult(false, "Không tìm thấy bàn!");
+                return new TableResult<TableEntityDTO>
+                {
+                    Success = false,
+                    Message = "Không tìm thấy bàn!"
+                };
             }
 
-            // Có thể kiểm tra status có hợp lệ không (ví dụ kiểm tra danh sách hằng số),
-            // nhưng tạm thời cập nhật trực tiếp.
             table.Status = status;
             _context.TableEntities.Update(table);
             await _context.SaveChangesAsync();
 
-            return new TableResult(true, "Cập nhật trạng thái bàn thành công", _mapper.Map<TableEntityDTO>(table));
+            return new TableResult<TableEntityDTO>
+            {
+                Success = true,
+                Message = "Cập nhật trạng thái bàn thành công",
+                Data = _mapper.Map<TableEntityDTO>(table)
+            };
         }
     }
 }

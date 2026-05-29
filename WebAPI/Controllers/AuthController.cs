@@ -1,7 +1,8 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Data;
 using WebAPI.DTOs.Accounts;
+using WebAPI.Helpers.Extensions;
+using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
 {
@@ -9,54 +10,36 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly CoffeeShopDbContext _context;
+        private readonly IAuthService _authService;
 
-        public AuthController(CoffeeShopDbContext context)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
+            _authService = authService;
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO dto)
+        public async Task<IActionResult> Login([FromBody] LoginDTO dto,
+            [FromServices] IValidator<LoginDTO> validator)
         {
-            var user = await _context.Users
-                .Include(u => u.Employee)
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
-
-            if (user == null || user.IsActive == false)
+            var error = await validator.ValidateAndReturnError(dto);
+            if (error != null)
             {
-                return BadRequest(new { success = false, message = "Tài khoản không tồn tại hoặc đã bị khóa!" });
+                return error;
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            var result = await _authService.LoginAsync(dto);
+            if (!result.Success)
             {
-                return BadRequest(new { success = false, message = "Email hoặc mật khẩu không đúng." });
-            }
-
-            if (user.RoleId == 1) 
-            {
-                return BadRequest(new { success = false, message = "Hệ thống chỉ dành cho nhân viên." });
-            }
-
-            if (user.Employee == null)
-            {
-                return BadRequest(new { success = false, message = "Lỗi dữ liệu nhân viên." });
+                return BadRequest(result);
             }
 
             return Ok(new
             {
                 success = true,
-                message = "Đăng nhập thành công.",
-                roleId = user.RoleId,
-                manager = new
-                {
-                    user.Employee.PublicId,
-                    user.Employee.FullName,
-                    user.Employee.Phone,
-                    user.Employee.Position,
-                    user.Email,
-                    user.Username
-                }
+                message = result.Message,
+                roleId = result.Data!.User.RoleId,
+                data = result.Data,
+                token = result.Token
             });
         }
     }

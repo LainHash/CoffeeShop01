@@ -7,7 +7,8 @@ namespace WebAPI.Mappings
 {
     public class OrderMP : Profile
     {
-        public OrderMP() { 
+        public OrderMP() {
+
             CreateMap<Order, OrderDTO>()
                 .ForMember(dest => dest.TableNumber, opt => opt.MapFrom(src => src.Table != null ? src.Table.TableNumber : 0))
                 .ForMember(dest => dest.FloorNumber, opt => opt.MapFrom(src => src.Table != null ? src.Table.FloorNumber : 0))

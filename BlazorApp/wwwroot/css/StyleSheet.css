@@ -1,0 +1,20 @@
+﻿.payment-method-card {
+    transition: all 0.3s ease;
+    border-width: 2px !important;
+    background-color: #fff;
+}
+
+    .payment-method-card:hover {
+        border-color: #DA9F5B !important;
+        transform: translateY(-2px);
+    }
+
+.active-method {
+    border-color: #DA9F5B !important;
+    background-color: rgba(218, 159, 91, 0.05) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}

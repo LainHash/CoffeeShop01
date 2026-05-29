@@ -19,32 +19,18 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _discountService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                list = result.Discounts
-            });
+            return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetOne(int id)
+        [HttpGet("{code}")]
+        public async Task<IActionResult> GetOne(string code)
         {
-            var result = await _discountService.GetOneAsync(id);
+            var result = await _discountService.GetOneAsync(code);
             if(!result.Success)
             {
-                return NotFound(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                data = result.Discount
-            });
+            return Ok(result);
         }
     }
 }

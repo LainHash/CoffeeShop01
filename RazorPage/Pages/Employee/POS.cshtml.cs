@@ -100,7 +100,7 @@ namespace RazorPage.Pages.Employee
             {
                 var tableStr = await tableResp.Content.ReadAsStringAsync();
                 var tableJson = JsonSerializer.Deserialize<TableResponse>(tableStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (tableJson?.List != null) Tables = tableJson.List;
+                if (tableJson?.Data != null) Tables = tableJson.Data;
             }
 
             var prodResp = await client.GetAsync("/api/Product");
@@ -108,7 +108,7 @@ namespace RazorPage.Pages.Employee
             {
                 var prodStr = await prodResp.Content.ReadAsStringAsync();
                 var prodJson = JsonSerializer.Deserialize<ProductResponse>(prodStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (prodJson?.List != null) Products = prodJson.List;
+                if (prodJson?.Data != null) Products = prodJson.Data;
             }
 
             var discountResp = await client.GetAsync("/api/Discount");
@@ -116,7 +116,7 @@ namespace RazorPage.Pages.Employee
             {
                 var discountStr = await discountResp.Content.ReadAsStringAsync();
                 var discountJson = JsonSerializer.Deserialize<DiscountResponse>(discountStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (discountJson?.List != null) Discounts = discountJson.List;
+                if (discountJson?.Data != null) Discounts = discountJson.Data;
             }
         }
     }

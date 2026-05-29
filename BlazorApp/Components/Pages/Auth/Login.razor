@@ -1,0 +1,189 @@
+@page "/login"
+@layout BlazorApp.Components.Layout.MainLayout
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject IAuthApiService AuthApiService
+@inject NavigationManager NavigationManager
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Đăng Nhập</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Đăng Nhập</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header text-center py-4" style="background: #33211d;">
+                    <h1 class="text-white m-0 display-4 text-uppercase">KOPPEE</h1>
+                    <p class="text-primary m-0 font-weight-bold">Chào mừng quay trở lại</p>
+                </div>
+                <div class="card-body p-5">
+                    <AlertMessage @ref="alert" />
+
+                    <EditForm Model="input" OnValidSubmit="HandleLogin" FormName="loginForm" id="login-form">
+                        <div class="form-group">
+                            <label asp-for="Input.Email" class="font-weight-bold">Email</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-envelope text-primary"></i>
+                                    </span>
+                                </div>
+                                <InputText @bind-Value="input.Email"
+                                           class="form-control p-3"
+                                           style="border-color: #d4a054;"
+                                           placeholder="Nhập email" />
+
+                            </div>
+                            <ValidationMessage For="@(() => input.Email)"
+                                               class="text-danger small" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Password" class="font-weight-bold">Mật khẩu</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background: #f8f3f2; border-color: #d4a054;">
+                                        <i class="fa fa-lock text-primary"></i>
+                                    </span>
+                                </div>
+                                <InputText @bind-Value="input.Password"
+                                           type="password"
+                                           class="form-control p-3"
+                                           placeholder="Nhập mật khẩu"
+                                           style="border-color: #d4a054;"
+                                           id="password-field" />
+
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="toggle-pwd" tabindex="-1">
+                                        <i class="fa fa-eye" id="eye-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <ValidationMessage For="@(() => input.Password)"
+                                               class="text-danger small" />
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-block font-weight-bold py-3 mt-4"
+                                style="border-radius: 8px; font-size: 1.1rem;"
+                                disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>Đang xử lý...</span>
+                            }
+                            else
+                            {
+                                <span>
+                                    <i class="fa fa-sign-in-alt mr-2"></i>Đăng Nhập
+                                </span>
+                            }
+                        </button>
+                    </EditForm>
+
+                        
+                    <hr class="my-4">
+
+                    @* <div class="text-center">
+                        <p class="mb-1">Chưa có tài khoản?</p>
+                        <a asp-page="/Auth/Register" class="btn btn-outline-primary font-weight-bold py-2 px-4"
+                           style="border-radius: 8px;">
+                            <i class="fa fa-user-plus mr-2"></i>Đăng Ký Ngay
+                        </a>
+                    </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm]
+    private LoginInput input { get; set; } = new();
+    private bool isLoading = false;
+    private AlertMessage alert = default!;
+
+    protected override void OnInitialized()
+    {
+        if (HttpContext?.User?.Identity?.IsAuthenticated == true)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrEmpty(input.Email) || string.IsNullOrEmpty(input.Password))
+        {
+            alert.ShowError("Vui lòng nhập email và mật khẩu.");
+            return;
+        }
+
+        isLoading = true;
+        alert.Hide();
+
+        var result = await AuthApiService.LoginAsync(input);
+
+        if (result != null && result.Success)
+        {
+            if (result.RoleId == 1)
+            {
+                alert.ShowError("Chỉ nhân viên hoặc quản lý mới được phép đăng nhập vào hệ thống.");
+                isLoading = false;
+                return;
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Role, result.RoleId == 2 ? "Manager" : "Employee")
+            };
+
+            if (result.Data != null)
+            {
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Data.PublicId.ToString()));
+                claims.Add(new Claim(ClaimTypes.Email, result.Data.Email));
+                claims.Add(new Claim(ClaimTypes.Name, result.Data.FullName));
+                claims.Add(new Claim("Username", result.Data.Username));
+                claims.Add(new Claim("Phone", result.Data.Phone));
+                if (!string.IsNullOrEmpty(result.Data.Position))
+                {
+                    claims.Add(new Claim("Position", result.Data.Position));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(result.Token))
+            {
+                claims.Add(new Claim("jwt_token", result.Token));
+            }
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            if (HttpContext != null)
+            {
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            }
+
+            NavigationManager.NavigateTo("/Order/POS", forceLoad: true);
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+        }
+
+        isLoading = false;
+    }
+}

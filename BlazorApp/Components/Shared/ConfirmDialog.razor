@@ -1,0 +1,51 @@
+@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Title</h5>
+                    <button type="button" class="btn-close" @onclick="Cancel"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@Message</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">Hủy</button>
+                    <button type="button" class="btn btn-primary" @onclick="Confirm">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Xác nhận";
+
+    [Parameter]
+    public string Message { get; set; } = "Bạn có chắc chắn muốn thực hiện thao tác này?";
+
+    [Parameter]
+    public EventCallback<bool> OnConfirm { get; set; }
+
+    public bool IsVisible { get; set; } = false;
+
+    public void Show()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task Cancel()
+    {
+        IsVisible = false;
+        await OnConfirm.InvokeAsync(false);
+    }
+
+    private async Task Confirm()
+    {
+        IsVisible = false;
+        await OnConfirm.InvokeAsync(true);
+    }
+}

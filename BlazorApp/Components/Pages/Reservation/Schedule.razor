@@ -1,0 +1,310 @@
+@page "/Reservation/Schedule"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IReservationApiService ReservationApiService
+
+<PageTitle>Lịch Đặt bàn - KOPPEE Coffee Shop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Lịch Đặt bàn</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Lịch Đặt bàn</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<AlertMessage @ref="alert" />
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && reservations != null)
+{
+    var weekEnd = currentWeekStart.AddDays(6);
+    var weeklyReservations = reservations
+        .Where(r => r.ReservationTime.Date >= currentWeekStart && r.ReservationTime.Date <= weekEnd)
+        .ToList();
+
+    <section class="schedule-section py-5">
+        <div class="container-xl">
+            <!-- Header Controls -->
+            <div class="schedule-header d-flex align-items-center justify-content-between flex-wrap mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-outline-primary btn-sm px-3" @onclick="PreviousWeek" id="prev-week-btn">
+                        <i class="fa fa-chevron-left mr-1"></i> Tuần trước
+                    </button>
+
+                    <div class="week-label text-center px-3">
+                        <span class="badge badge-primary px-3 py-2" style="font-size:0.95rem;">
+                            <i class="fa fa-calendar-week mr-1"></i>
+                            @currentWeekStart.ToString("dd/MM") – @weekEnd.ToString("dd/MM/yyyy")
+                        </span>
+                    </div>
+
+                    <button class="btn btn-outline-primary btn-sm px-3" @onclick="NextWeek" id="next-week-btn">
+                        Tuần sau <i class="fa fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-secondary btn-sm px-3" @onclick="TodayWeek" id="today-btn">
+                        <i class="fa fa-home mr-1"></i> Tuần này
+                    </button>
+                    <a href="/Reservation/Create" class="btn btn-primary btn-sm px-3" id="create-reservation-btn">
+                        <i class="fa fa-plus mr-1"></i> Tạo đặt bàn
+                    </a>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge badge-warning px-2 py-1"><i class="fa fa-clock mr-1"></i>Chờ xác nhận</span>
+                <span class="badge badge-info px-2 py-1"><i class="fa fa-check mr-1"></i>Đã xác nhận</span>
+                <span class="badge badge-success px-2 py-1"><i class="fa fa-star mr-1"></i>Hoàn thành</span>
+                <span class="badge badge-secondary px-2 py-1"><i class="fa fa-times mr-1"></i>Đã hủy</span>
+                <span class="ml-auto text-muted small align-self-center">
+                    Tổng: <strong>@weeklyReservations.Count</strong> lịch đặt trong tuần
+                </span>
+            </div>
+
+            <div class="weekly-calendar">
+                <div class="calendar-grid">
+                    @for (int i = 0; i < 7; i++)
+                    {
+                        var dayDate = currentWeekStart.AddDays(i);
+                        var isToday = dayDate.Date == DateTime.Today;
+                        var dayReservations = weeklyReservations.Where(r => r.ReservationTime.Date == dayDate.Date).OrderBy(r => r.ReservationTime).ToList();
+
+                        <div class="day-column @(isToday ? "today" : "")" id="day-col-@i">
+                            <!-- Day Header -->
+                            <div class="day-header @(isToday ? "today-header" : "")">
+                                <div class="day-name">@GetDayName(dayDate.DayOfWeek)</div>
+                                <div class="day-date @(isToday ? "text-white font-weight-bold" : "")">
+                                    @dayDate.ToString("dd/MM")
+                                </div>
+                                @if (dayReservations.Any())
+                                {
+                                    <span class="day-count-badge">@dayReservations.Count</span>
+                                }
+                            </div>
+
+                            <!-- Reservations List -->
+                            <div class="day-body">
+                                @if (!dayReservations.Any())
+                                {
+                                    <div class="no-reservation-placeholder">
+                                        <i class="fa fa-calendar-times"></i>
+                                        <span>Chưa có lịch</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach (var r in dayReservations)
+                                    {
+                                        <div class="reservation-card status-@r.Status.ToLower()"
+                                             style="cursor: pointer;"
+                                             @onclick="() => ShowUpdateModal(r)">
+                                            <div class="res-time">
+                                                <i class="fa fa-clock"></i> @r.ReservationTime.ToString("HH:mm")
+                                            </div>
+                                            <div class="res-customer">
+                                                <i class="fa fa-user"></i> @r.CustomerFullName
+                                            </div>
+                                            <div class="res-table">
+                                                <i class="fa fa-chair"></i> Bàn @r.TableNumber · @r.NumberOfGuests khách
+                                            </div>
+                                            <span class="res-status-badge badge @r.StatusBadgeClass">@r.StatusLabel</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@if (selectedReservation != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius:16px; overflow:hidden;">
+                <div class="modal-header" style="background: linear-gradient(135deg, #6f4e37, #c8a97e);">
+                    <h5 class="modal-title text-white">
+                        <i class="fa fa-edit mr-2"></i>Cập nhật Đặt Bàn
+                    </h5>
+                    <button type="button" class="close text-white" @onclick="CloseModal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="detail-grid mb-3">
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fa fa-hashtag text-primary mr-1"></i>Mã đặt bàn</span>
+                            <span class="detail-value font-weight-bold">#@selectedReservation.ReservationId</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fa fa-user text-primary mr-1"></i>Khách hàng</span>
+                            <span class="detail-value">@selectedReservation.CustomerFullName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fa fa-phone text-primary mr-1"></i>Điện thoại</span>
+                            <span class="detail-value">@selectedReservation.CustomerPhone</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fa fa-chair text-primary mr-1"></i>Bàn</span>
+                            <span class="detail-value">@selectedReservation.TableName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fa fa-clock text-primary mr-1"></i>Thời gian</span>
+                            <span class="detail-value">@selectedReservation.ReservationTime.ToString("HH:mm dd/MM/yyyy")</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fa fa-users text-primary mr-1"></i>Số khách</span>
+                            <span class="detail-value">@selectedReservation.NumberOfGuests người</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label class="font-weight-bold">Trạng thái mới</label>
+                        <select class="form-control" @bind="updateInput.Status">
+                            <option value="Pending">Chờ xác nhận</option>
+                            <option value="Confirmed">Đã xác nhận</option>
+                            <option value="Completed">Hoàn thành</option>
+                            <option value="Cancelled">Đã huỷ</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="font-weight-bold">Ghi chú</label>
+                        <textarea class="form-control" rows="3" @bind="updateInput.Note" placeholder="Thêm ghi chú nếu cần..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Hủy</button>
+                    <button type="button" class="btn btn-primary" @onclick="UpdateReservation" disabled="@isUpdating">
+                        @if (isUpdating)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+                            <span>Đang lưu...</span>
+                        }
+                        else
+                        {
+                            <span><i class="fa fa-save mr-1"></i>Lưu thay đổi</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ReservationModel>? reservations;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+
+    private ReservationModel? selectedReservation;
+    private UpdateReservationInput updateInput = new();
+    private bool isUpdating = false;
+
+    private DateTime currentWeekStart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        SetToCurrentWeek();
+        await LoadReservations();
+    }
+
+    private void SetToCurrentWeek()
+    {
+        var today = DateTime.Today;
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        currentWeekStart = today.AddDays(-1 * diff).Date;
+    }
+
+    private async Task LoadReservations()
+    {
+        isLoading = true;
+        var result = await ReservationApiService.GetAllAsync();
+        
+        if (result != null && result.Success)
+        {
+            reservations = result.List;
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Không thể tải danh sách đặt bàn.");
+        }
+        isLoading = false;
+    }
+
+    private void PreviousWeek()
+    {
+        currentWeekStart = currentWeekStart.AddDays(-7);
+    }
+
+    private void NextWeek()
+    {
+        currentWeekStart = currentWeekStart.AddDays(7);
+    }
+
+    private void TodayWeek()
+    {
+        SetToCurrentWeek();
+    }
+
+    private string GetDayName(DayOfWeek day)
+    {
+        return day switch
+        {
+            DayOfWeek.Monday => "Thứ Hai",
+            DayOfWeek.Tuesday => "Thứ Ba",
+            DayOfWeek.Wednesday => "Thứ Tư",
+            DayOfWeek.Thursday => "Thứ Năm",
+            DayOfWeek.Friday => "Thứ Sáu",
+            DayOfWeek.Saturday => "Thứ Bảy",
+            DayOfWeek.Sunday => "Chủ Nhật",
+            _ => ""
+        };
+    }
+
+    private void ShowUpdateModal(ReservationModel res)
+    {
+        selectedReservation = res;
+        updateInput = new UpdateReservationInput
+        {
+            Status = res.Status,
+            Note = res.Note
+        };
+    }
+
+    private void CloseModal()
+    {
+        selectedReservation = null;
+    }
+
+    private async Task UpdateReservation()
+    {
+        if (selectedReservation == null) return;
+        
+        isUpdating = true;
+        var result = await ReservationApiService.UpdateAsync(selectedReservation.ReservationId, updateInput);
+        
+        if (result != null && result.Success)
+        {
+            alert.ShowSuccess("Cập nhật lịch đặt bàn thành công.");
+            await LoadReservations();
+            CloseModal();
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Lỗi khi cập nhật.");
+        }
+        isUpdating = false;
+    }
+}

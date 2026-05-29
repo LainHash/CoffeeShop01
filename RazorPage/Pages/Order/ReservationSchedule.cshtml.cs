@@ -57,16 +57,16 @@ namespace RazorPage.Pages.Order
                 var body = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<ReservationListApiResponse>(body, _jsonOptions);
 
-                if (result?.Success == true && result.Reservations != null)
+                if (result?.Success == true && result.Data != null)
                 {
-                    foreach (var r in result.Reservations)
+                    foreach (var r in result.Data)
                     {
                         var day = r.ReservationTime.Date;
                         if (ReservationsByDay.ContainsKey(day))
                             ReservationsByDay[day].Add(r);
                     }
 
-                    TotalReservations = result.Reservations.Count;
+                    TotalReservations = result.Data.Count;
                 }
                 else
                 {

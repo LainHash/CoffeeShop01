@@ -59,8 +59,6 @@ public partial class CoffeeShopDbContext : DbContext
         {
             entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64D864EF4D22");
 
-            entity.HasIndex(e => e.Phone, "IX_Customers").IsUnique();
-
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.Phone)
@@ -183,10 +181,10 @@ public partial class CoffeeShopDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
             entity.Property(e => e.IsAvailable).HasDefaultValue(true);
+            entity.Property(e => e.IsMadeToOrder).HasDefaultValue(true);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ProductName).HasMaxLength(150);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.UnitsInStock).HasDefaultValue(0);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
@@ -202,6 +200,7 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Note).HasMaxLength(255);
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.ReservationTime).HasColumnType("datetime");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
@@ -233,6 +232,7 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.MaxCapacity).HasDefaultValue(2);
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RecommendedCapacity).HasDefaultValue(2);
             entity.Property(e => e.Shape).HasMaxLength(50);
             entity.Property(e => e.Status)
@@ -247,6 +247,7 @@ public partial class CoffeeShopDbContext : DbContext
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RoleId).HasDefaultValue(1);
             entity.Property(e => e.Username).HasMaxLength(100);
 

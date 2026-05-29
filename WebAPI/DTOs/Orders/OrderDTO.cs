@@ -4,7 +4,7 @@ namespace WebAPI.DTOs.Orders
     {
         public int OrderId { get; set; }
 
-        public Guid? PublicId { get; set; }
+        public Guid PublicId { get; set; }
 
         public int TableId { get; set; }
 
@@ -26,6 +26,7 @@ namespace WebAPI.DTOs.Orders
         public int FloorNumber { get; set; }
         public string? EmployeeName { get; set; }
         public string? DiscountCode { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public List<OrderDetailDTO> OrderDetails { get; set; } = new List<OrderDetailDTO>();
     }

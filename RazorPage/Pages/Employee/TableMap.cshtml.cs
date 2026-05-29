@@ -38,9 +38,9 @@ namespace RazorPage.Pages.Employee
             {
                 var tableStr = await tableResp.Content.ReadAsStringAsync();
                 var tableJson = JsonSerializer.Deserialize<TableResponse>(tableStr, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (tableJson?.List != null)
+                if (tableJson?.Data != null)
                 {
-                    Tables = tableJson.List;
+                    Tables = tableJson.Data;
                 }
             }
         }

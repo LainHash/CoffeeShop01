@@ -19,44 +19,25 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _tableService.GetAllAsync();
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                list = result.TableEntities
-            });
+            return Ok(result);
         }
 
         [HttpGet("floor/{floorNumber}")]
         public async Task<IActionResult> GetAllByFloor(int floorNumber)
         {
             var result = await _tableService.GetAllByFloorAsync(floorNumber);
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                list = result.TableEntities
-            });
+            return Ok(result);
         }
 
-        [HttpGet("{floorNumber}/{tableNumber}")]
+        [HttpGet("floor/{floorNumber}/{tableNumber}")]
         public async Task<IActionResult> GetOne(int floorNumber, int tableNumber)
         {
             var result = await _tableService.GetOneAsync(floorNumber, tableNumber);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                table = result.TableEntity
-            });
+            return Ok(result);
         }
 
         public class UpdateStatusRequest
@@ -64,24 +45,15 @@ namespace WebAPI.Controllers
             public string Status { get; set; } = string.Empty;
         }
 
-        [HttpPut("{tableId}/status")]
-        public async Task<IActionResult> UpdateStatus(int tableId, [FromBody] UpdateStatusRequest req)
+        [HttpPut("floor/{floorNumber}/{tableNumber}/status")]
+        public async Task<IActionResult> UpdateStatus(int floorNumber, int tableNumber, [FromBody] UpdateStatusRequest req)
         {
-            var result = await _tableService.UpdateStatusAsync(tableId, req.Status);
+            var result = await _tableService.UpdateStatusAsync(floorNumber, tableNumber, req.Status);
             if (!result.Success)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = result.Message
-                });
+                return BadRequest(result);
             }
-            return Ok(new
-            {
-                success = true,
-                message = result.Message,
-                table = result.TableEntity
-            });
+            return Ok(result);
         }
     }
 }

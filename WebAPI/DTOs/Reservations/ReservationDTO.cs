@@ -2,7 +2,7 @@ namespace WebAPI.DTOs.Reservations
 {
     public class ReservationDTO
     {
-        public int ReservationId { get; set; }
+        public Guid PublicId { get; set; }
         public string CustomerFullName { get; set; } = string.Empty;
         public string CustomerPhone { get; set; } = string.Empty;
         public string? TableName { get; set; }

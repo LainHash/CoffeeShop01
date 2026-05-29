@@ -1,0 +1,132 @@
+@page "/Manager/Employees/Create"
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager")]
+@inject IAuthApiService AuthApiService
+
+<PageTitle>Thêm Nhân viên - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Thêm Nhân viên</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Thêm Nhân viên</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Thêm Nhân viên mới</h4>
+            </div>
+            <div class="card-body p-4">
+                <AlertMessage @ref="alert" />
+
+                <EditForm Model="input" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label">Tài khoản (Username) <span class="text-danger">*</span></label>
+                        <InputText @bind-Value="input.Username" class="form-control" />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="input.Password" type="password" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label class="form-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="input.ConfirmPassword" type="password" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                        <InputText @bind-Value="input.FullName" class="form-control" />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="input.Email" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label class="form-label">Số điện thoại</label>
+                            <InputText @bind-Value="input.Phone" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Vị trí (Chức vụ) <span class="text-danger">*</span></label>
+                        <InputSelect @bind-Value="input.Position" class="form-select">
+                            <option value="">-- Chọn vị trí --</option>
+                            <option value="Phục vụ">Phục vụ</option>
+                            <option value="Pha chế">Pha chế</option>
+                            <option value="Thu ngân">Thu ngân</option>
+                            <option value="Quản lý">Quản lý (Manager)</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary px-4" disabled="@isSubmitting">
+                            @if (isSubmitting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>Đang xử lý...</span>
+                            }
+                            else
+                            {
+                                <span>Tạo nhân viên</span>
+                            }
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterEmployeeInput input = new();
+    private bool isSubmitting = false;
+    private AlertMessage alert = default!;
+
+    private async Task HandleSubmit()
+    {
+        if (input.Password != input.ConfirmPassword)
+        {
+            alert.ShowError("Mật khẩu xác nhận không khớp.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(input.Position))
+        {
+            alert.ShowError("Vui lòng chọn vị trí công việc.");
+            return;
+        }
+
+        isSubmitting = true;
+        alert.Hide();
+
+        var result = await AuthApiService.RegisterEmployeeAsync(input);
+
+        if (result != null && result.Success)
+        {
+            alert.ShowSuccess("Tạo tài khoản nhân viên thành công.");
+            input = new RegisterEmployeeInput(); // reset form
+        }
+        else
+        {
+            alert.ShowError(result?.Message ?? "Lỗi khi tạo nhân viên.");
+        }
+
+        isSubmitting = false;
+    }
+}
+

@@ -1,7 +1,8 @@
-﻿namespace RazorPage.DTOs.Products
+namespace RazorPage.DTOs.Products
 {
     public class ProductDTO
     {
+        public int ProductId { get; set; }
         public Guid PublicId { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public int CategoryId { get; set; }

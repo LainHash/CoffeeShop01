@@ -1,0 +1,57 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using BlazorApp.Auth
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
+
+<!-- Navbar Start -->
+<div class="container-fluid p-0 nav-bar" style="position: sticky; top: 0; z-index: 1040; background: #33211D;">
+    <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
+        <AuthorizeView Roles="Manager, Employee">
+            <Authorized>
+                <button class="sidebar-toggle-btn ml-3" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Mở/Đóng Menu">
+                    <i class="bi bi-layout-sidebar"></i>
+                </button>
+            </Authorized>
+        </AuthorizeView>
+        <a href="/" class="navbar-brand px-lg-4 m-0">
+            <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
+        </a>
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+            <div class="navbar-nav ml-auto p-4">
+                <a class="nav-item nav-link" href="/">Trang Chủ</a>
+                <a class="nav-item nav-link" href="/Home/About">Về Chúng Tôi</a>
+                <a class="nav-item nav-link" href="/Home/Service">Dịch Vụ</a>
+                <a class="nav-item nav-link" href="/Product">Thực Đơn</a>
+                <a class="nav-item nav-link" href="/Home/Testimonial">Phản Hồi</a>
+                <a href="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="nav-item dropdown ml-3">
+                            <a class="nav-link dropdown-toggle text-primary font-weight-bold"
+                               data-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                                <i class="fa fa-user mr-1"></i>@context.User.Identity?.Name
+                            </a>
+                            <div class="dropdown-menu">
+                                <a href="/logout" class="dropdown-item text-danger">
+                                    <i class="fa fa-sign-out-alt mr-2"></i>Đăng xuất
+                                </a>
+                            </div>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/login" class="btn btn-primary font-weight-bold ml-3">
+                            <i class="fa fa-sign-in-alt mr-1"></i>Đăng Nhập
+                        </a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- Navbar End -->
+
+<Sidebar />

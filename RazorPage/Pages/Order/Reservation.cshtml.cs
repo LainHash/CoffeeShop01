@@ -52,7 +52,7 @@ namespace RazorPage.Pages.Order
                 );
                 if (result?.Success == true)
                 {
-                    Tables = result.List.Where(t => t.Status == "Available")
+                    Tables = result.Data.Where(t => t.Status == "Available")
                                         .OrderBy(t => t.FloorNumber)
                                         .ThenBy(t => t.TableNumber)
                                         .ToList();

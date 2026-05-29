@@ -3,6 +3,6 @@
     public static class DiscountType
     {
         public const string Percent = "Percent";
-        public const string Flat = "Flat";
+        public const string Fixed = "Fixed";
     }
 }

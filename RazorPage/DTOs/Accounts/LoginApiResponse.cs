@@ -6,6 +6,6 @@ namespace RazorPage.DTOs.Accounts
     {
         public bool Success { get; set; }
         public string? Message { get; set; }
-        public CustomerDTO? Customer { get; set; }
+        public CustomerDTO? Data { get; set; }
     }
 }

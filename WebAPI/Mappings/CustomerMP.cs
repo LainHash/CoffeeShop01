@@ -8,7 +8,6 @@ namespace WebAPI.Mappings
     {
         public CustomerMP()
         {
-            // Customer -> CustomerDTO (plain data, no User link)
             CreateMap<Customer, CustomerDTO>();
         }
     }
