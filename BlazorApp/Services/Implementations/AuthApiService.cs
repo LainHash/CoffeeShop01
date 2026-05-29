@@ -1,4 +1,5 @@
 using BlazorApp.Models.Auth;
+using BlazorApp.Models.Managers;
 using BlazorApp.Services.Interfaces;
 
 namespace BlazorApp.Services.Implementations

@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace BlazorApp.Models.Reservations
@@ -33,37 +34,5 @@ namespace BlazorApp.Models.Reservations
             "Completed" => "badge-info",
             _           => "badge-secondary"
         };
-    }
-
-    public class CreateReservationInput
-    {
-        public string FullName { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public DateTime ReservationTime { get; set; } = DateTime.Now.AddDays(1);
-        public int NumberOfGuests { get; set; } = 2;
-        public string? Note { get; set; }
-        public int? TableId { get; set; }
-    }
-
-    public class UpdateReservationInput
-    {
-        public string Status { get; set; } = string.Empty;
-        public int? TableId { get; set; }
-        public string? Note { get; set; }
-    }
-
-    public class ReservationListResponse
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        [JsonPropertyName("data")]
-        public List<ReservationModel> List { get; set; } = new();
-    }
-
-    public class ReservationResponse
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public ReservationModel? Data { get; set; }
     }
 }

@@ -10,10 +10,8 @@ namespace BlazorApp.Auth
         public string Position { get; set; } = string.Empty;
         public int RoleId { get; set; }
 
-        // RoleId = 1 → Customer, RoleId != 1 → Employee/Manager
         public bool IsCustomer => RoleId == 1;
         public bool IsEmployee => RoleId != 1;
-        // RoleId = 2 → Manager (full access), 3 → Employee
         public bool IsManager => RoleId == 2;
     }
 }

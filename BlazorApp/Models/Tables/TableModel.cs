@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace BlazorApp.Models.Tables
 {
     public class TableModel
@@ -28,20 +26,5 @@ namespace BlazorApp.Models.Tables
             "Maintenance" => "Bảo trì",
             _             => Status
         };
-    }
-
-    public class TableListResponse
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        [JsonPropertyName("data")]
-        public List<TableModel> List { get; set; } = new();
-    }
-
-    public class TableResponse
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public TableModel? Data { get; set; }
     }
 }
