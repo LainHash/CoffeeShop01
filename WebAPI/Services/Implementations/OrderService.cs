@@ -126,14 +126,15 @@ namespace WebAPI.Services.Implementations
                                 Message = $"Sản phẩm có ID {detail.ProductId} không tồn tại."
                             };
                         }
-                        if(!product.IsMadeToOrder && product.UnitsInStock < detail.Quantity)
+                        if (!product.IsMadeToOrder && product.UnitsInStock < detail.Quantity)
                         {
                             return new OrderResult<OrderDTO>
                             {
                                 Success = false,
                                 Message = "Sản phẩm không đủ số lượng trong kho."
                             };
-                        }else if(product.IsMadeToOrder && product.UnitsInStock >= detail.Quantity)
+                        }
+                        else if (!product.IsMadeToOrder && product.UnitsInStock >= detail.Quantity)
                         {
                             product.UnitsInStock -= detail.Quantity;
                         }
@@ -159,7 +160,7 @@ namespace WebAPI.Services.Implementations
                         }
                         else if (discount.Type.Equals(DiscountType.Percent, StringComparison.OrdinalIgnoreCase))
                         {
-                            discountAmount = subTotal * (decimal)(discount.Value/100);
+                            discountAmount = subTotal * (decimal)(discount.Value / 100);
                         }
                     }
                     else
