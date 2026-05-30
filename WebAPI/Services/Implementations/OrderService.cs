@@ -234,6 +234,12 @@ namespace WebAPI.Services.Implementations
             else
             {
                 order.Status = InvoiceStatuses.Cancelled;
+                foreach (var detail in order.OrderDetails)
+                {
+                    var product = await _context.Products
+                            .FirstOrDefaultAsync(p => p.ProductId == detail.ProductId);
+                    product!.UnitsInStock += detail.Quantity;
+                }
             }
 
             await _context.SaveChangesAsync();
