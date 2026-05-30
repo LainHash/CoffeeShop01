@@ -133,14 +133,14 @@ namespace WebAPI.Services.Implementations
                                 Success = false,
                                 Message = "Sản phẩm không đủ số lượng trong kho."
                             };
+                        }else if(product.IsMadeToOrder && product.UnitsInStock >= detail.Quantity)
+                        {
+                            product.UnitsInStock -= detail.Quantity;
                         }
 
                         detail.UnitPrice = product.Price;
                         detail.LineTotal = detail.Quantity * detail.UnitPrice;
                         subTotal += detail.LineTotal;
-
-                        product.UnitsInStock -= detail.Quantity;
-
                     }
                 }
 
