@@ -20,7 +20,7 @@ namespace BlazorApp.Services.Implementations
         public async Task<TableResponse?> UpdateStatusAsync(int floorNumber, int tableNumber, string status)
         {
             var payload = new { Status = status };
-            return await _apiService.PutAsync<object, TableResponse>($"/api/Table/{floorNumber}/{tableNumber}/status", payload);
+            return await _apiService.PutAsync<object, TableResponse>($"/api/Table/Floor/{floorNumber}/{tableNumber}/status", payload);
         }
     }
 }
