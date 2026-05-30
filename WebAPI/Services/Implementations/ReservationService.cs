@@ -32,6 +32,16 @@ namespace WebAPI.Services.Implementations
                 };
             }
 
+            var timeOfDay = dto.ReservationTime.TimeOfDay;
+            if (timeOfDay < TimeSpan.FromHours(6) || timeOfDay > TimeSpan.FromHours(20))
+            {
+                return new ReservationResult<ReservationDTO>
+                {
+                    Success = false,
+                    Message = "Thời gian đặt bàn phải trong khoảng từ 6:00 sáng đến 8:00 tối."
+                };
+            }
+
             if (dto.NumberOfGuests <= 0)
             {
                 return new ReservationResult<ReservationDTO>
@@ -42,7 +52,7 @@ namespace WebAPI.Services.Implementations
             }
 
             var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Phone == dto.Phone);
+                .FirstOrDefaultAsync(c => c.Phone == dto.Phone && c.FullName == dto.FullName);
 
             if (customer == null)
             {
@@ -53,11 +63,6 @@ namespace WebAPI.Services.Implementations
                 };
                 _context.Customers.Add(customer);
                 await _context.SaveChangesAsync();
-            }
-            else if (customer.FullName != dto.FullName)
-            {
-                customer.FullName = dto.FullName;
-                _context.Customers.Update(customer);
             }
 
             var reservation = new Reservation

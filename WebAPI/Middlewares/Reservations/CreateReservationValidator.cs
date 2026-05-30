@@ -16,7 +16,9 @@ namespace WebAPI.Middlewares.Reservations
                 .Matches(@"^(0|\+84)[0-9]{8,10}$").WithMessage("Số điện thoại không đúng định dạng");
 
             RuleFor(x => x.ReservationTime)
-                .GreaterThan(DateTime.Now).WithMessage("Thời gian đặt bàn phải ở tương lai");
+                .GreaterThan(DateTime.Now).WithMessage("Thời gian đặt bàn phải ở tương lai")
+                .Must(time => time.TimeOfDay >= TimeSpan.FromHours(6) && time.TimeOfDay <= TimeSpan.FromHours(20))
+                .WithMessage("Thời gian đặt bàn phải trong khoảng từ 6 giờ sáng (06:00) đến 8 giờ tối (20:00)");
 
             RuleFor(x => x.NumberOfGuests)
                 .GreaterThan(0).WithMessage("Số lượng khách phải lớn hơn 0")
