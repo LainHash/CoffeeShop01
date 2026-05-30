@@ -133,13 +133,14 @@ namespace WebAPI.Services.Implementations
                                 Success = false,
                                 Message = "Sản phẩm không đủ số lượng trong kho."
                             };
+                        }else if(product.IsMadeToOrder && product.UnitsInStock >= detail.Quantity)
+                        {
+                            product.UnitsInStock -= detail.Quantity;
                         }
 
                         detail.UnitPrice = product.Price;
                         detail.LineTotal = detail.Quantity * detail.UnitPrice;
                         subTotal += detail.LineTotal;
-
-                        product.UnitsInStock -= detail.Quantity;
                     }
                 }
 
@@ -195,11 +196,6 @@ namespace WebAPI.Services.Implementations
                     Message = $"Lỗi khi tạo hóa đơn: {ex.Message}"
                 };
             }
-        }
-
-        public Task<OrderResult<OrderDTO>> UpdateAsync(Guid id, UpdateOrderDTO request)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<OrderResult<OrderDTO>> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null)

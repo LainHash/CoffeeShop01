@@ -11,7 +11,6 @@ namespace WebAPI.Services.Interfaces
         Task<OrderResult<OrderDTO>> GetOneAsync(Guid id);
 
         Task<OrderResult<OrderDTO>> CreateAsync(CreateOrderDTO request);
-        Task<OrderResult<OrderDTO>> UpdateAsync(Guid id, UpdateOrderDTO request);
 
         Task<OrderResult<OrderDTO>> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null);
 
