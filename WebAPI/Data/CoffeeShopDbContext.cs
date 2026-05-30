@@ -230,6 +230,7 @@ public partial class CoffeeShopDbContext : DbContext
 
             entity.HasIndex(e => new { e.TableNumber, e.FloorNumber }, "IX_TableEntities").IsUnique();
 
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.MaxCapacity).HasDefaultValue(2);
             entity.Property(e => e.PublicId).HasDefaultValueSql("(newid())");
@@ -239,6 +240,7 @@ public partial class CoffeeShopDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasDefaultValue("Available");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetime())");
         });
 
         modelBuilder.Entity<User>(entity =>

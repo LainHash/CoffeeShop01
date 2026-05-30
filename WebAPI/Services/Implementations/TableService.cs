@@ -77,6 +77,7 @@ namespace WebAPI.Services.Implementations
             }
 
             table.Status = status;
+            table.UpdatedAt = DateTime.Now;
             _context.TableEntities.Update(table);
             await _context.SaveChangesAsync();
 

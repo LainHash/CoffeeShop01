@@ -5,6 +5,8 @@ using WebAPI.DTOs.Reservations;
 using WebAPI.ResultModels;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
+using WebAPI.Helpers.Constants.Reservations;
+using WebAPI.Helpers.Constants.Tables;
 
 namespace WebAPI.Services.Implementations
 {
@@ -65,14 +67,14 @@ namespace WebAPI.Services.Implementations
                 ReservationTime = dto.ReservationTime,
                 NumberOfGuests = dto.NumberOfGuests,
                 Note = dto.Note,
-                Status = "Pending",
+                Status = ReservationStatuses.Pending,
             };
 
             var conflictWindowStart = dto.ReservationTime.AddHours(-2);
             var conflictWindowEnd = dto.ReservationTime.AddHours(2);
 
             var busyTableIds = await _context.Reservations
-                .Where(r => r.Status != "Cancelled"
+                .Where(r => r.Status != ReservationStatuses.Cancelled
                          && r.ReservationTime >= conflictWindowStart
                          && r.ReservationTime <= conflictWindowEnd)
                 .Select(r => r.TableId)
@@ -84,21 +86,29 @@ namespace WebAPI.Services.Implementations
             if (dto.TableId.HasValue)
             {
                 var table = await _context.TableEntities
-                    .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value && t.IsActive == true && t.Status == "Available");
+                    .FirstOrDefaultAsync(t => t.TableId == dto.TableId.Value
+                                            && t.IsActive == true
+                                            && (t.Status == TableStatuses.Available
+                                                || (t.Status != TableStatuses.Maintenance
+                                                    && dto.ReservationTime >= t.UpdatedAt.AddHours(2))));
 
                 if (table == null)
+                {
                     return new ReservationResult<ReservationDTO>
                     {
                         Success = false,
                         Message = "Bàn được chọn không tồn tại hoặc không ở trạng thái sẵn sàng."
                     };
+                }
 
                 if (busyTableIds.Contains(table.TableId))
+                {
                     return new ReservationResult<ReservationDTO>
                     {
                         Success = false,
                         Message = "Bàn được chọn đã có người đặt trong khung giờ này."
                     };
+                }
 
                 availableTableId = table.TableId;
             }
@@ -106,7 +116,9 @@ namespace WebAPI.Services.Implementations
             {
                 var availableTable = await _context.TableEntities
                     .Where(t => t.IsActive == true
-                             && t.Status == "Available"
+                             && (t.Status == TableStatuses.Available
+                                 || (t.Status != TableStatuses.Maintenance
+                                     && dto.ReservationTime >= t.UpdatedAt.AddHours(2)))
                              && t.RecommendedCapacity >= dto.NumberOfGuests
                              && !busyTableIds.Contains(t.TableId))
                     .OrderBy(t => t.RecommendedCapacity)
