@@ -2,8 +2,6 @@ namespace WebAPI.DTOs.Orders
 {
     public class OrderDTO
     {
-        public int OrderId { get; set; }
-
         public Guid PublicId { get; set; }
 
         public int TableId { get; set; }

@@ -4,7 +4,6 @@ namespace WebAPI.DTOs.Orders
 {
     public class OrderDetailDTO
     {
-        public int OrderDetailId { get; set; }
 
         public int OrderId { get; set; }
 

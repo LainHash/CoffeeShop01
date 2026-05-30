@@ -126,7 +126,7 @@
                                     @foreach (var order in filteredOrders)
                                     {
                                         <tr>
-                                            <td class="font-weight-bold text-dark py-3">#@order.OrderId</td>
+                                            <td class="font-weight-bold text-dark py-3">#@order.PublicId</td>
                                             <td class="py-3">
                                                 @if (order.TableNumber > 0)
                                                 {
@@ -210,7 +210,7 @@
             // Sort: Unpaid first, then by OrderId descending
             allOrders = result.Orders
                 .OrderBy(o => o.Status != "Unpaid")
-                .ThenByDescending(o => o.OrderId)
+                .ThenByDescending(o => o.CreatedAt)
                 .ToList();
             FilterOrders();
         }
@@ -237,7 +237,6 @@
             var lowerQuery = searchQuery.ToLowerInvariant();
             query = query.Where(o =>
                 (o.PublicId.ToString().ToLowerInvariant().Contains(lowerQuery)) ||
-                (o.OrderId.ToString().Contains(lowerQuery)) ||
                 (o.TableNumber.ToString().Contains(lowerQuery)) ||
                 (!string.IsNullOrEmpty(o.EmployeeName) && o.EmployeeName.ToLowerInvariant().Contains(lowerQuery))
             );
