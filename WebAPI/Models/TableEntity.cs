@@ -23,6 +23,10 @@ public partial class TableEntity
 
     public Guid PublicId { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();

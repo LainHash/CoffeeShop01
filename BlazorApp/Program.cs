@@ -26,6 +26,7 @@ builder.Services.AddScoped<IReservationApiService, ReservationApiService>();
 builder.Services.AddScoped<ITableApiService, TableApiService>();
 builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 builder.Services.AddScoped<IDiscountApiService, DiscountApiService>();
+builder.Services.AddScoped<IUserApiService, UserApiService>();
 
 // Register Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

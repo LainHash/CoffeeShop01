@@ -85,6 +85,7 @@
                                                        @bind-Value="input.ReservationTime"
                                                        class="form-control bg-transparent border-primary p-4 datetimepicker-input text-white" />
                                         </div>
+                                        <small class="text-white-50 d-block mt-1">Giờ nhận khách: 06:00 - 20:00 hàng ngày</small>
                                     </div>
                                 </div>
                             </div>
@@ -173,6 +174,13 @@
         if (string.IsNullOrEmpty(input.FullName) || string.IsNullOrEmpty(input.Phone))
         {
             alert.ShowError("Vui lòng điền đủ Tên và SĐT khách hàng.");
+            return;
+        }
+
+        var timeOfDay = input.ReservationTime.TimeOfDay;
+        if (timeOfDay < TimeSpan.FromHours(6) || timeOfDay > TimeSpan.FromHours(20))
+        {
+            alert.ShowError("Thời gian đặt bàn phải trong khoảng từ 6 giờ sáng đến 8 giờ tối (20:00).");
             return;
         }
 
