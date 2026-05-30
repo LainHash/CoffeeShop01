@@ -126,10 +126,20 @@ namespace WebAPI.Services.Implementations
                                 Message = $"Sản phẩm có ID {detail.ProductId} không tồn tại."
                             };
                         }
+                        if(!product.IsMadeToOrder && product.UnitsInStock < detail.Quantity)
+                        {
+                            return new OrderResult<OrderDTO>
+                            {
+                                Success = false,
+                                Message = "Sản phẩm không đủ số lượng trong kho."
+                            };
+                        }
 
                         detail.UnitPrice = product.Price;
                         detail.LineTotal = detail.Quantity * detail.UnitPrice;
                         subTotal += detail.LineTotal;
+
+                        product.UnitsInStock -= detail.Quantity;
                     }
                 }
 

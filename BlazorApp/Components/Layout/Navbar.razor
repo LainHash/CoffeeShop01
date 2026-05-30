@@ -24,9 +24,10 @@
                 <a class="nav-item nav-link" href="/">Trang Chủ</a>
                 <a class="nav-item nav-link" href="/Home/About">Về Chúng Tôi</a>
                 <a class="nav-item nav-link" href="/Home/Service">Dịch Vụ</a>
-                <a class="nav-item nav-link" href="/Product">Thực Đơn</a>
+                <a class="nav-item nav-link" href="/Menu">Thực Đơn</a>
                 <a class="nav-item nav-link" href="/Home/Testimonial">Phản Hồi</a>
                 <a href="/Home/Contact" class="nav-item nav-link">Liên Hệ</a>
+                <a href="/Reservation" class="nav-item nav-link">Đặt bàn</a>
 
                 <AuthorizeView>
                     <Authorized>
@@ -36,14 +37,14 @@
                                 <i class="fa fa-user mr-1"></i>@context.User.Identity?.Name
                             </a>
                             <div class="dropdown-menu">
-                                <a href="/logout" class="dropdown-item text-danger">
+                                <a href="/Logout" class="dropdown-item text-danger">
                                     <i class="fa fa-sign-out-alt mr-2"></i>Đăng xuất
                                 </a>
                             </div>
                         </div>
                     </Authorized>
                     <NotAuthorized>
-                        <a href="/login" class="btn btn-primary font-weight-bold ml-3">
+                        <a href="/Login" class="btn btn-primary font-weight-bold ml-3">
                             <i class="fa fa-sign-in-alt mr-1"></i>Đăng Nhập
                         </a>
                     </NotAuthorized>
