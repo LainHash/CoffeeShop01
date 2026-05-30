@@ -140,6 +140,7 @@ namespace WebAPI.Services.Implementations
                         subTotal += detail.LineTotal;
 
                         product.UnitsInStock -= detail.Quantity;
+
                     }
                 }
 
@@ -195,11 +196,6 @@ namespace WebAPI.Services.Implementations
                     Message = $"Lỗi khi tạo hóa đơn: {ex.Message}"
                 };
             }
-        }
-
-        public Task<OrderResult<OrderDTO>> UpdateAsync(Guid id, UpdateOrderDTO request)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<OrderResult<OrderDTO>> Checkout(Guid id, bool confirm, string paymentMethod = "Cash", string? note = null)
