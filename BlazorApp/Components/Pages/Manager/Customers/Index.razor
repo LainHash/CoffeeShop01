@@ -1,6 +1,138 @@
 @page "/Manager/Customers"
-<h3>Index</h3>
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Manager,Employee")]
+@inject IUserApiService UserApiService
+
+<PageTitle>Quản lý Khách hàng - CoffeeShop</PageTitle>
+
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+    <div class="d-flex flex-column align-items-center justify-content-center pt-0 pt-lg-5" style="min-height: 400px">
+        <h1 class="display-4 mb-3 mt-0 mt-lg-5 text-white text-uppercase">Quản lý Khách hàng</h1>
+        <div class="d-inline-flex mb-lg-5">
+            <p class="m-0 text-white"><a class="text-white" href="/">Trang Chủ</a></p>
+            <p class="m-0 text-white px-2">/</p>
+            <p class="m-0 text-white">Quản lý Khách hàng</p>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<AlertMessage @ref="alert" />
+<LoadingSpinner IsLoading="isLoading" />
+
+@if (!isLoading && customers != null)
+{
+    <div class="container-fluid pt-5">
+        <div class="container">
+            <div class="section-title position-relative text-center mx-auto mb-5" style="max-width: 600px;">
+                <h1 class="display-4">Quản Lý Khách Hàng</h1>
+                <span class="text-primary font-weight-bold">Danh sách các khách hàng thành viên của quán</span>
+            </div>
+
+            <!-- Search and Filter Start -->
+            <div class="row mb-4 justify-content-end">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-primary" placeholder="Tìm kiếm theo tên hoặc SĐT..." 
+                               @bind="searchTerm" @bind:event="oninput" />
+                        <div class="input-group-append">
+                            <span class="input-group-text bg-primary text-white"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Search and Filter End -->
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 text-white"><i class="fa fa-users mr-2 text-primary"></i>Danh Sách Khách Hàng</h5>
+                </div>
+                <div class="card-body bg-light">
+                    <div class="table-responsive">
+                        <table class="table table-hover bg-white mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col" class="py-3">Mã KH (ID)</th>
+                                    <th scope="col" class="py-3">Họ và tên</th>
+                                    <th scope="col" class="py-3">Số điện thoại</th>
+                                    <th scope="col" class="py-3">Ngày đăng ký</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (FilteredCustomers.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-muted">
+                                            <i class="fa fa-user-slash fa-3x mb-3 text-light"></i>
+                                            <p class="mb-0">Không tìm thấy khách hàng nào phù hợp.</p>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var cust in FilteredCustomers)
+                                    {
+                                        <tr>
+                                            <td class="py-3 text-secondary">#@cust.CustomerId</td>
+                                            <td class="font-weight-bold text-dark py-3">
+                                                <i class="fa fa-user text-primary mr-2"></i>@cust.FullName
+                                            </td>
+                                            <td class="py-3 font-weight-bold text-primary">@cust.Phone</td>
+                                            <td class="py-3 text-secondary">
+                                                @(cust.CreatedAt.HasValue ? cust.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    private List<CustomerModel>? customers;
+    private bool isLoading = true;
+    private AlertMessage alert = default!;
+    private string searchTerm = string.Empty;
 
+    private List<CustomerModel> FilteredCustomers => customers?
+        .Where(c => string.IsNullOrWhiteSpace(searchTerm) || 
+                    c.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    c.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+        .ToList() ?? new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        isLoading = true;
+        try
+        {
+            var result = await UserApiService.GetCustomerListAsync();
+            if (result != null && result.Success)
+            {
+                customers = result.List;
+            }
+            else
+            {
+                alert.ShowError(result?.Message ?? "Không thể tải danh sách khách hàng từ máy chủ.");
+            }
+        }
+        catch (Exception ex)
+        {
+            alert.ShowError($"Đã xảy ra lỗi: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 }
