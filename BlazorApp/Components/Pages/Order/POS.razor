@@ -33,7 +33,7 @@
         <AlertMessage @ref="alert" />
 
         <div class="row">
-            
+
             <div class="col-lg-8 mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="mb-0">Danh sách sản phẩm</h4>
@@ -81,7 +81,7 @@
                 <h4 class="mb-4">Chi tiết hóa đơn</h4>
                 <div class="card shadow-sm border-0 bg-light pb-2">
                     <div class="card-body">
-                        
+
                         <div class="form-group mb-4 bg-white p-3 rounded shadow-sm">
                             <label class="font-weight-bold mb-3 d-block">
                                 <i class="fa fa-table mr-1 text-primary"></i> Chọn bàn phục vụ
@@ -336,7 +336,9 @@
         var prodResult = await ProductApiService.GetAllAsync();
         if (prodResult != null && prodResult.Success)
         {
-            products = prodResult.List.Where(p => p.IsAvailable).ToList();
+            products = prodResult.List
+            .Where(p => p.IsAvailable && p.UnitsInstock > 0)
+            .ToList();
             FilterProducts();
         }
 
