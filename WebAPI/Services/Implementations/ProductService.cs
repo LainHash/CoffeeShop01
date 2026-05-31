@@ -35,35 +35,6 @@ namespace WebAPI.Services.Implementations
             };
         }
 
-        public async Task<ProductResult<ProductDTO>> GetOneAsync(Guid id)
-        {
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.PublicId == id);
-            if (product == null)
-            {
-                return new ProductResult<ProductDTO>
-                {
-                    Success = false,
-                    Message = "Sản phẩm không tồn tại!"
-                };
-            }
-            if (product.IsAvailable != true)
-            {
-                return new ProductResult<ProductDTO>
-                {
-                    Success = false,
-                    Message = "Sản phẩm này đã bị xóa!"
-                };
-            }
-            return new ProductResult<ProductDTO>
-            {
-                Success = true,
-                Message = "Lấy sản phẩm thành công",
-                Data = _mapper.Map<ProductDTO>(product)
-            };
-        }
-
         public async Task<ProductResult<ProductDTO>> CreateAsync(CreateProductDTO dto)
         {
             var product = _mapper.Map<Product>(dto);

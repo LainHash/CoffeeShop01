@@ -27,17 +27,6 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetOne(Guid id)
-        {
-            var result = await _productsService.GetOneAsync(id);
-            if (!result.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
         [HttpPost]
         [Authorize(Roles = "Manager,Employee")]
         public async Task<IActionResult> Create(CreateProductDTO dto, [FromServices] IValidator<CreateProductDTO> validator)

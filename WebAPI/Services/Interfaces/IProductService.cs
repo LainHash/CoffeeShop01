@@ -9,7 +9,6 @@ namespace WebAPI.Services.Interfaces
     public interface IProductService
     {
         Task<ProductResult<List<ProductDTO>>> GetAllAsync();
-        Task<ProductResult<ProductDTO>> GetOneAsync(Guid id);
 
         Task<ProductResult<ProductDTO>> CreateAsync(CreateProductDTO dto);
         Task<ProductResult<ProductDTO>> UpdateAsync(Guid id, UpdateProductDTO dto);
