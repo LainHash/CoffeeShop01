@@ -133,12 +133,6 @@
 
         if (result != null && result.Success)
         {
-            if (result.RoleId == 1)
-            {
-                alert.ShowError("Chỉ nhân viên hoặc quản lý mới được phép đăng nhập vào hệ thống.");
-                isLoading = false;
-                return;
-            }
 
             var claims = new List<Claim>
             {
@@ -152,10 +146,6 @@
                 claims.Add(new Claim(ClaimTypes.Name, result.Data.FullName));
                 claims.Add(new Claim("Username", result.Data.Username));
                 claims.Add(new Claim("Phone", result.Data.Phone));
-                if (!string.IsNullOrEmpty(result.Data.Position))
-                {
-                    claims.Add(new Claim("Position", result.Data.Position));
-                }
             }
 
             if (!string.IsNullOrEmpty(result.Token))
